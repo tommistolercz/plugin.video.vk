@@ -3,7 +3,7 @@
 	<category label="30000">
 		<setting label="30001" id="contentType" type="text" default="files"/>
         <setting label="30002" id="itemsPerPage" type="text" default="100"/>
-		<setting label="30004" id="vkApiVersion" type="text" default="5.80"/>
-        <setting label="30003" id="vkUserAccessToken" type="text" default=""/>
+		<setting label="30003" id="vkApiVersion" type="text" default="5.80"/>
+        <setting label="30004" id="vkUserAccessToken" type="text" default=""/>
     </category>
 </settings>

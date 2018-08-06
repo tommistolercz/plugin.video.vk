@@ -75,7 +75,7 @@ class VKPlugin(object):
                     'title': video['title'],
                     'plot': video['description'],
                     'duration': video['duration'],
-                    'date': datetime.fromtimestamp(video['date']).strftime('%d.%m.%Y'),
+                    # 'date': datetime.fromtimestamp(video['date']).strftime('%d.%m.%Y'),
                     'dateadded': datetime.fromtimestamp(video['adding_date']).strftime('%Y-%m-%d %H:%M:%S'),
                     'playcount': video['views'],
                 }
