@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.vk" name="VK" version="1.0.0" provider-name="TomMistolerCZ">
+	<requires>
+		<import addon="xbmc.python" version="2.25.0"/>
+		<import addon="script.module.requests"/>
+		<import addon="script.module.urlresolver"/>
+	</requires>
+	<extension point="xbmc.python.pluginsource" library="resources/lib/addon.py">
+		<provides>video</provides>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary lang="en_GB">VK for Kodi</summary>
+		<description lang="en_GB">Kodi add-on for watching videos from VK.com site.</description>
+		<disclaimer lang="en_GB">Author does not host or distribute any of the content displayed by this add-on.</disclaimer>
+		<platform>all</platform>
+		<license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
+		<forum></forum>
+		<website></website>
+		<source></source>
+		<email></email>
+		<news></news>
+		<assets>
+			<icon>resources/icon.png</icon>
+			<fanart></fanart>
+			<screenshot></screenshot>
+			<screenshot></screenshot>
+			<screenshot></screenshot>
+		</assets>
+	</extension>
+</addon>
