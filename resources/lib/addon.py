@@ -6,10 +6,14 @@ from xbmcplugin import setContent, setResolvedUrl, addDirectoryItems, endOfDirec
 from requests import get
 from urlresolver import resolve
 from datetime import datetime
+from math import ceil
 
-# debug
-# addon.xml: <import addon="script.module.web-pdb"/>
+# debugger
+# <import addon="script.module.web-pdb"/>
 # import web_pdb; web_pdb.set_trace()
+
+ISFOLDER_TRUE = True
+ISFOLDER_FALSE = False
 
 
 class VKPlugin(object):
@@ -18,56 +22,64 @@ class VKPlugin(object):
     def __init__(self):
         self.addon = Addon()
         self.handle = int(argv[1])
-        self.url = argv[0]
-        self.base = 'plugin://plugin.video.vk'
-        self.path = self.url.replace(self.base, '')
-        self.query = argv[2]
-        self.args = {}
-        if self.query.startswith('?'):
-            self.args = parse_qs(self.query.lstrip('?'))
-        self.userSettings = {
+        self.urlBase = 'plugin://plugin.video.vk'
+        self.urlPath = argv[0].replace(self.urlBase, '')
+        self.urlQS = argv[2]
+        self.urlArgs = {}
+        if self.urlQS.startswith('?'):
+            self.urlArgs = parse_qs(self.urlQS.lstrip('?'))
+        self.settings = {
             'contentType': self.addon.getSetting('contentType'),
             'itemsPerPage': int(self.addon.getSetting('itemsPerPage')),
-            'vkApiVersion': float(self.addon.getSetting('vkApiVersion')),
+            'vkApiVersion': self.addon.getSetting('vkApiVersion'),
             'vkUserAccessToken': self.addon.getSetting('vkUserAccessToken'),
         }
-        setContent(self.handle, self.userSettings['contentType'])
+        setContent(self.handle, self.settings['contentType'])
         self.dispatch()
 
-    # plugin routing
+    # plugin's routing dispatcher
     def dispatch(self):
-        if self.path == '/':
+        if self.urlPath == '/':
             self.listRoot()
-        elif self.path == '/videos':
+        elif self.urlPath == '/videos':
             self.listVideos()
-        elif self.path == '/play':
+        elif self.urlPath == '/play':
             self.playVideo()
 
-    # plugin directory: /
+    # plugin's root directory
     def listRoot(self):
-        isFolder = True
         listItems = [
-            (self.base + '/videos', ListItem(self.addon.getLocalizedString(30005)), isFolder),
+            (self.urlBase + '/videos?offset=0', ListItem(self.addon.getLocalizedString(30005)), ISFOLDER_TRUE),
         ]
         addDirectoryItems(self.handle, listItems, len(listItems))
         addSortMethod(self.handle, SORT_METHOD_NONE)
         endOfDirectory(self.handle)
 
-    # plugin directory: /videos
+    # plugin's directory: /videos
     def listVideos(self):
         requestUrl = 'https://api.vk.com/method/video.get'
         requestParams = {
-            'access_token': self.userSettings['vkUserAccessToken'],
-            'count': self.userSettings['itemsPerPage'],
-            'offset': 0,
-            'v': self.userSettings['vkApiVersion'],
+            'access_token': self.settings['vkUserAccessToken'],
+            'v': self.settings['vkApiVersion'],
+            'count': self.settings['itemsPerPage'],
+            'offset': self.urlArgs['offset'],
         }
         videos = get(requestUrl, requestParams).json()
-        videosTotalCount = int(videos['response']['count'])
         listItems = []
-        isFolder = False
+        # pagination
+        if videos['response']['count'] > self.settings['itemsPerPage']:
+            offset = int(self.urlArgs['offset'].pop())  # 0
+            offsetNext = offset + self.settings['itemsPerPage']  # 0+100=100
+            page = 1 if offset is 0 else (offset / self.settings['itemsPerPage']) + 1  # 1
+            pagesCount = ceil(videos['response']['count'] / self.settings['itemsPerPage'])  # 6
+            itemsCount = videos['response']['count']  # 522
+            pagination = {}
+            pagination['listItem'] = ListItem('PAGE {0} OF {1} ({2} ITEMS)'.format(page, pagesCount, itemsCount))
+            pagination['url'] = self.urlBase + '/videos?offset={0}'.format(offsetNext)
+            listItems.extend((pagination['url'], pagination['listItem'], ISFOLDER_FALSE))
         for video in videos['response']['items']:
             listItem = ListItem(video['title'])
+            listItem.setProperty('IsPlayable', 'true')
             listItem.setArt({'thumb': video['photo_320']})
             listItem.setInfo(
                 'video',
@@ -75,13 +87,11 @@ class VKPlugin(object):
                     'title': video['title'],
                     'plot': video['description'],
                     'duration': video['duration'],
-                    # 'date': datetime.fromtimestamp(video['date']).strftime('%d.%m.%Y'),
                     'dateadded': datetime.fromtimestamp(video['adding_date']).strftime('%Y-%m-%d %H:%M:%S'),
                     'playcount': video['views'],
                 }
             )
-            listItem.setProperty('IsPlayable', 'true')
-            listItems.append((self.base + '/play?oid={0}&id={1}'.format(video['owner_id'], video['id']), listItem, isFolder))
+            listItems.extend((self.urlBase + '/play?oid={0}&id={1}'.format(video['owner_id'], video['id']), listItem, ISFOLDER_FALSE))
         addDirectoryItems(self.handle, listItems, len(listItems))
         addSortMethod(self.handle, SORT_METHOD_DATEADDED)
         addSortMethod(self.handle, SORT_METHOD_DURATION)
@@ -90,15 +100,11 @@ class VKPlugin(object):
 
     # play video
     def playVideo(self):
-        video = {
-            'oid': self.args['oid'].pop(),
-            'id': self.args['id'].pop(),
-        }
-        video['player_vk'] = 'https://vk.com/video{0}_{1}'.format(video['oid'], video['id'])
-        video['url'] = resolve(video['player_vk'])
-        playItem = ListItem()
-        playItem.setPath(video['url'])
-        setResolvedUrl(self.handle, True, playItem)
+        video = {}
+        video['id'] = self.urlArgs['id'].pop()
+        video['oid'] = self.urlArgs['oid'].pop()
+        video['url'] = resolve('https://vk.com/video{0}_{1}'.format(video['oid'], video['id']))
+        setResolvedUrl(self.handle, True, ListItem().setPath(video['url']))
 
 
 # and action! ;-)
