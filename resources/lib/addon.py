@@ -30,7 +30,7 @@ class VKPlugin(object):
             self.urlArgs = parse_qs(self.urlQS.lstrip('?'))
         self.settings = {
             'contentType': self.addon.getSetting('contentType'),
-            'itemsPerPage': int(self.addon.getSetting('itemsPerPage')),
+            'itemsPerPage': self.addon.getSetting('itemsPerPage'),
             'vkApiVersion': self.addon.getSetting('vkApiVersion'),
             'vkUserAccessToken': self.addon.getSetting('vkUserAccessToken'),
         }
@@ -50,6 +50,7 @@ class VKPlugin(object):
     def listRoot(self):
         listItems = [
             (self.urlBase + '/videos?offset=0', ListItem(self.addon.getLocalizedString(30005)), ISFOLDER_TRUE),
+            (self.urlBase + '/communities?offset=0', ListItem(self.addon.getLocalizedString(30007)), ISFOLDER_TRUE),
         ]
         addDirectoryItems(self.handle, listItems, len(listItems))
         addSortMethod(self.handle, SORT_METHOD_NONE)
@@ -61,8 +62,9 @@ class VKPlugin(object):
         requestParams = {
             'access_token': self.settings['vkUserAccessToken'],
             'v': self.settings['vkApiVersion'],
+            'extended': 1,
+            'offset': self.urlArgs['offset'].pop(),
             'count': self.settings['itemsPerPage'],
-            'offset': self.urlArgs['offset'],
         }
         videos = get(requestUrl, requestParams).json()
         listItems = []
@@ -76,7 +78,9 @@ class VKPlugin(object):
             pagination = {}
             pagination['listItem'] = ListItem('PAGE {0} OF {1} ({2} ITEMS)'.format(page, pagesCount, itemsCount))
             pagination['url'] = self.urlBase + '/videos?offset={0}'.format(offsetNext)
-            listItems.extend((pagination['url'], pagination['listItem'], ISFOLDER_FALSE))
+            listItems.append(
+                (pagination['url'], pagination['listItem'], ISFOLDER_FALSE)
+            )
         for video in videos['response']['items']:
             listItem = ListItem(video['title'])
             listItem.setProperty('IsPlayable', 'true')
@@ -91,7 +95,9 @@ class VKPlugin(object):
                     'playcount': video['views'],
                 }
             )
-            listItems.extend((self.urlBase + '/play?oid={0}&id={1}'.format(video['owner_id'], video['id']), listItem, ISFOLDER_FALSE))
+            listItems.append(
+                (self.urlBase + '/play?oid={0}&id={1}'.format(video['owner_id'], video['id']), listItem, ISFOLDER_FALSE)
+            )
         addDirectoryItems(self.handle, listItems, len(listItems))
         addSortMethod(self.handle, SORT_METHOD_DATEADDED)
         addSortMethod(self.handle, SORT_METHOD_DURATION)
