@@ -28,9 +28,11 @@ class VKPlugin(object):
         self.urlArgs = {}
         if self.urlQS.startswith('?'):
             self.urlArgs = parse_qs(self.urlQS.lstrip('?'))
+            for k, v in self.urlArgs.items():
+                self.urlArgs[k] = v.pop()
         self.settings = {
             'contentType': self.addon.getSetting('contentType'),
-            'itemsPerPage': self.addon.getSetting('itemsPerPage'),
+            'itemsPerPage': int(self.addon.getSetting('itemsPerPage')),
             'vkApiVersion': self.addon.getSetting('vkApiVersion'),
             'vkUserAccessToken': self.addon.getSetting('vkUserAccessToken'),
         }
@@ -48,11 +50,11 @@ class VKPlugin(object):
 
     # plugin's root directory
     def listRoot(self):
-        listItems = [
+        items = [
             (self.urlBase + '/videos?offset=0', ListItem(self.addon.getLocalizedString(30005)), ISFOLDER_TRUE),
             (self.urlBase + '/communities?offset=0', ListItem(self.addon.getLocalizedString(30007)), ISFOLDER_TRUE),
         ]
-        addDirectoryItems(self.handle, listItems, len(listItems))
+        addDirectoryItems(self.handle, items, len(items))
         addSortMethod(self.handle, SORT_METHOD_NONE)
         endOfDirectory(self.handle)
 
@@ -63,22 +65,22 @@ class VKPlugin(object):
             'access_token': self.settings['vkUserAccessToken'],
             'v': self.settings['vkApiVersion'],
             'extended': 1,
-            'offset': self.urlArgs['offset'].pop(),
+            'offset': int(self.urlArgs['offset']),
             'count': self.settings['itemsPerPage'],
         }
         videos = get(requestUrl, requestParams).json()
-        listItems = []
+        items = []
         # pagination
         if videos['response']['count'] > self.settings['itemsPerPage']:
-            offset = int(self.urlArgs['offset'].pop())  # 0
-            offsetNext = offset + self.settings['itemsPerPage']  # 0+100=100
-            page = 1 if offset is 0 else (offset / self.settings['itemsPerPage']) + 1  # 1
-            pagesCount = ceil(videos['response']['count'] / self.settings['itemsPerPage'])  # 6
-            itemsCount = videos['response']['count']  # 522
+            offset = int(self.urlArgs['offset'])
+            offsetNext = offset + self.settings['itemsPerPage']
+            page = 1 if not offset else int(offset / self.settings['itemsPerPage']) + 1
+            pagesCount = int(ceil(videos['response']['count'] / self.settings['itemsPerPage'])) + 1
+            itemsCount = videos['response']['count']
             pagination = {}
             pagination['listItem'] = ListItem('PAGE {0} OF {1} ({2} ITEMS)'.format(page, pagesCount, itemsCount))
             pagination['url'] = self.urlBase + '/videos?offset={0}'.format(offsetNext)
-            listItems.append(
+            items.append(
                 (pagination['url'], pagination['listItem'], ISFOLDER_FALSE)
             )
         for video in videos['response']['items']:
@@ -95,10 +97,10 @@ class VKPlugin(object):
                     'playcount': video['views'],
                 }
             )
-            listItems.append(
+            items.append(
                 (self.urlBase + '/play?oid={0}&id={1}'.format(video['owner_id'], video['id']), listItem, ISFOLDER_FALSE)
             )
-        addDirectoryItems(self.handle, listItems, len(listItems))
+        addDirectoryItems(self.handle, items, len(items))
         addSortMethod(self.handle, SORT_METHOD_DATEADDED)
         addSortMethod(self.handle, SORT_METHOD_DURATION)
         addSortMethod(self.handle, SORT_METHOD_PLAYCOUNT)
@@ -106,10 +108,9 @@ class VKPlugin(object):
 
     # play video
     def playVideo(self):
-        video = {}
-        video['id'] = self.urlArgs['id'].pop()
-        video['oid'] = self.urlArgs['oid'].pop()
-        video['url'] = resolve('https://vk.com/video{0}_{1}'.format(video['oid'], video['id']))
+        video = {
+            'url': resolve('https://vk.com/video{0}_{1}'.format(self.urlArgs['oid'], self.urlArgs['id'])),
+        }
         setResolvedUrl(self.handle, True, ListItem().setPath(video['url']))
 
 
