@@ -107,9 +107,11 @@ class VKPlugin(object):
     # play video
     def playVideo(self):
         video = {
-            'url': resolve('https://vk.com/video{0}_{1}'.format(self.urlArgs['oid'], self.urlArgs['id'])),
+            'url': resolve('https://vk.com/video{0}_{1}'.format(self.urlArgs['oid'], self.urlArgs['id']))
         }
-        setResolvedUrl(self.handle, True, ListItem().setPath(video['url']))
+        listItem = ListItem()
+        listItem.setPath(video['url'])
+        setResolvedUrl(self.handle, True, listItem)
 
 
 # and action! ;-)
