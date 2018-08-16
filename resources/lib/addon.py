@@ -77,11 +77,9 @@ class VKPlugin(object):
             page = 1 if not offset else int(offset / self.settings['itemsPerPage']) + 1
             pagesCount = int(ceil(videos['response']['count'] / self.settings['itemsPerPage'])) + 1
             itemsCount = videos['response']['count']
-            pagination = {}
-            pagination['listItem'] = ListItem('PAGE {0} OF {1} ({2} ITEMS)'.format(page, pagesCount, itemsCount))
-            pagination['url'] = self.urlBase + '/videos?offset={0}'.format(offsetNext)
+            listItem = ListItem('PAGE {0} OF {1} ({2} ITEMS)'.format(page, pagesCount, itemsCount))
             items.append(
-                (pagination['url'], pagination['listItem'], ISFOLDER_FALSE)
+                (self.urlBase + '/videos?offset={0}'.format(offsetNext), listItem, ISFOLDER_FALSE)
             )
         for video in videos['response']['items']:
             listItem = ListItem(video['title'])
