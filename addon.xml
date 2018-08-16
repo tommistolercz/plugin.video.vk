@@ -3,7 +3,7 @@
 	<requires>
 		<import addon="xbmc.python" version="2.25.0"/>
 		<import addon="script.module.requests"/>
-		<import addon="script.module.urlresolver"/>
+		<import addon="script.module.urlresolver" version="4.0.07"/>
 	</requires>
 	<extension point="xbmc.python.pluginsource" library="resources/lib/addon.py">
 		<provides>video</provides>
