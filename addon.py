@@ -1,6 +1,3 @@
-# Enable unicode strings by default
-# from __future__ import unicode_literals
-
 # Import std modules
 import datetime
 import json
@@ -14,7 +11,6 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 import xbmcplugin
-import requests
 import YDStreamExtractor  # todo: correct?
 
 # Import addon modules
@@ -27,8 +23,6 @@ VK_API_CLIENT_ID = '6432748'
 VK_API_VERSION = '5.85'
 ISFOLDER_TRUE = True
 ISFOLDER_FALSE = False
-# todo: dev only
-_VK_API_COOKIE = 'remixlang=21; remixlhk=300eac9d2544ea2904; remixstid=1947479265_931c20d2be6cdf6d3d; remixaudio_date=19-09-2018; remixaudio_background_play_time_=0; remixaudio_background_play_time_limit=1800; remixaudio_show_alert_today=0'
 
 
 # Define addon class
@@ -84,19 +78,6 @@ class MyAddon(object):
 
     # Authorize addon
     def authorize(self):
-        # request vk oauth2 service for user access token
-        response = requests.get(
-            url='https://oauth.vk.com/authorize',
-            params={
-                'v': VK_API_VERSION,
-                'client_id': int(VK_API_CLIENT_ID),
-                'scope': 'video,groups,friends,notes,email,status,offline',
-                'display': 'popup',
-                'response_type': 'token',
-                'redirect_uri': 'https://oauth.vk.com/blank.html',
-            }
-        )
-        debug('response', response)
         usr = xbmcgui.Dialog().input('ENTER YOUR USERNAME/EMAIL:')
         pwd = xbmcgui.Dialog().input('ENTER YOUR PASSWORD:', type=xbmcgui.INPUT_PASSWORD)
         debug('usr', usr)
@@ -158,20 +139,7 @@ class MyAddon(object):
     # List videos
     def listVideos(self):
         # request vk api for videos metadata
-        response = requests.get(
-            url='https://api.vk.com/method/video.get',
-            params={
-                'access_token': self.settings['vkUserAccessToken'],
-                'v': VK_API_VERSION,
-                'extended': 1,
-                'count': self.settings['itemsPerPage'],
-                'offset': self.url['args']['offset'],
-            },
-            headers={
-                'Cookie': _VK_API_COOKIE,
-            }
-        ).json()
-        videos = response['response']
+        videos = {}  # todo
         debug('videos', videos)
         # create list items for videos
         listItems = []
@@ -220,18 +188,7 @@ class MyAddon(object):
     # Play video
     def playVideo(self):
         # request vk api for video metadata
-        response = requests.get(
-            url='https://api.vk.com/method/video.get',
-            params={
-                'access_token': self.settings['vkUserAccessToken'],
-                'v': VK_API_VERSION,
-                'videos': '{0}_{1}'.format(self.url['args']['oid'], self.url['args']['id']),
-            },
-            headers={
-                'Cookie': _VK_API_COOKIE,
-            }
-        ).json()
-        video = response['response']['items'][0]
+        video = {}  # todo
         debug('video', video)
         # get video url and resolve it
         url = video['player']
