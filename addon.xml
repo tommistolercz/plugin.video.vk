@@ -2,20 +2,23 @@
 <addon id="plugin.video.vk" name="VK" version="1.0.0" provider-name="TomMistolerCZ">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0"/>
-		<import addon="script.module.requests"/>
-		<import addon="script.module.urlresolver" version="4.0.07"/>
+		<import addon="script.module.requests" version="2.19.1"/>
+		<import addon="script.module.youtube.dl" version="18.425.0"/>
 	</requires>
-	<extension point="xbmc.python.pluginsource" library="resources/lib/addon.py">
+	<extension point="xbmc.python.pluginsource" library="addon.py">
 		<provides>video</provides>
 	</extension>
 	<extension point="xbmc.addon.metadata">
 		<summary lang="en_GB">VK for Kodi</summary>
 		<description lang="en_GB">Kodi add-on for watching videos from VK.com site.</description>
 		<disclaimer lang="en_GB">Author does not host or distribute any of the content displayed by this add-on.</disclaimer>
+		<summary lang="cs_CZ">VK pro Kodi</summary>
+		<description lang="cs_CZ">Kodi doplněk pro přehrávání videí ze sociální sítě VK.com.</description>
+		<disclaimer lang="cs_CZ">Autor doplňku se žádným způsobem nepodílí na tvorbě či distribuci zobrazovaného obsahu.</disclaimer>
 		<platform>all</platform>
 		<license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
 		<forum></forum>
-		<website>https://tommistolercz.github.io/plugin.video.vk/</website>
+		<website></website>
 		<source></source>
 		<email></email>
 		<news></news>

@@ -1,0 +1,35 @@
+{
+	"build_systems":
+	[
+		{
+			"file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+			"name": "Anaconda Python Builder",
+			"selector": "source.python",
+			"shell_cmd": "\"python\" -u \"$file\""
+		}
+	],
+	"folders":
+	[
+		{
+			"file_exclude_patterns":
+			[
+				"resources/__init__.pyo",
+				"resources/lib/debug.pyo",
+				"resources/lib/__init__.pyo",
+				"vk.sublime-workspace"
+			],
+			"folder_exclude_patterns":
+			[
+				"resources/_Archiv_"
+			],
+			"path": "."
+		},
+	],
+	"settings":
+	{
+		"extra_paths":
+		[
+			"/Users/tom/Library/Application Support/Sublime Text 3/Packages/User/Kodistubs"
+		]
+	}
+}
