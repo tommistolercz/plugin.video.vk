@@ -18,13 +18,43 @@ msgstr ""
 
 
 msgctxt "#30000"
-msgid "General"
-msgstr "Obecné"
+msgid "GENERAL"
+msgstr "OBECNÉ"
 
 msgctxt "#30001"
 msgid "Items per page"
 msgstr "Položek na stránku"
 
 msgctxt "#30002"
-msgid "VK.com user access token"
-msgstr "VK.com uživatelský token"
+msgid "Search results sorting"
+msgstr "Řazení při vyhledávání"
+
+msgctxt "#30003"
+msgid "By date"
+msgstr "Dle data"
+
+msgctxt "#30004"
+msgid "By duration"
+msgstr "Dle stopáže"
+
+msgctxt "#30005"
+msgid "By relevance"
+msgstr "Dle relevance"
+
+# 30006-30009 unused
+
+msgctxt "#30010"
+msgid "VK API"
+msgstr "VK API"
+
+msgctxt "#30011"
+msgid "VK.com login/email"
+msgstr "VK.com login/email"
+
+msgctxt "#30012"
+msgid "VK.com password"
+msgstr "VK.com heslo"
+
+msgctxt "#30013"
+msgid "VK.com phone"
+msgstr "VK.com telefon"

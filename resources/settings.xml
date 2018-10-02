@@ -2,6 +2,11 @@
 <settings>
 	<category label="30000">
         <setting label="30001" id="itemsPerPage" type="text" default="100"/>
-        <setting label="30002" id="vkUserAccessToken" type="text" enable="false"/>
+        <setting label="30002" id="searchSortMethod" type="enum" lvalues="30003|30004|30005" ldefault="30003"/>
+    </category>
+    <category label="30010">
+        <setting label="30011" id="vkUserLogin" type="text"/>
+        <setting label="30012" id="vkUserPassword" type="text" option="hidden"/>
+        <setting label="30013" id="vkUserPhone" type="text"/>
     </category>
 </settings>

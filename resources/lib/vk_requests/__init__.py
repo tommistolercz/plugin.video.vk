@@ -9,14 +9,6 @@ __version__ = '1.1.2'
 
 PY_VERSION = sys.version_info.major, sys.version_info.minor
 
-if PY_VERSION < (3, 4):
-    import warnings
-
-    warnings.simplefilter('default')
-    warnings.warn('Support of all python version less than 3.4 will be stopped '
-                  'in 2.0.0, please migrate your code to python 3.4+',
-                  DeprecationWarning)
-
 
 def create_api(app_id=None, login=None, password=None, phone_number=None,
                scope='offline', api_version=None, http_params=None,

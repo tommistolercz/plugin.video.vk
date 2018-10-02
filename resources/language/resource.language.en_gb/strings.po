@@ -18,13 +18,33 @@ msgstr ""
 
 
 msgctxt "#30000"
-msgid "General"
-msgstr ""
+msgid "GENERAL"
 
 msgctxt "#30001"
 msgid "Items per page"
-msgstr ""
 
 msgctxt "#30002"
-msgid "VK.com user access token"
-msgstr ""
+msgid "Search results sorting"
+
+msgctxt "#30003"
+msgid "By date"
+
+msgctxt "#30004"
+msgid "By duration"
+
+msgctxt "#30005"
+msgid "By relevance"
+
+# 30006-30009 unused
+
+msgctxt "#30010"
+msgid "VK API"
+
+msgctxt "#30011"
+msgid "VK.com login/email"
+
+msgctxt "#30012"
+msgid "VK.com password"
+
+msgctxt "#30013"
+msgid "VK.com phone"
