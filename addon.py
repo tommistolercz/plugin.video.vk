@@ -1,31 +1,33 @@
-# todo: try convert camelCase to pep8 naming (make git version for it)
-
 # Import std lib modules
 import datetime
 import json
 import os
+import re
 import sys
 import urllib
-import urlparse
+import urllib2  # python3: urllib.request, urllib.error
+import urlparse  # python3: urllib.parse
 
 # Import kodi modules
 import xbmc
 import xbmcaddon
 import xbmcgui
 import xbmcplugin
-import YDStreamExtractor  # todo: actually, url resolver is for nothing at the time ;-)
 
 # Import addon modules
-sys.path.append('/Users/tom/Library/Application Support/Kodi/addons/plugin.video.vk/resources/lib')
+sys.path.append('/Users/tom/Library/Application Support/Kodi/addons/plugin.video.vk/resources/lib')  # todo
 import debug
-sys.path.append('/Users/tom/Library/Application Support/Kodi/addons/plugin.video.vk/resources/lib/vk_requests')
-import vk_requests
+sys.path.append('/Users/tom/Library/Application Support/Kodi/addons/plugin.video.vk/resources/lib/vk')  # todo
+import vk
 
 
 # Define constants
-VK_API_CLIENT_ID = 6432748
-VK_API_SCOPE = ['email', 'friends', 'groups', 'offline', 'stats', 'status', 'video']  # friends: required by fave methods
+VK_API_APP_ID = '6432748'
+VK_API_SCOPE = 'email,friends,groups,offline,stats,status,video,wall'
 VK_API_VERSION = '5.85'
+VK_API_LANG = 'en'
+VK_API_TIMEOUT = 10
+VK_API_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Safari/605.1.15'
 ISFOLDER_TRUE = True
 ISFOLDER_FALSE = False
 
@@ -41,21 +43,35 @@ class MyAddon(object):
         self.settings = {
             'itemsPerPage': int(self.addon.getSetting('itemsPerPage')),
             'searchSortMethod': int(self.addon.getSetting('searchSortMethod')),
-            'vkUserLogin': self.addon.getSetting('vkUserLogin'),
-            'vkUserPassword': self.addon.getSetting('vkUserPassword'),
-            'vkUserPhone': self.addon.getSetting('vkUserPhone'),
+            'vkUserLogin': self.addon.getSetting('vkUserLogin'),  # todo
+            'vkUserPassword': self.addon.getSetting('vkUserPassword'),  # todo
+            'vkUserPhone': self.addon.getSetting('vkUserPhone'),  # todo
+            'vkUserAccessToken': self.addon.getSetting('vkUserAccessToken'),
         }
         debug.log('self.settings', self.settings)
-        # init vk api session using vk user credentials :-(
-        self.vkapi = vk_requests.create_api(
-            app_id=VK_API_CLIENT_ID,
-            login=self.settings['vkUserLogin'],
-            password=self.settings['vkUserPassword'],
-            phone_number=self.settings['vkUserPhone'],
-            scope=VK_API_SCOPE,
-            api_version=VK_API_VERSION,
-        )  # todo: exceptions.VkAuthError: Authorization error: incorrect password or authentication code
-        debug.log('self.vkapi._session.access_token', self.vkapi._session.access_token)
+        # init vk api session using user credentials, then use saved user access token only
+        # vk.logger.setLevel('DEBUG')
+        if self.settings['vkUserAccessToken'] == '':
+            session = vk.AuthSession(
+                app_id=VK_API_APP_ID,
+                user_login=self.settings['vkUserLogin'],
+                user_password=self.settings['vkUserPassword'],
+                # phone_number=self.settings['vkUserPhone'],
+                scope=VK_API_SCOPE,
+            )
+            # save user access token
+            self.addon.setSetting('vkUserAccessToken', session.access_token)
+        else:
+            session = vk.Session(
+                access_token=self.settings['vkUserAccessToken']
+            )
+        # create vk api object
+        self.vkapi = vk.API(
+            session,
+            v=VK_API_VERSION,
+            lang=VK_API_LANG,
+            timeout=VK_API_TIMEOUT
+        )
         # request vk api to track addon usage
         response = self.vkapi.stats.trackVisitor()
         debug.log('self.vkapi.stats.trackVisitor()', response)
@@ -86,14 +102,29 @@ class MyAddon(object):
             '/stats': self.listStats,
             '/videos': self.listVideos,
             # contextmenu action handlers
+            '/addtoalbum': self.addToAlbum,
+            '/deletealbum': self.deleteAlbum,
+            '/deletequery': self.deleteQuery,
+            '/editquery': self.editQuery,
             '/likecommunity': self.likeCommunity,
             '/likevideo': self.likeVideo,
-            '/unfollowcommunity': None,
+            '/playalbum': self.playAlbum,
+            '/removefromalbum': self.removeFromAlbum,
+            '/renamealbum': self.renameAlbum,
+            '/reorderalbum': self.reorderAlbum,
+            '/searchsimilar': self.searchSimilar,
+            '/unfollowcommunity': self.unfollowCommunity,
+            '/unlikecommunity': self.unlikeCommunity,
+            '/unlikevideo': self.unlikeVideo,
         }
         if self.urlPath in self.routing:
             handler = self.routing[self.urlPath]
             if handler is not None:
                 handler()
+
+    # Add video to album (contextmenu action handler)
+    def addToAlbum(self):
+        pass
 
     # Build addon url (helper function)
     def buildUrl(self, urlPath, urlArgs=None):
@@ -112,6 +143,8 @@ class MyAddon(object):
         listItems = []
         _nameKey = 'title' if listType == 'likedcommunities' else 'name'  # ugly!
         for community in listData['items']:
+            if listType == 'likedcommunities':
+                community['id'] = community['id'].split('_')[2]  # ugly!
             li = xbmcgui.ListItem(
                 label=community[_nameKey],
             )
@@ -120,12 +153,12 @@ class MyAddon(object):
             li.addContextMenuItems(
                 [
                     ('LIKE COMMUNITY', ''),  # todo
+                    ('UNLIKE COMMUNITY', ''),  # todo
                     ('UNFOLLOW COMMUNITY', ''),  # todo
                 ]
             )
-            _id = community['id'].split('_')[2] if listType == 'likedcommunities' else community['id']  # ugly!
             listItems.append(
-                (self.buildUrl('/communityvideos', {'ownerId': '-{0}'.format(_id)}), li, ISFOLDER_TRUE)  # negative id required when owner is a community
+                (self.buildUrl('/communityvideos', {'ownerId': '-{0}'.format(community['id'])}), li, ISFOLDER_TRUE)  # negative id required when owner is a community
             )
         # add paginator item  # todo: make this a function
         if listData['count'] > self.settings['itemsPerPage']:
@@ -142,10 +175,10 @@ class MyAddon(object):
 
     # Build list of videos (helper function)
     def buildListOfVideos(self, listType, listData):
-        listTypes = ['videos', 'searchedvideos', 'albumvideos', 'communityvideos', 'likedvideos']
+        listTypes = ['videos', 'searchedvideos', 'albumvideos', 'communityvideos', 'likedvideos']  # todo: take list type into account
         if listType not in listTypes:
             return False
-        # create list items for videos  # todo: take list type into account
+        # create list items for videos
         listItems = []
         for video in listData['items']:
             li = xbmcgui.ListItem(label=video['title'])
@@ -171,8 +204,9 @@ class MyAddon(object):
             li.addContextMenuItems(
                 [
                     ('LIKE VIDEO', 'RunPlugin({0})'.format(self.buildUrl('/likevideo', {'ownerId': video['owner_id'], 'id': video['id']}))),
-                    ('ADD VIDEO TO ALBUM', ''),  # todo
-                    ('SEARCH SIMILAR VIDEOS', ''),  # todo
+                    ('UNLIKE VIDEO', 'RunPlugin({0})'.format(self.buildUrl('/unlikevideo', {'ownerId': video['owner_id'], 'id': video['id']}))),
+                    ('ADD TO ALBUM', ''),  # todo
+                    ('SEARCH SIMILAR', ''),  # todo
                 ]
             )
             listItems.append(
@@ -192,13 +226,31 @@ class MyAddon(object):
         xbmcplugin.addSortMethod(self.handle, searchSortMethods[self.settings['searchSortMethod']])  # todo: take listType into account
         xbmcplugin.endOfDirectory(self.handle)
 
-    # Like video (contextmenu action handler)
-    def likeVideo(self):
+    # Delete album (contextmenu action handler)
+    def deleteAlbum(self):
+        pass
+
+    # Delete query from search history (contextmenu action handler)
+    def deleteQuery(self):
+        pass
+
+    # Edit query in search history (contextmenu action handler)
+    def editQuery(self):
         pass
 
     # Like community (contextmenu action handler)
     def likeCommunity(self):
         pass
+
+    # Like video (contextmenu action handler)
+    def likeVideo(self):
+        response = self.vkapi.likes.add(
+            type='video',
+            owner_id=self.urlArgs['ownerId'],
+            item_id=self.urlArgs['id'],
+        )
+        debug.log('self.vkapi.likes.add()', response)
+        xbmcgui.Dialog().notification('LIKES:', '{0}'.format(response['likes']))
 
     # List user's albums (action handler)
     def listAlbums(self):
@@ -213,7 +265,7 @@ class MyAddon(object):
         )
         debug.log('self.vkapi.video.getAlbums()', response)
         # notify of total items count
-        xbmcgui.Dialog().notification('TOTAL COUNT:', '{0} ALBUMS'.format(response['count']))
+        xbmcgui.Dialog().notification('ALBUMS:', '{0}'.format(response['count']))
         # create list items for albums
         listItems = []
         for album in response['items']:
@@ -225,10 +277,10 @@ class MyAddon(object):
                 li.setArt({'thumb': album['photo_320']})
             li.addContextMenuItems(
                 [
-                    ('PLAY ALL', ''),  # todo
+                    ('PLAY ALBUM', ''),  # todo
                     ('RENAME ALBUM', ''),  # todo
+                    ('REORDER ALBUM', ''),  # todo
                     ('DELETE ALBUM', ''),  # todo
-                    # todo: reorder album?
                 ]
             )
             listItems.append(
@@ -261,7 +313,7 @@ class MyAddon(object):
         )
         debug.log('self.vkapi.video.get()', response)
         # notify of total items count
-        xbmcgui.Dialog().notification('TOTAL COUNT:', '{0} ALBUM VIDEOS'.format(response['count']))
+        xbmcgui.Dialog().notification('ALBUM VIDEOS:', '{0}'.format(response['count']))
         # build list of album videos
         self.buildListOfVideos('albumvideos', response)
 
@@ -278,7 +330,7 @@ class MyAddon(object):
         )
         debug.log('self.vkapi.groups.get()', response)
         # notify of total items count
-        xbmcgui.Dialog().notification('TOTAL COUNT:', '{0} COMMUNITIES'.format(response['count']))
+        xbmcgui.Dialog().notification('COMMUNITIES:', '{0}'.format(response['count']))
         # build list of communities
         self.buildListOfCommunities('communities', response)  # todo: make listType=communities default?
 
@@ -296,7 +348,7 @@ class MyAddon(object):
         )
         debug.log('self.vkapi.video.get()', response)
         # notify of total items count
-        xbmcgui.Dialog().notification('TOTAL COUNT:', '{0} COMMUNITY VIDEOS'.format(response['count']))
+        xbmcgui.Dialog().notification('COMMUNITY VIDEOS:', '{0}'.format(response['count']))
         # build list of community videos
         self.buildListOfVideos('communityvideos', response)
 
@@ -312,7 +364,7 @@ class MyAddon(object):
         )
         debug.log('self.vkapi.fave.getLinks()', response)
         # notify of total items count
-        xbmcgui.Dialog().notification('TOTAL COUNT:', '{0} LIKED COMMUNITIES'.format(response['count']))
+        xbmcgui.Dialog().notification('LIKED COMMUNITIES:', '{0}'.format(response['count']))
         # build list of liked communities
         self.buildListOfCommunities('likedcommunities', response)
 
@@ -329,7 +381,7 @@ class MyAddon(object):
         )
         debug.log('self.vkapi.fave.getVideos()', response)
         # notify of total items count
-        xbmcgui.Dialog().notification('TOTAL COUNT:', '{0} LIKED VIDEOS'.format(response['count']))
+        xbmcgui.Dialog().notification('LIKED VIDEOS:', '{0}'.format(response['count']))
         # build list of liked videos
         self.buildListOfVideos('likedvideos', response)
 
@@ -374,7 +426,7 @@ class MyAddon(object):
             li.addContextMenuItems(
                 [
                     ('EDIT QUERY', ''),  # todo
-                    ('REMOVE QUERY', ''),  # todo
+                    ('DELETE QUERY', ''),  # todo
                 ]
             )
             listItems.append(
@@ -416,9 +468,13 @@ class MyAddon(object):
         )
         debug.log('self.vkapi.video.get()', response)
         # notify of total items count
-        xbmcgui.Dialog().notification('TOTAL COUNT:', '{0} VIDEOS'.format(response['count']))
+        xbmcgui.Dialog().notification('VIDEOS:', '{0}'.format(response['count']))
         # build list of videos
         self.buildListOfVideos('videos', response)
+
+    # Play album (contextmenu action handler)
+    def playAlbum(self):
+        pass
 
     # Play video (action handler)
     def playVideo(self):
@@ -426,19 +482,51 @@ class MyAddon(object):
         response = self.vkapi.video.get(
             videos='{0}_{1}'.format(self.urlArgs['ownerId'], self.urlArgs['id']),
         )
-        debug.log('self.vkapi.video.get()', response)
-        # get video's vk.com site url containing web player and resolve it
         video = response['items'].pop()
-        url = video['player']
-        vi = YDStreamExtractor.getVideoInfo(url, quality=3)
-        if vi is not None:
-            resolvedUrl = vi.streamURL()
-            debug.log('resolvedUrl', resolvedUrl)
-        # create item for kodi player
-        if resolvedUrl:
-            li = xbmcgui.ListItem(path=resolvedUrl)
-            # todo: set info labels
+        debug.log('video', video)
+        # resolve video url into playable stream/s
+        videoUrl = video['player']
+        debug.log('videoUrl', videoUrl)
+        urlo = urllib2.urlopen(
+            urllib2.Request(url=videoUrl, headers={'User-Agent': VK_API_UA})
+        )
+        html = urlo.read()
+        po = re.compile('"url(\d+)":"([^"]+)"')
+        matches = po.findall(html)
+        playableStreams = {}
+        for m in matches:
+            quality = str(m[0])
+            stream = m[1].replace('\\', '')
+            playableStreams[quality] = stream
+        debug.log('playableStreams', playableStreams)
+        # create item for kodi player (using max avail. quality)
+        if playableStreams:
+            qualityMax = max(playableStreams.keys())
+            li = xbmcgui.ListItem(path=playableStreams[qualityMax])
+            # todo: set info labels?
+            xbmcplugin.setContent(self.handle, 'videos')
             xbmcplugin.setResolvedUrl(self.handle, True, li)
+        # or notify of error
+        else:
+            xbmcgui.Dialog().notification('ERROR', 'Video cannot be played', icon=xbmcgui.NOTIFICATION_ERROR)
+            debug.log('ERROR: Video cannot be played', videoUrl)  # todo
+            return False
+
+    # Remove video from album (contextmenu action handler)
+    def removeFromAlbum(self):
+        pass
+
+    # Rename album (contextmenu action handler)
+    def renameAlbum(self):
+        pass
+
+    # Reorder album (contextmenu action handler)
+    def reorderAlbum(self):
+        pass
+
+    # Search similar videos (contextmenu action handler)
+    def searchSimilar(self):
+        pass
 
     # Search videos (action handler)
     def searchVideos(self):
@@ -465,9 +553,27 @@ class MyAddon(object):
         # update search history json file, if not exists create a new one
         pass  # todo
         # notify of total items count
-        xbmcgui.Dialog().notification('TOTAL COUNT:', '{0} SEARCHED VIDEOS'.format(response['count']))
+        xbmcgui.Dialog().notification('SEARCHED VIDEOS:', '{0}'.format(response['count']))
         # build list of searched videos
         self.buildListOfVideos('searchedvideos', response)
+
+    # Unfollow community (contextmenu action handler)
+    def unfollowCommunity(self):
+        pass
+
+    # Unlike community (contextmenu action handler)
+    def unlikeCommunity(self):
+        pass
+
+    # Unlike video (contextmenu action handler)
+    def unlikeVideo(self):
+        response = self.vkapi.likes.delete(
+            type='video',
+            owner_id=self.urlArgs['ownerId'],
+            item_id=self.urlArgs['id'],
+        )
+        debug.log('self.vkapi.likes.delete()', response)
+        xbmcgui.Dialog().notification('LIKES:', '{0}'.format(response['likes']))
 
 
 # Run addon

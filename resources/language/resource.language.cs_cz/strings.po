@@ -16,7 +16,6 @@ msgstr ""
 "Language: cs_CZ\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
-
 msgctxt "#30000"
 msgid "GENERAL"
 msgstr "OBECNÉ"
@@ -48,13 +47,17 @@ msgid "VK API"
 msgstr "VK API"
 
 msgctxt "#30011"
-msgid "VK.com login/email"
-msgstr "VK.com login/email"
+msgid "VK.com user login/email"
+msgstr "VK.com uživ. login/email"
 
 msgctxt "#30012"
-msgid "VK.com password"
-msgstr "VK.com heslo"
+msgid "VK.com user password"
+msgstr "VK.com uživ. heslo"
 
 msgctxt "#30013"
-msgid "VK.com phone"
-msgstr "VK.com telefon"
+msgid "VK.com user phone"
+msgstr "VK.com uživ. telefon"
+
+msgctxt "#30014"
+msgid "VK.com user access token"
+msgstr "VK.com uživ. token"

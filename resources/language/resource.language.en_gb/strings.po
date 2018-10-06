@@ -16,35 +16,48 @@ msgstr ""
 "Language: en_GB\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-
 msgctxt "#30000"
 msgid "GENERAL"
+msgstr ""
 
 msgctxt "#30001"
 msgid "Items per page"
+msgstr ""
 
 msgctxt "#30002"
 msgid "Search results sorting"
+msgstr ""
 
 msgctxt "#30003"
 msgid "By date"
+msgstr ""
 
 msgctxt "#30004"
 msgid "By duration"
+msgstr ""
 
 msgctxt "#30005"
 msgid "By relevance"
+msgstr ""
 
 # 30006-30009 unused
 
 msgctxt "#30010"
 msgid "VK API"
+msgstr ""
 
 msgctxt "#30011"
-msgid "VK.com login/email"
+msgid "VK.com user login/email"
+msgstr ""
 
 msgctxt "#30012"
-msgid "VK.com password"
+msgid "VK.com user password"
+msgstr ""
 
 msgctxt "#30013"
-msgid "VK.com phone"
+msgid "VK.com user phone"
+msgstr ""
+
+msgctxt "#30014"
+msgid "VK.com user access token"
+msgstr ""
