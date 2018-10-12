@@ -47,17 +47,5 @@ msgid "VK API"
 msgstr "VK API"
 
 msgctxt "#30011"
-msgid "VK.com user login/email"
-msgstr "VK.com uživ. login/email"
-
-msgctxt "#30012"
-msgid "VK.com user password"
-msgstr "VK.com uživ. heslo"
-
-msgctxt "#30013"
-msgid "VK.com user phone"
-msgstr "VK.com uživ. telefon"
-
-msgctxt "#30014"
 msgid "VK.com user access token"
 msgstr "VK.com uživ. token"

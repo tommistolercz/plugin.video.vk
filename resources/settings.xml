@@ -5,9 +5,6 @@
         <setting label="30002" id="searchSortMethod" type="enum" lvalues="30003|30004|30005" default="0"/>
     </category>
     <category label="30010">
-        <setting label="30011" id="vkUserLogin" type="text" default=""/>
-        <setting label="30012" id="vkUserPassword" type="text" option="hidden" default=""/>
-        <setting label="30013" id="vkUserPhone" type="text" default=""/>
-        <setting label="30014" id="vkUserAccessToken" type="text" enable="false" default=""/>
+        <setting label="30011" id="vkUserAccessToken" type="text" default=""/>
     </category>
 </settings>
