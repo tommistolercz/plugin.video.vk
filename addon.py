@@ -6,13 +6,10 @@ Kodi add-on for watching videos from VK.com social network.
 
 :features:
 - todo
-- ...
 
 :copyright: (c) 2018 TomMistolerCZ.
 :license: GNU GPL v2, see LICENSE for more details.
 """
-
-# TODO: test ticketmasteru [github.com/tommistolercz/plugin.video.vk/issues/27]
 
 import datetime
 import json
@@ -213,9 +210,9 @@ class VkAddon():
             li.addContextMenuItems(
                 [
                     ('LIKE VIDEO', 'RunPlugin({0})'.format(self.buildUrl('/likevideo', {'ownerId': video['owner_id'], 'id': video['id']}))),
-                    ('LIKE VIDEO ALT', 'Container.Update({0})'.format(self.buildUrl('/likevideo', {'ownerId': video['owner_id'], 'id': video['id']}))),
+                    # ('LIKE VIDEO ALT', 'Container.Update({0})'.format(self.buildUrl('/likevideo', {'ownerId': video['owner_id'], 'id': video['id']}))),
                     ('UNLIKE VIDEO', 'RunPlugin({0})'.format(self.buildUrl('/unlikevideo', {'ownerId': video['owner_id'], 'id': video['id']}))),
-                    ('UNLIKE VIDEO ALT', 'Container.Update({0})'.format(self.buildUrl('/unlikevideo', {'ownerId': video['owner_id'], 'id': video['id']}))),
+                    # ('UNLIKE VIDEO ALT', 'Container.Update({0})'.format(self.buildUrl('/unlikevideo', {'ownerId': video['owner_id'], 'id': video['id']}))),
                     # ('ADD TO ALBUM', ''),  # todo
                     # ('SEARCH SIMILAR', ''),  # todo
                 ]
@@ -259,7 +256,7 @@ class VkAddon():
         Get addon settings managed by user via Kodi GUI.
         :returns: dict
         """
-        settings = { 
+        settings = {
             'vkUserAccessToken': self.addon.getSetting('vkUserAccessToken'),
             'itemsPerPage': self.addon.getSetting('itemsPerPage'),  # todo: itemsPerPage int => str
             'searchAdult': self.addon.getSetting('searchAdult'),
@@ -278,7 +275,7 @@ class VkAddon():
         pass
 
     def likeVideo(self):
-        """ 
+        """
         Like video (contextmenu action handler).
         """
         oidid = '{0}_{1}'.format(self.urlArgs['ownerId'], self.urlArgs['id'])
@@ -287,11 +284,11 @@ class VkAddon():
             owner_id=self.urlArgs['ownerId'],
             item_id=self.urlArgs['id'],
         )
-        self.log('Like added. oidid: {0}, total: {1}'.format(oidid, like['likes']))
-        self.notify('Like added. ({0} likes total)'.format(like['likes']))
+        self.log('Like added: {0} ({1} likes)'.format(oidid, like['likes']))
+        self.notify('Like added. ({0} likes)'.format(like['likes']))
 
     def listAlbums(self):
-        """ 
+        """
         List user's albums (action handler).
         """
         # set default paging offset
@@ -614,7 +611,7 @@ class VkAddon():
     def saveCookies(self, cookieJar):
         """
         Save session cookiejar as addon data file (helper function).
-        :param cookieJar: 
+        :param cookieJar:
         """
         fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_COOKIEJAR)
         with open(fp, 'wb') as f:
@@ -688,13 +685,14 @@ class VkAddon():
         """
         Unlike video (contextmenu action handler).
         """
+        oidid = '{0}_{1}'.format(self.urlArgs['ownerId'], self.urlArgs['id'])
         unlike = self.vkApi.likes.delete(
             type='video',
             owner_id=self.urlArgs['ownerId'],
             item_id=self.urlArgs['id'],
         )
-        # self.log('unlikeVideo(): unlike:', unlike)
-        self.notify('Like deleted. ({0} likes total)'.format(unlike['likes']))
+        self.log('Like deleted: {0} ({1} likes)'.format(oidid, unlike['likes']))
+        self.notify('Like deleted. ({0} likes)'.format(unlike['likes']))
 
 
 if __name__ == '__main__':
