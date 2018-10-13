@@ -21,31 +21,41 @@ msgid "GENERAL"
 msgstr "OBECNÉ"
 
 msgctxt "#30001"
+msgid "VK API user access token"
+msgstr "VK API uživatelský token"
+
+msgctxt "#30002"
 msgid "Items per page"
 msgstr "Položek na stránku"
 
-msgctxt "#30002"
-msgid "Search results sorting"
-msgstr "Řazení při vyhledávání"
-
 msgctxt "#30003"
-msgid "By date"
-msgstr "Dle data"
+msgid "Search also adult videos"
+msgstr "Hledat také videa pro dospělé"
 
 msgctxt "#30004"
-msgid "By duration"
-msgstr "Dle stopáže"
+msgid "Search also own videos"
+msgstr "Hledat také vlastní videa"
 
 msgctxt "#30005"
-msgid "By relevance"
-msgstr "Dle relevance"
+msgid "Search videos longer than [minutes]"
+msgstr "Hledat videa delší než [minut]"
 
-# 30006-30009 unused
+msgctxt "#30006"
+msgid "Search videos shorter than [minutes]"
+msgstr "Hledat videa kratší než [minut]"
+
+msgctxt "#30007"
+msgid "Sort searched videos"
+msgstr "Řadit výsledky vyhledávání"
+
+msgctxt "#30008"
+msgid "By date"
+msgstr "Podle data"
+
+msgctxt "#30009"
+msgid "By duration"
+msgstr "Podle délky"
 
 msgctxt "#30010"
-msgid "VK API"
-msgstr "VK API"
-
-msgctxt "#30011"
-msgid "VK.com user access token"
-msgstr "VK.com uživ. token"
+msgid "By relevance"
+msgstr "Podle relevance"

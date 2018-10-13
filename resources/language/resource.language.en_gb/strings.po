@@ -21,31 +21,41 @@ msgid "GENERAL"
 msgstr ""
 
 msgctxt "#30001"
-msgid "Items per page"
+msgid "VK API user access token"
 msgstr ""
 
 msgctxt "#30002"
-msgid "Search results sorting"
+msgid "Items per page"
 msgstr ""
 
 msgctxt "#30003"
-msgid "By date"
+msgid "Search also adult videos"
 msgstr ""
 
 msgctxt "#30004"
-msgid "By duration"
+msgid "Search also own videos"
 msgstr ""
 
 msgctxt "#30005"
-msgid "By relevance"
+msgid "Search videos longer than [minutes]"
 msgstr ""
 
-# 30006-30009 unused
+msgctxt "#30006"
+msgid "Search videos shorter than [minutes]"
+msgstr ""
+
+msgctxt "#30007"
+msgid "Sort searched videos"
+msgstr ""
+
+msgctxt "#30008"
+msgid "By date"
+msgstr ""
+
+msgctxt "#30009"
+msgid "By duration"
+msgstr ""
 
 msgctxt "#30010"
-msgid "VK API"
-msgstr ""
-
-msgctxt "#30011"
-msgid "VK.com user access token"
+msgid "By relevance"
 msgstr ""
