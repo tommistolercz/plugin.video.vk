@@ -249,7 +249,7 @@ class VkAddon():
                     (self.buildUrl(self.urlPath, self.urlArgs), xbmcgui.ListItem('[COLOR blue]NEXT PAGE[/COLOR]'), ISFOLDER_TRUE)
                 )
         # show video list in kodi, even if empty
-        xbmc.executebuildin('Container.SetViewMode(500)')
+        xbmc.executebuiltin('Container.SetViewMode(500)')
         xbmcplugin.setContent(self.handle, 'videos')
         xbmcplugin.addDirectoryItems(self.handle, listItems, len(listItems))
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_NONE)
