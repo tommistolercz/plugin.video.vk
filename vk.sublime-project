@@ -13,17 +13,16 @@
 		{
 			"file_exclude_patterns":
 			[
-				"resources/lib/vk/mixins.pyo",
 				"resources/lib/vk/exceptions.pyo",
-				"resources/lib/vk/logs.pyo",
-				"resources/lib/vk/api.pyo",
-				"vk.sublime-workspace",
 				"resources/lib/vk/utils.pyo",
-				"resources/lib/vk/__init__.pyo"
+				"resources/lib/vk/api.pyo",
+				"resources/lib/vk/logs.pyo",
+				"resources/lib/vk/mixins.pyo",
+				"resources/lib/vk/__init__.pyo",
+				"vk.sublime-workspace"
 			],
 			"folder_exclude_patterns":
 			[
-				"resources/_Archiv_"
 			],
 			"path": "."
 		}

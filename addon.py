@@ -2,13 +2,38 @@ __all__ = []
 
 """
 VK (plugin.video.vk)
+====================
 Kodi add-on for watching videos from VK.com social network.
 
-:features:
-- todo
+:copyright: (c)2018 TomMistolerCZ
+:license: GNU GPL v2 (see LICENSE for more details)
 
-:copyright: (c) 2018 TomMistolerCZ.
-:license: GNU GPL v2, see LICENSE for more details.
+Features
+========
+
+v1.0.0
+- General:
+    - OAuth2 authorization, user access token, user credentials is not stored inaddon
+    - Menu counters via VK API's 'stored functions' (server side)
+    - Plays videos in 1080p, 720p
+- My videos:
+    -
+- My albums:
+    -
+- Context menu actions:
+    - Video: Like/Unlike, ...
+    - Album:
+
+Backlog:
+- TODO: auto set view + setting
+- TODO:  sh ts->date human
+- TODO: create album
+- TODO: add to album
+- TODO: windows ready
+- TODO: langs
+- TODO: When updating searchhistory, save results count with searchquery
+- TODO: Stop banning of PEP8 naming conventions and adopt it
+
 """
 
 import datetime
@@ -26,8 +51,8 @@ import xbmcaddon
 import xbmcgui
 import xbmcplugin
 
-sys.path.append('/Users/tom/Library/Application Support/Kodi/addons/plugin.video.vk/resources/lib')  # todo: ugly!
-sys.path.append('/Users/tom/Library/Application Support/Kodi/addons/plugin.video.vk/resources/lib/vk')  # todo: ugly!
+sys.path.append('/Users/tom/Library/Application Support/Kodi/addons/plugin.video.vk/resources/lib')  # todo: ugly! win
+sys.path.append('/Users/tom/Library/Application Support/Kodi/addons/plugin.video.vk/resources/lib/vk')  # todo: ugly! win
 import vk  # todo: replace by inpos vk module?
 
 
@@ -117,11 +142,7 @@ class VkAddon():
         if self.urlPath in self.routing:
             self.routing[self.urlPath]()
 
-    def addToAlbum(self):
-        """
-        Add video into album.
-        """
-        pass  # todo
+    """ ----- Helpers ----- """
 
     def buildUrl(self, urlPath, urlArgs=None):
         """
@@ -228,28 +249,11 @@ class VkAddon():
                     (self.buildUrl(self.urlPath, self.urlArgs), xbmcgui.ListItem('[COLOR blue]NEXT PAGE[/COLOR]'), ISFOLDER_TRUE)
                 )
         # show video list in kodi, even if empty
+        xbmc.executebuildin('Container.SetViewMode(500)')
         xbmcplugin.setContent(self.handle, 'videos')
         xbmcplugin.addDirectoryItems(self.handle, listItems, len(listItems))
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_NONE)
         xbmcplugin.endOfDirectory(self.handle)
-
-    def deleteAlbum(self):
-        """
-        Delete album (contextmenu action handler).
-        """
-        pass  # todo
-
-    def deleteQuery(self):
-        """
-        Delete query from search history (contextmenu action handler).
-        """
-        pass
-
-    def editQuery(self):
-        """
-        Edit query in search history (contextmenu action handler).
-        """
-        pass  # todo
 
     def getSettings(self):
         """
@@ -268,24 +272,78 @@ class VkAddon():
         self.log('Settings: {0}'.format(settings))
         return settings
 
-    def likeCommunity(self):
+    def loadCookies(self):
         """
-        Like community (contextmenu action handler).
+        load session cookies from addon data file (helper function).
         """
-        pass
+        cookieJar = {}
+        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_COOKIEJAR)
+        if os.path.exists(fp):  # todo: else raise exception
+            with open(fp, 'rb') as f:
+                cookieJar = pickle.load(f)
+        return cookieJar
 
-    def likeVideo(self):
+    def loadSearchHistory(self):
         """
-        Like video (contextmenu action handler).
+        Load search history from addon data file (helper function).
         """
-        oidid = '{0}_{1}'.format(self.urlArgs['ownerId'], self.urlArgs['id'])
-        like = self.vkApi.likes.add(
-            type='video',
-            owner_id=self.urlArgs['ownerId'],
-            item_id=self.urlArgs['id'],
+        sh = {'items': []}
+        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_SEARCH)
+        if os.path.exists(fp):
+            with open(fp) as f:
+                sh = json.load(f)
+        return sh
+
+    def log(self, msg, level=xbmc.LOGDEBUG):
+        """
+        Log message into default Kodi.log using an uniform style (incl. addon id).
+        :param msg: str
+        :param level: xbmc.LOGDEBUG (default)
+        """
+        msg = '{0}: {1}'.format(self.addon.getAddonInfo('id'), msg)
+        xbmc.log(msg, level)
+
+    def notify(self, msg, icon=xbmcgui.NOTIFICATION_INFO):
+        """
+        Notify user using uniform style (helper function).
+        :param msg: str
+        :param icon: xbmcgui.NOTIFICATION_INFO (default)
+        """
+        heading = self.addon.getAddonInfo('id')
+        xbmcgui.Dialog().notification(heading, msg, icon)
+
+    def oidid(self, ownerId, id):
+        """
+        Build a full video identifier (ownerId_id).
+        :param ownerId: str
+        :param id: str
+        :returns: str
+        """
+        return '{0}_{1}'.format(ownerId, id)
+
+    def saveCookies(self, cookieJar):
+        """
+        Save session cookiejar as addon data file (helper function).
+        :param cookieJar:
+        """
+        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_COOKIEJAR)
+        with open(fp, 'wb') as f:
+            pickle.dump(cookieJar, f)
+
+    def updateSearchHistory(self, q):
+        """
+        Update search history addon data file (helper function).
+        :param q: search query (str)
+        """
+        sh = self.loadSearchHistory()
+        sh['items'].append(
+            {'q': q, 'timestamp': int(time.time())}
         )
-        self.log('Like added: {0} ({1} likes)'.format(oidid, like['likes']))
-        self.notify('Like added. ({0} likes)'.format(like['likes']))
+        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_SEARCH)
+        with open(fp, 'w') as f:
+            json.dump(sh, f)
+
+    """ ----- Menu actions ----- """
 
     def listAlbums(self):
         """
@@ -428,7 +486,7 @@ class VkAddon():
         try:
             counters = self.vkApi.execute.getMenuCounters()
         except vk.exceptions.VkAPIError:
-            counters = {'videos': 'n/a', 'albums': 'n/a', 'communities': 'n/a', 'likedVideos': 'n/a', 'likedCommunities': 'n/a'}  # todo: better?
+            counters = {'videos': 'n/a', 'albums': 'n/a', 'communities': 'n/a', 'likedVideos': 'n/a', 'likedCommunities': 'n/a'}  # todo: better? do not display at all?
         # self.log('listMainMenu(): counters:', counters)
         # create list items for main menu
         listItems = [
@@ -511,57 +569,11 @@ class VkAddon():
         # build list of videos
         self.buildListOfVideos(listType='videos', listData=videos)
 
-    def loadCookies(self):
-        """
-        load session cookies from addon data file (helper function).
-        """
-        cookieJar = {}
-        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_COOKIEJAR)
-        if os.path.exists(fp):  # todo: else raise exception
-            with open(fp, 'rb') as f:
-                cookieJar = pickle.load(f)
-        return cookieJar
-
-    def loadSearchHistory(self):
-        """
-        Load search history from addon data file (helper function).
-        """
-        sh = {'items': []}
-        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_SEARCH)
-        if os.path.exists(fp):
-            with open(fp) as f:
-                sh = json.load(f)
-        return sh
-
-    def log(self, msg, level=xbmc.LOGDEBUG):
-        """
-        Log message into default Kodi.log using an uniform style (incl. addon id).
-        :param msg: str
-        :param level: xbmc.LOGDEBUG (default)
-        """
-        msg = '{0}: {1}'.format(self.addon.getAddonInfo('id'), msg)
-        xbmc.log(msg, level)
-
-    def notify(self, msg, icon=xbmcgui.NOTIFICATION_INFO):
-        """
-        Notify user using uniform style (helper function).
-        :param msg: str
-        :param icon: xbmcgui.NOTIFICATION_INFO (default)
-        """
-        heading = self.addon.getAddonInfo('id')
-        xbmcgui.Dialog().notification(heading, msg, icon)
-
-    def playAlbum(self):
-        """
-        Play album (contextmenu action handler).
-        """
-        pass  # todo
-
     def playVideo(self):
         """
         Play video (action handler).
         """
-        oidid = '{0}_{1}'.format(self.urlArgs['ownerId'], self.urlArgs['id'])
+        oidid = self.oidid(self.urlArgs['ownerId'], self.urlArgs['id'])
         self.log('Trying to play video: {0}'.format(oidid))
         # resolve playable streams using vk videoinfo api (hack)
         try:
@@ -589,52 +601,6 @@ class VkAddon():
         qualityMax = max(playableStreams.keys())
         li = xbmcgui.ListItem(path=playableStreams[qualityMax])
         xbmcplugin.setResolvedUrl(self.handle, True, li)
-
-    def removeFromAlbum(self):
-        """
-        Remove video from album (contextmenu action handler).
-        """
-        pass  # todo
-
-    def renameAlbum(self):
-        """
-        Rename album (contextmenu action handler).
-        """
-        pass  # todo
-
-    def reorderAlbum(self):
-        """
-        Reorder album (contextmenu action handler).
-        """
-        pass  # todo
-
-    def saveCookies(self, cookieJar):
-        """
-        Save session cookiejar as addon data file (helper function).
-        :param cookieJar:
-        """
-        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_COOKIEJAR)
-        with open(fp, 'wb') as f:
-            pickle.dump(cookieJar, f)
-
-    def updateSearchHistory(self, q):
-        """
-        Update search history addon data file (helper function).
-        :param q: search query (str)
-        """
-        sh = self.loadSearchHistory()
-        sh['items'].append(
-            {'q': q, 'timestamp': int(time.time())}
-        )
-        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_SEARCH)
-        with open(fp, 'w') as f:
-            json.dump(sh, f)
-
-    def searchSimilar(self):
-        """
-        Search similar videos (contextmenu action handler).
-        """
-        pass  # todo
 
     def searchVideos(self):
         """
@@ -669,6 +635,81 @@ class VkAddon():
         # build list of searched videos
         self.buildListOfVideos(listType='searchedvideos', listData=searchedVideos)  # todo: const. for listtypes?
 
+    """ ----- Contextmenu actions ----- """
+
+    def addToAlbum(self):
+        """
+        Add video into album.
+        """
+        pass  # todo
+
+    def deleteAlbum(self):
+        """
+        Delete album (contextmenu action handler).
+        """
+        pass  # todo
+
+    def deleteQuery(self):
+        """
+        Delete query from search history (contextmenu action handler).
+        """
+        pass
+
+    def editQuery(self):
+        """
+        Edit query in search history (contextmenu action handler).
+        """
+        pass  # todo
+
+    def likeCommunity(self):
+        """
+        Like community (contextmenu action handler).
+        """
+        pass
+
+    def likeVideo(self):
+        """
+        Like video (contextmenu action handler).
+        """
+        oidid = '{0}_{1}'.format(self.urlArgs['ownerId'], self.urlArgs['id'])
+        like = self.vkApi.likes.add(
+            type='video',
+            owner_id=self.urlArgs['ownerId'],
+            item_id=self.urlArgs['id'],
+        )
+        self.log('Like added: {0} ({1} likes)'.format(oidid, like['likes']))
+        self.notify('Like added. ({0} likes)'.format(like['likes']))
+
+    def playAlbum(self):
+        """
+        Play album (contextmenu action handler).
+        """
+        pass  # todo
+
+    def removeFromAlbum(self):
+        """
+        Remove video from album (contextmenu action handler).
+        """
+        pass  # todo
+
+    def renameAlbum(self):
+        """
+        Rename album (contextmenu action handler).
+        """
+        pass  # todo
+
+    def reorderAlbum(self):
+        """
+        Reorder album (contextmenu action handler).
+        """
+        pass  # todo
+
+    def searchSimilar(self):
+        """
+        Search similar videos (contextmenu action handler).
+        """
+        pass  # todo
+
     def unfollowCommunity(self):
         """
         Unfollow community (contextmenu action handler).
@@ -683,9 +724,9 @@ class VkAddon():
 
     def unlikeVideo(self):
         """
-        Unlike video (contextmenu action handler).
+        Unlike video (contextmenu action handler)
         """
-        oidid = '{0}_{1}'.format(self.urlArgs['ownerId'], self.urlArgs['id'])
+        oidid = self.oidid(self.urlArgs['ownerId'], self.urlArgs['id'])
         unlike = self.vkApi.likes.delete(
             type='video',
             owner_id=self.urlArgs['ownerId'],
