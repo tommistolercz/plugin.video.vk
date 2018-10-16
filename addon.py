@@ -1,7 +1,6 @@
 __all__ = []
 # todo: give up banning of PEP8 naming conventions ;-)
 
-
 import datetime
 import json
 import os
@@ -21,7 +20,6 @@ sys.path.append('/Users/tom/Library/Application Support/Kodi/addons/plugin.video
 sys.path.append('/Users/tom/Library/Application Support/Kodi/addons/plugin.video.vk/resources/lib/vk')  # todo: ugly! os-indep.
 import vk  # todo: replace by inpos vk module?
 
-
 VK_API_APP_ID = '6432748'
 VK_API_SCOPE = 'email,friends,groups,offline,stats,status,video,wall'
 VK_API_VERSION = '5.85'
@@ -36,20 +34,21 @@ ISFOLDER_FALSE = False
 
 class VKAddon(xbmcaddon.Addon):
     """
-    Main addon class encapsulating all its logic and data.
+    Main addon class encapsulating all data and logic.
     Derived from xbmcaddon.Addon().
     """
-    def __init__(self):
+    def __init__(self):  # todo: too complex
         self.addon = xbmcaddon.Addon()
         self.handle = int(sys.argv[1])
         self.settings = self.getSettings()
-        # init vk session  # todo: too complex
+        # init vk session
         if self.settings['vkUserAccessToken'] == '':
             credentials = {
                 'login': xbmcgui.Dialog().input('ENTER VK USER LOGIN (EMAIL)'),
                 'password': xbmcgui.Dialog().input('ENTER VK USER PASSWORD', option=xbmcgui.ALPHANUM_HIDE_INPUT),
             }
             self.vkSession = vk.AuthSession(VK_API_APP_ID, credentials['login'], credentials['password'], VK_API_SCOPE)
+            credentials = None  # no longer used
             self.addon.setSetting('vkUserAccessToken', self.vkSession.access_token)
             self.saveCookies(self.vkSession.auth_session.cookies)
         else:
@@ -70,7 +69,7 @@ class VKAddon(xbmcaddon.Addon):
                 self.urlArgs[k] = v.pop()
         self.log('addon url parsed: {0} {1} {2}'.format(self.urlBase, self.urlPath, self.urlArgs))
         # dispatch addon routing by calling applicable action handler
-        self.routing = {  # todo: pass urlargs as **kwargs
+        self.routing = {  # todo: pass urlargs as **kwargs, structure paths i.e. '/videos/albums'
             # menu actions:
             '/': self.listMainMenu,
             '/albums': self.listAlbums,
@@ -106,7 +105,7 @@ class VKAddon(xbmcaddon.Addon):
 
     """ Helpers """
 
-    def buildUrl(self, urlPath, urlArgs=None):
+    def buildUrl(self, urlPath, urlArgs=None):  # todo: rename: url()
         """
         Build addon url.
         :param urlPath:
@@ -118,15 +117,13 @@ class VKAddon(xbmcaddon.Addon):
             url += '?' + urllib.urlencode(urlArgs)
         return url
 
-    def buildListOfCommunities(self, listType, listData):
+    def buildListOfCommunities(self, listType, listData):  # todo: class?
         """
         Build list of communities.
         :param listType:
         :param listData:
         """
-        listTypes = ['communities', 'likedcommunities']
-        if listType not in listTypes:
-            return False  # todo: raise exception
+        listTypes = ['communities', 'likedcommunities']  # todo: change to subtypes = ['likedcommunities']
         # create list items for communities
         listItems = []
         _nameKey = 'title' if listType == 'likedcommunities' else 'name'  # ugly!
@@ -161,7 +158,7 @@ class VKAddon(xbmcaddon.Addon):
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_NONE)
         xbmcplugin.endOfDirectory(self.handle)
 
-    def buildListOfVideos(self, listType, listData):
+    def buildListOfVideos(self, listType, listData):  # todo: class?
         """
         Build list of videos.
         :param listType:
@@ -217,7 +214,7 @@ class VKAddon(xbmcaddon.Addon):
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_NONE)
         xbmcplugin.endOfDirectory(self.handle)
 
-    def getSettings(self):
+    def getSettings(self):  # todo: deprec.
         """
         Get addon settings managed by user via Kodi GUI.
         :returns: dict
