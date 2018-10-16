@@ -1,40 +1,6 @@
 __all__ = []
+# todo: give up banning of PEP8 naming conventions ;-)
 
-"""
-VK (plugin.video.vk)
-====================
-Kodi add-on for watching videos from VK.com social network.
-
-:copyright: (c)2018 TomMistolerCZ
-:license: GNU GPL v2 (see LICENSE for more details)
-
-Features
-========
-
-v1.0.0
-- General:
-    - OAuth2 authorization, user access token, user credentials is not stored inaddon
-    - Menu counters via VK API's 'stored functions' (server side)
-    - Plays videos in 1080p, 720p
-- My videos:
-    -
-- My albums:
-    -
-- Context menu actions:
-    - Video: Like/Unlike, ...
-    - Album:
-
-Backlog:
-- TODO: auto set view + setting
-- TODO:  sh ts->date human
-- TODO: create album
-- TODO: add to album
-- TODO: windows ready
-- TODO: langs
-- TODO: When updating searchhistory, save results count with searchquery
-- TODO: Stop banning of PEP8 naming conventions and adopt it
-
-"""
 
 import datetime
 import json
@@ -51,8 +17,8 @@ import xbmcaddon
 import xbmcgui
 import xbmcplugin
 
-sys.path.append('/Users/tom/Library/Application Support/Kodi/addons/plugin.video.vk/resources/lib')  # todo: ugly! win
-sys.path.append('/Users/tom/Library/Application Support/Kodi/addons/plugin.video.vk/resources/lib/vk')  # todo: ugly! win
+sys.path.append('/Users/tom/Library/Application Support/Kodi/addons/plugin.video.vk/resources/lib')  # todo: ugly! os-indep.
+sys.path.append('/Users/tom/Library/Application Support/Kodi/addons/plugin.video.vk/resources/lib/vk')  # todo: ugly! os-indep.
 import vk  # todo: replace by inpos vk module?
 
 
@@ -68,17 +34,12 @@ ISFOLDER_TRUE = True
 ISFOLDER_FALSE = False
 
 
-class VkAddonError(Exception):
-    def __init__():
-        pass
-
-
-class VkAddon():
-
+class VKAddon(xbmcaddon.Addon):
+    """
+    Main addon class encapsulating all its logic and data.
+    Derived from xbmcaddon.Addon().
+    """
     def __init__(self):
-        """
-        Initialize addon instance.
-        """
         self.addon = xbmcaddon.Addon()
         self.handle = int(sys.argv[1])
         self.settings = self.getSettings()
@@ -125,6 +86,7 @@ class VkAddon():
             '/videos': self.listVideos,
             # contextmenu actions:
             '/addtoalbum': self.addToAlbum,
+            '/createalbum': self.createAlbum,
             '/deletealbum': self.deleteAlbum,
             '/deletequery': self.deleteQuery,
             '/editquery': self.editQuery,
@@ -142,7 +104,7 @@ class VkAddon():
         if self.urlPath in self.routing:
             self.routing[self.urlPath]()
 
-    """ ----- Helpers ----- """
+    """ Helpers """
 
     def buildUrl(self, urlPath, urlArgs=None):
         """
@@ -335,6 +297,8 @@ class VkAddon():
         Update search history addon data file (helper function).
         :param q: search query (str)
         """
+        # todo: ts->dt
+        # todo: When updating, save nr of results for q as well
         sh = self.loadSearchHistory()
         sh['items'].append(
             {'q': q, 'timestamp': int(time.time())}
@@ -343,7 +307,7 @@ class VkAddon():
         with open(fp, 'w') as f:
             json.dump(sh, f)
 
-    """ ----- Menu actions ----- """
+    """ Menu action handlers """
 
     def listAlbums(self):
         """
@@ -517,7 +481,7 @@ class VkAddon():
         for search in sorted(searchHistory['items'], key=lambda x: x['timestamp'], reverse=True):
             li = xbmcgui.ListItem(
                 label=search['q'],
-                label2=datetime.datetime.fromtimestamp(search['timestamp']).strftime('%d.%m.%Y'),
+                label2=datetime.datetime.fromtimestamp(search['timestamp']).strftime('%d.%m.%Y'),  # todo: ts->dt
             )
             li.addContextMenuItems(
                 [
@@ -635,11 +599,17 @@ class VkAddon():
         # build list of searched videos
         self.buildListOfVideos(listType='searchedvideos', listData=searchedVideos)  # todo: const. for listtypes?
 
-    """ ----- Contextmenu actions ----- """
+    """ Contextmenu action handlers """
 
     def addToAlbum(self):
         """
         Add video into album.
+        """
+        pass  # todo
+
+    def createAlbum(self):
+        """
+        Create a new album of videos (contextmenu action handler).
         """
         pass  # todo
 
@@ -736,6 +706,14 @@ class VkAddon():
         self.notify('Like deleted. ({0} likes)'.format(unlike['likes']))
 
 
+class VKAddonError(Exception):
+    def __init__():
+        """
+        todo
+        """
+        pass  # todo
+
+
 if __name__ == '__main__':
     # run addon
-    VkAddon()
+    VKAddon()
