@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?> 
 <settings>
-	<category label="30000">
-        <setting label="30001" id="vkUserAccessToken" type="text" default=""/>
+    <category label="30000">
+        <setting label="30001" id="vkuseraccesstoken" type="text" default=""/>
         <setting type="sep"/>
-        <setting label="30002" id="itemsPerPage" type="number" default="200"/>
+        <setting label="30002" id="itemsperpage" type="number" default="200"/>
         <setting type="sep"/>
-        <setting label="30003" id="searchAdult" type="bool" default="true"/>
-        <setting label="30004" id="searchOwn" type="bool" default="false"/>
-        <setting label="30005" id="searchLonger" type="number" default="10"/>
-        <setting label="30006" id="searchShorter" type="number" default="60"/>
-        <setting label="30007" id="searchSort" type="enum" lvalues="30008|30009|30010" default="0"/>
+        <setting label="30003" id="searchadult" type="bool" default="true"/>
+        <setting label="30004" id="searchown" type="bool" default="false"/>
+        <setting label="30005" id="searchlonger" type="number" default="10"/>
+        <setting label="30006" id="searchshorter" type="number" default="60"/>
+        <setting label="30007" id="searchsort" type="enum" lvalues="30008|30009|30010" default="0"/>
     </category>
 </settings>
