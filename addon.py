@@ -28,7 +28,7 @@ FOLDER, NOT_FOLDER = (True, False)
 
 VK_API_APP_ID = '6432748'
 VK_API_SCOPE = 'email,friends,groups,offline,stats,status,video,wall'
-VK_API_VERSION = '5.85'
+VK_API_VERSION = '5.85'  # todo 5.87
 VK_API_LANG = 'ru'
 VK_VIDEOINFO_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246'
 ADDON_DATA_FILE_COOKIEJAR = '.cookiejar'
@@ -66,7 +66,6 @@ class VKAddon():
             self.notify('VK authorization error!', icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
         # create vk api, enable api usage tracking
-        # todo: debug param types in all vk api requests
         try:
             self.vkapi = vk.API(self.vksession, v=VK_API_VERSION, lang=VK_API_LANG)
             tracking = bool(self.vkapi.stats.trackVisitor())
@@ -328,21 +327,24 @@ class VKAddon():
         )
         # create list items for albums
         listitems = []
-        for album in albums['items']:
+        for i, album in enumerate(albums['items']):
             li = xbmcgui.ListItem(
                 label='{0} [COLOR blue]({1})[/COLOR]'.format(album['title'], album['count']),
             )
-            # todo: use infolabels (plot, ...) for showing album details?
-            if album['count'] > 0:  # empty albums have no thumbs
+            if album['count'] > 0:
                 li.setArt({'thumb': album['photo_320']})
+            # before/after album ids for reordering
+            beforeid = albums['items'][i - 1]['id'] if i > 0 else None
+            afterid = albums['items'][i + 1]['id'] if i < len(albums['items']) - 1 else None
             li.addContextMenuItems(
                 [
-                    ('PLAY ALBUM', ''),  # todo
-                    ('RENAME ALBUM', ''),  # todo
-                    ('REORDER ALBUM', ''),  # todo
-                    ('DELETE ALBUM', ''),  # todo
-                    ('ADD ALBUM', 'RunPlugin({0})'.format(self.buildurl('/addalbum'))),
-                ] 
+                    # ('PLAY ALBUM', ''),  # todo
+                    ('[COLOR blue]Rename album[/COLOR]', 'RunPlugin({0})'.format(self.buildurl('/renamealbum', {'albumid': album['id']}))),
+                    ('[COLOR blue]Reorder album up[/COLOR]', 'RunPlugin({0})'.format(self.buildurl('/reorderalbum', {'albumid': album['id'], 'beforeid': beforeid}))),
+                    ('[COLOR blue]Reorder album down[/COLOR]', 'RunPlugin({0})'.format(self.buildurl('/reorderalbum', {'albumid': album['id'], 'afterid': afterid}))),
+                    ('[COLOR blue]Delete album[/COLOR]', 'RunPlugin({0})'.format(self.buildurl('/deletealbum', {'albumid': album['id']}))),
+                    ('[COLOR blue]Add album[/COLOR]', 'RunPlugin({0})'.format(self.buildurl('/addalbum'))),
+                ]
             )
             listitems.append(
                 (self.buildurl('/albumvideos', {'albumid': album['id']}), li, FOLDER)
@@ -371,7 +373,7 @@ class VKAddon():
         # request vk api for album videos
         albumvideos = self.vkapi.video.get(
             extended=1,
-            album_id=self.urlargs['albumid'],
+            album_id=int(self.urlargs['albumid']),
             offset=int(self.urlargs['offset']),
             count=int(self.addon.getSetting('itemsperpage')),
         )
@@ -406,7 +408,7 @@ class VKAddon():
         # request vk api for community videos
         communityvideos = self.vkapi.video.get(
             extended=1,
-            owner_id=self.urlargs['ownerid'],
+            owner_id=int(self.urlargs['ownerid']),
             offset=int(self.urlargs['offset']),
             count=int(self.addon.getSetting('itemsperpage')),
         )
@@ -628,20 +630,27 @@ class VKAddon():
         Add new album.
         (contextmenu action handler)
         """
-        albumtitle = xbmcgui.Dialog().input('ENTER ALBUM NAME')
+        albumtitle = xbmcgui.Dialog().input('ENTER ALBUM TITLE')
         addedalbum = self.vkapi.video.addAlbum(
             title=str(albumtitle),
-            privacy=['3']  # 3=only me  # todo: editable?
+            privacy=['3']  # 3=onlyme  # todo: editable?
         )
-        self.log('New album added: {0}'.format(addedalbum))
+        self.log('New album added: {0}'.format(addedalbum['album_id']))
         self.notify('New album added.')
+        # todo: refresh list view
 
     def deletealbum(self):
         """
         Delete album.
         (contextmenu action handler)
         """
-        pass  # todo
+        if xbmcgui.Dialog().yesno('CONFIRMATION', 'DO YOU WANT TO DELETE ALBUM?'):
+            self.vkapi.video.deleteAlbum(
+                album_id=int(self.urlargs['albumid']),
+            )
+            self.log('Album deleted: {0}'.format(self.urlargs['albumid']))
+            self.notify('Album deleted.')
+            # todo: refresh list view
 
     def deletesearch(self):
         """
@@ -672,8 +681,8 @@ class VKAddon():
         oidid = self.buildoidid(self.urlargs['ownerid'], self.urlargs['id'])
         like = self.vkapi.likes.add(
             type='video',
-            owner_id=self.urlargs['ownerid'],
-            item_id=self.urlargs['id'],
+            owner_id=int(self.urlargs['ownerid']),
+            item_id=int(self.urlargs['id']),
         )
         self.log('Like added to video: {0} ({1} likes)'.format(oidid, like['likes']))
         self.notify('Like added to video. ({0} likes)'.format(like['likes']))
@@ -697,14 +706,31 @@ class VKAddon():
         Rename album.
         (contextmenu action handler)
         """
-        pass  # todo
+        albumtitle = self.vkapi.video.getAlbumById(
+            album_id=int(self.urlargs['albumid']),
+        )['title']
+        albumtitle = xbmcgui.Dialog().input('EDIT ALBUM TITLE', albumtitle)
+        self.vkapi.video.editAlbum(
+            album_id=int(self.urlargs['albumid']),
+            title=str(albumtitle),
+            privacy=['3']  # 3=onlyme  # todo: editable?
+        )
+        self.log('Album renamed: {0}'.format(self.urlargs['albumid']))
+        self.notify('Album renamed.')
+        # todo: refresh list view
 
     def reorderalbum(self):
         """
         Reorder album.
         (contextmenu action handler)
         """
-        pass  # todo
+        self.vkapi.video.reorderAlbums(
+            album_id=int(self.urlargs['albumid']),
+            before=int(self.urlargs['beforeid']),  # todo
+            after=int(self.urlargs['afterid']),  # todo
+        )
+        self.log('Album reordered: {0}'.format(self.urlargs['albumid']))
+        # todo: refresh list view
 
     def searchsimilarvideos(self):
         """
@@ -735,8 +761,8 @@ class VKAddon():
         oidid = self.buildoidid(self.urlargs['ownerid'], self.urlargs['id'])
         unlike = self.vkapi.likes.delete(
             type='video',
-            owner_id=self.urlargs['ownerid'],
-            item_id=self.urlargs['id'],
+            owner_id=int(self.urlargs['ownerid']),
+            item_id=int(self.urlargs['id']),
         )
         self.log('Like deleted from video: {0} ({1} likes)'.format(oidid, unlike['likes']))
         self.notify('Like deleted from video. ({0} likes)'.format(unlike['likes']))
