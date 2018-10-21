@@ -24,9 +24,9 @@
 		<assets>
 			<icon>resources/icon.png</icon>
 			<fanart></fanart>
-			<screenshot></screenshot>
-			<screenshot></screenshot>
-			<screenshot></screenshot>
+			<screenshot>resources/media/screenshot1.jpg</screenshot>
+			<screenshot>resources/media/screenshot2.jpg</screenshot>
+			<screenshot>resources/media/screenshot3.jpg</screenshot>
 		</assets>
 	</extension>
 </addon>

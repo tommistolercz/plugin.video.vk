@@ -16,6 +16,8 @@ msgstr ""
 "Language: en_GB\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+# Settings
+
 msgctxt "#30000"
 msgid "GENERAL"
 msgstr ""
@@ -58,4 +60,56 @@ msgstr ""
 
 msgctxt "#30010"
 msgid "By relevance"
+msgstr ""
+
+# Main menu 30020+
+
+msgctxt "#30020"
+msgid "ENTER VK USER LOGIN (EMAIL)"
+msgstr ""
+
+msgctxt "#30021"
+msgid "ENTER VK USER PASSWORD"
+msgstr ""
+
+msgctxt "#30022"
+msgid ""
+msgstr ""
+
+msgctxt "#30023"
+msgid ""
+msgstr ""
+
+msgctxt "#30024"
+msgid ""
+msgstr ""
+
+msgctxt "#30025"
+msgid ""
+msgstr ""
+
+msgctxt "#30026"
+msgid ""
+msgstr ""
+
+msgctxt "#30027"
+msgid ""
+msgstr ""
+
+msgctxt "#30028"
+msgid ""
+msgstr ""
+
+msgctxt "#30029"
+msgid ""
+msgstr ""
+
+#
+
+msgctxt "#30030"
+msgid ""
+msgstr ""
+
+msgctxt "#30031"
+msgid ""
 msgstr ""

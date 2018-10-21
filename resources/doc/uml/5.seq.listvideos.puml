@@ -1,0 +1,16 @@
+@startuml
+
+'Diagram
+
+'Elements
+actor "User" as user
+participant "Addon" as addon
+participant "Kodi API" as kodiapi
+participant "VK API" as vkapi
+
+'Relationships
+user -> addon : List videos
+    addon -> vkapi : GET video.get
+        addon <-- vkapi : videos
+
+@enduml

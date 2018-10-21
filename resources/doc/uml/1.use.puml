@@ -1,0 +1,67 @@
+@startuml
+left to right direction
+
+'user
+actor "User" as user
+note "Kodi user with\nVK.com accout" as n
+    user . n
+
+'common
+rectangle "Common" <<package>> {
+    user -- (Edit addon settings)
+    user -- (Authorize addon)
+    user -- (List main menu)
+}
+
+'search
+rectangle "Search" <<package>> {
+    user -- (Search videos)
+    user -- (List searched videos)
+    user -- (Search similar videos)
+    user -- (List search history)
+    user -- (Edit search)
+    user -- (Delete search)
+}
+
+'videos
+rectangle "My videos" <<package>> {
+    user -- (List videos)
+    user -- (Play video)
+}
+
+'albums
+rectangle "My video albums" <<package>> {
+    user -- (List albums)
+    user -- (List album videos)
+    user -- (Add album)
+    user -- (Rename album)
+    user -- (Reorder album up/down)
+    user -- (Delete album)
+    user -- (Add video to album)
+    user -- (Remove video from album)
+    user -- (Play album)
+}
+
+'communities
+rectangle "My communities" <<package>> {
+   user -- (List communities)
+   user -- (List community videos)
+   user -- (Unfollow community)
+}
+
+'likes
+rectangle "My likes" <<package>> {
+    user -- (List liked videos)
+    user -- (List liked communities)
+    user -- (Like video)
+    user -- (Unlike video)
+    user -- (Like community)
+    user -- (Unlike community)
+}
+
+'stats
+rectangle "Stats" <<package>> {
+    user -- (List stats)
+}
+
+@enduml

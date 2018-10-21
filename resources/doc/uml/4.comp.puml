@@ -1,0 +1,13 @@
+@startuml
+
+'Diagram
+
+'Elements
+participant "Addon" as addon
+participant "Kodi API" as kodiapi
+participant "VK API" as vkapi
+
+'Relationships
+addon -- vkapi
+
+@enduml

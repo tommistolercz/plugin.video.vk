@@ -51,8 +51,8 @@ class VKAddon():
             if self.addon.getSetting('vkuseraccesstoken') == '':
                 self.vksession = vk.AuthSession(
                     VK_API_APP_ID,
-                    xbmcgui.Dialog().input('ENTER VK USER LOGIN (EMAIL)'),
-                    xbmcgui.Dialog().input('ENTER VK USER PASSWORD', option=xbmcgui.ALPHANUM_HIDE_INPUT),
+                    xbmcgui.Dialog().input(self.addon.getLocalizedString(30020)),  # enter vk usr login
+                    xbmcgui.Dialog().input(self.addon.getLocalizedString(30021), option=xbmcgui.ALPHANUM_HIDE_INPUT),  # enter vk usr pass
                     VK_API_SCOPE
                 )
                 self.addon.setSetting('vkuseraccesstoken', self.vksession.access_token)
@@ -172,7 +172,7 @@ class VKAddon():
             listitems.append(
                 (self.buildurl('/communityvideos', {'ownerid': '-{0}'.format(community['id'])}), li, FOLDER)  # negative id required when owner is a community
             )
-        # add paginator item  # todo: make this a function
+        # add paginator item  # todo: make this a method
         if int(listdata['count']) > int(self.addon.getSetting('itemsperpage')):
             if int(listdata['count']) > int(self.urlargs['offset']) + int(self.addon.getSetting('itemsperpage')):
                 self.urlargs['offset'] = int(self.urlargs['offset']) + int(self.addon.getSetting('itemsperpage'))
@@ -349,7 +349,7 @@ class VKAddon():
             listitems.append(
                 (self.buildurl('/albumvideos', {'albumid': album['id']}), li, FOLDER)
             )
-        # add paginator item  # todo: def func
+        # add paginator item  # todo: def
         if int(albums['count']) > int(self.addon.getSetting('itemsperpage')):
             if int(albums['count']) > int(self.urlargs['offset']) + int(self.addon.getSetting('itemsperpage')):
                 self.urlargs['offset'] = int(self.urlargs['offset']) + self.addon.getSetting('itemsperpage')
@@ -706,9 +706,7 @@ class VKAddon():
         Rename album.
         (contextmenu action handler)
         """
-        albumtitle = self.vkapi.video.getAlbumById(
-            album_id=int(self.urlargs['albumid']),
-        )['title']
+        albumtitle = self.vkapi.video.getAlbumById(album_id=int(self.urlargs['albumid']))['title']
         albumtitle = xbmcgui.Dialog().input('EDIT ALBUM TITLE', albumtitle)
         self.vkapi.video.editAlbum(
             album_id=int(self.urlargs['albumid']),
@@ -724,11 +722,12 @@ class VKAddon():
         Reorder album.
         (contextmenu action handler)
         """
-        self.vkapi.video.reorderAlbums(
-            album_id=int(self.urlargs['albumid']),
-            before=int(self.urlargs['beforeid']),  # todo
-            after=int(self.urlargs['afterid']),  # todo
-        )
+        kwparams = {'album_id': int(self.urlargs['albumid'])}
+        if self.urlargs['beforeid']:
+            kwparams['before'] = int(self.urlargs['beforeid'])
+        elif self.urlargs['afterid']:
+            kwparams['after'] = int(self.urlargs['beforeid'])
+        self.vkapi.video.reorderAlbums(**kwparams)
         self.log('Album reordered: {0}'.format(self.urlargs['albumid']))
         # todo: refresh list view
 
