@@ -16,7 +16,7 @@ msgstr ""
 "Language: en_GB\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-# Settings
+# Addon settings (30000+)
 
 msgctxt "#30000"
 msgid "GENERAL"
@@ -39,11 +39,11 @@ msgid "Search also own videos"
 msgstr ""
 
 msgctxt "#30005"
-msgid "Search videos longer than [minutes]"
+msgid "Search videos longer than [min.]"
 msgstr ""
 
 msgctxt "#30006"
-msgid "Search videos shorter than [minutes]"
+msgid "Search videos shorter than [min.]"
 msgstr ""
 
 msgctxt "#30007"
@@ -62,54 +62,58 @@ msgctxt "#30010"
 msgid "By relevance"
 msgstr ""
 
-# Main menu 30020+
+# Addon init (30020+)
 
 msgctxt "#30020"
-msgid "ENTER VK USER LOGIN (EMAIL)"
+msgid "Enter your VK login/email"
 msgstr ""
 
 msgctxt "#30021"
-msgid "ENTER VK USER PASSWORD"
+msgid "Enter your VK password"
 msgstr ""
 
 msgctxt "#30022"
-msgid ""
+msgid "VK authorization error!"
 msgstr ""
 
 msgctxt "#30023"
-msgid ""
+msgid "VK API error!"
 msgstr ""
 
 msgctxt "#30024"
-msgid ""
+msgid "Addon routing error!"
 msgstr ""
 
-msgctxt "#30025"
-msgid ""
-msgstr ""
-
-msgctxt "#30026"
-msgid ""
-msgstr ""
-
-msgctxt "#30027"
-msgid ""
-msgstr ""
-
-msgctxt "#30028"
-msgid ""
-msgstr ""
-
-msgctxt "#30029"
-msgid ""
-msgstr ""
-
-#
+# Addon menu (30030+)
 
 msgctxt "#30030"
-msgid ""
+msgid "SEARCH"
 msgstr ""
 
 msgctxt "#30031"
-msgid ""
+msgid "SEARCH HISTORY"
+msgstr ""
+
+msgctxt "#30032"
+msgid "VIDEOS"
+msgstr ""
+
+msgctxt "#30033"
+msgid "LIKED VIDEOS"
+msgstr ""
+
+msgctxt "#30034"
+msgid "ALBUMS"
+msgstr ""
+
+msgctxt "#30035"
+msgid "COMMUNITIES"
+msgstr ""
+
+msgctxt "#30036"
+msgid "LIKED COMMUNITIES"
+msgstr ""
+
+msgctxt "#30037"
+msgid "STATS"
 msgstr ""

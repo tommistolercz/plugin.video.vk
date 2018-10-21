@@ -41,7 +41,7 @@ class VKAddon():
     """
     def __init__(self):
         """
-        Initialize everything and manage all that controlling stuff during runtime ;-)
+        Initialize and manage all that controlling stuff during runtime ;-)
         """
         self.addon = xbmcaddon.Addon()
         self.handle = int(sys.argv[1])
@@ -51,8 +51,8 @@ class VKAddon():
             if self.addon.getSetting('vkuseraccesstoken') == '':
                 self.vksession = vk.AuthSession(
                     VK_API_APP_ID,
-                    xbmcgui.Dialog().input(self.addon.getLocalizedString(30020)),  # enter vk usr login
-                    xbmcgui.Dialog().input(self.addon.getLocalizedString(30021), option=xbmcgui.ALPHANUM_HIDE_INPUT),  # enter vk usr pass
+                    xbmcgui.Dialog().input(self.addon.getLocalizedString(30020)),  # enter vk user login
+                    xbmcgui.Dialog().input(self.addon.getLocalizedString(30021), option=xbmcgui.ALPHANUM_HIDE_INPUT),  # enter vk user pass
                     VK_API_SCOPE
                 )
                 self.addon.setSetting('vkuseraccesstoken', self.vksession.access_token)
@@ -63,7 +63,7 @@ class VKAddon():
                 self.vksession.requests_session.cookies = self.loadcookies()
         except vk.exceptions.VkAuthError:
             self.log('VK authorization error!', level=xbmc.LOGERROR)
-            self.notify('VK authorization error!', icon=xbmcgui.NOTIFICATION_ERROR)
+            self.notify(self.addon.getLocalizedString(30022), icon=xbmcgui.NOTIFICATION_ERROR)  # vk auth error
             exit()
         # create vk api, enable api usage tracking
         try:
@@ -72,7 +72,7 @@ class VKAddon():
             self.log('VK API object created. API usage tracking: {0}'.format(tracking))
         except vk.exceptions.VkAPIError:
             self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify('VK API error!', icon=xbmcgui.NOTIFICATION_ERROR)
+            self.notify(self.addon.getLocalizedString(30023), icon=xbmcgui.NOTIFICATION_ERROR)  # vk api error
             exit()
         # parse addon url
         self.urlbase = 'plugin://' + self.addon.getAddonInfo('id')
@@ -84,8 +84,7 @@ class VKAddon():
                 self.urlargs[k] = v.pop()
         self.log('Addon URL parsed: {0}'.format(self.buildurl(self.urlpath, self.urlargs)))
         # dispatch addon routing by calling a handler for respective user action
-        # todo: pass urlargs as **kwargs
-        # todo: add hierarchy into urlpath i.e. '/videos/albums'
+        # todo: pass urlargs as **kwargs?
         self.routing = {
             # menu actions:
             '/': self.listmainmenu,
@@ -102,31 +101,34 @@ class VKAddon():
             '/videos': self.listvideos,
             # contextmenu actions:
             '/addalbum': self.addalbum,
-            '/addtoalbum': self.addtoalbum,
             '/deletealbum': self.deletealbum,
             '/deletesearch': self.deletesearch,
             '/editsearch': self.editsearch,
             '/likecommunity': self.likecommunity,
             '/likevideo': self.likevideo,
             '/playalbum': self.playalbum,
-            '/removefromalbum': self.removefromalbum,
             '/renamealbum': self.renamealbum,
             '/reorderalbum': self.reorderalbum,
-            '/searchsimilar': self.searchsimilarvideos,
+            '/searchsimilar': self.searchvideos,  # reuse
+            '/setalbumsforvideo': self.setalbumsforvideo,
             '/unfollowcommunity': self.unfollowcommunity,
             '/unlikecommunity': self.unlikecommunity,
             '/unlikevideo': self.unlikevideo,
         }
-        if self.urlpath in self.routing:
+        try:
             self.routing[self.urlpath]()
+        except KeyError:
+            self.log('Addon routing error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30024), icon=xbmcgui.NOTIFICATION_ERROR)  # addon routing error
+            exit()
 
     def buildoidid(self, ownerid, id):
         """
         Build a full video identifier, aka oidid.
         (helper)
-        :param ownerid: str
-        :param id: str
-        :returns: str
+        :param ownerid: int; video owner id
+        :param id: int; video id
+        :returns: str; video oidid
         """
         return '{0}_{1}'.format(ownerid, id)
 
@@ -134,12 +136,12 @@ class VKAddon():
         """
         Build addon url.
         (helper)
-        :param urlpath: str
-        :param urlargs: dict
-        :returns: str
+        :param urlpath: str; action name
+        :param urlargs: dict; action params, default=None
+        :returns: str; addon url (plugin://...)
         """
         url = self.urlbase + urlpath
-        if urlargs is not None:
+        if urlargs is not None and len(list(urlargs)) > 0:
             url += '?' + urllib.urlencode(urlargs)
         return url
 
@@ -216,16 +218,14 @@ class VKAddon():
             else:
                 maxthumb = video['photo_320']
             li.setArt({'thumb': maxthumb})
-            li.addContextMenuItems(
-                [
-                    # if not video['likes']['user_likes']:    
-                    ('[COLOR blue]Like video[/COLOR]', 'RunPlugin({0})'.format(self.buildurl('/likevideo', {'ownerid': video['owner_id'], 'id': video['id']}))),
-                    # if video['likes']['user_likes']:    
-                    ('[COLOR blue]Unlike video[/COLOR]', 'RunPlugin({0})'.format(self.buildurl('/unlikevideo', {'ownerid': video['owner_id'], 'id': video['id']}))),
-                    # ('ADD TO ALBUM', ''),  # todo
-                    # ('SEARCH SIMILAR VIDEOS', ''),  # todo
-                ]
-            )
+            cmi = []
+            if (listtype == 'likedvideos') or ('likes' in video and video['likes']['user_likes'] == 1):  # isliked
+                cmi.append(('[COLOR blue]Unlike video[/COLOR]', 'RunPlugin({0})'.format(self.buildurl('/unlikevideo', {'ownerid': video['owner_id'], 'id': video['id']}))))
+            else:
+                cmi.append(('[COLOR blue]Like video[/COLOR]', 'RunPlugin({0})'.format(self.buildurl('/likevideo', {'ownerid': video['owner_id'], 'id': video['id']}))))
+            cmi.append(('[COLOR blue]Set albums for video[/COLOR]', 'RunPlugin({0})'.format(self.buildurl('/setalbumsforvideo', {'ownerid': video['owner_id'], 'id': video['id']}))))
+            cmi.append(('[COLOR blue]Search similar[/COLOR]', 'RunPlugin({0})'.format(self.buildurl('/searchsimilar', {'q': video['title']}))))
+            li.addContextMenuItems(cmi)
             listitems.append(
                 (self.buildurl('/play', {'ownerid': video['owner_id'], 'id': video['id']}), li, NOT_FOLDER)
             )
@@ -283,10 +283,10 @@ class VKAddon():
         """
         Notify user using uniform style.
         (helper)
-        :param msg: str
-        :param icon: xbmcgui.NOTIFICATION_INFO (default)
+        :param msg: str;
+        :param icon: int; xbmcgui.NOTIFICATION_INFO (default)
         """
-        heading = '{0}'.format(self.addon.getAddonInfo('name'))
+        heading = '{0} ({1})'.format(self.addon.getAddonInfo('name'), self.addon.getAddonInfo('id'))
         xbmcgui.Dialog().notification(heading, msg, icon)
 
     def savecookies(self, cookiejar):
@@ -340,8 +340,8 @@ class VKAddon():
                 [
                     # ('PLAY ALBUM', ''),  # todo
                     ('[COLOR blue]Rename album[/COLOR]', 'RunPlugin({0})'.format(self.buildurl('/renamealbum', {'albumid': album['id']}))),
-                    ('[COLOR blue]Reorder album up[/COLOR]', 'RunPlugin({0})'.format(self.buildurl('/reorderalbum', {'albumid': album['id'], 'beforeid': beforeid}))),
-                    ('[COLOR blue]Reorder album down[/COLOR]', 'RunPlugin({0})'.format(self.buildurl('/reorderalbum', {'albumid': album['id'], 'afterid': afterid}))),
+                    ('[COLOR blue]Move up[/COLOR]', 'RunPlugin({0})'.format(self.buildurl('/reorderalbum', {'albumid': album['id'], 'beforeid': beforeid}))),
+                    ('[COLOR blue]Move down[/COLOR]', 'RunPlugin({0})'.format(self.buildurl('/reorderalbum', {'albumid': album['id'], 'afterid': afterid}))),
                     ('[COLOR blue]Delete album[/COLOR]', 'RunPlugin({0})'.format(self.buildurl('/deletealbum', {'albumid': album['id']}))),
                     ('[COLOR blue]Add album[/COLOR]', 'RunPlugin({0})'.format(self.buildurl('/addalbum'))),
                 ]
@@ -457,18 +457,17 @@ class VKAddon():
         try:
             counters = self.vkapi.execute.getMenuCounters()
         except vk.exceptions.VkAPIError:
-            counters = {'videos': 'n/a', 'albums': 'n/a', 'communities': 'n/a', 'likedVideos': 'n/a', 'likedCommunities': 'n/a'}
-            # todo: do not display counters at all?
+            counters = {'videos': '?', 'likedvideos': '?', 'albums': '?', 'communities': '?', 'likedcommunities': '?'}
         # create list items for main menu
         listitems = [
-            (self.buildurl('/search'), xbmcgui.ListItem('SEARCH'), FOLDER),
-            (self.buildurl('/searchhistory'), xbmcgui.ListItem('SEARCH HISTORY'), FOLDER),
-            (self.buildurl('/videos'), xbmcgui.ListItem('VIDEOS [COLOR blue]({0})[/COLOR]'.format(counters['videos'])), FOLDER),
-            (self.buildurl('/likedvideos'), xbmcgui.ListItem('LIKED VIDEOS [COLOR blue]({0})[/COLOR]'.format(counters['likedVideos'])), FOLDER),
-            (self.buildurl('/albums'), xbmcgui.ListItem('ALBUMS [COLOR blue]({0})[/COLOR]'.format(counters['albums'])), FOLDER),
-            (self.buildurl('/communities'), xbmcgui.ListItem('COMMUNITIES [COLOR blue]({0})[/COLOR]'.format(counters['communities'])), FOLDER),
-            (self.buildurl('/likedcommunities'), xbmcgui.ListItem('LIKED COMMUNITIES [COLOR blue]({0})[/COLOR]'.format(counters['likedCommunities'])), FOLDER),
-            (self.buildurl('/stats'), xbmcgui.ListItem('STATS'), FOLDER),
+            (self.buildurl('/search'), xbmcgui.ListItem('{0}'.format(self.addon.getLocalizedString(30030))), FOLDER),  # search
+            (self.buildurl('/searchhistory'), xbmcgui.ListItem('{0}'.format(self.addon.getLocalizedString(30031))), FOLDER),  # search history
+            (self.buildurl('/videos'), xbmcgui.ListItem('{0} [COLOR blue]({1})[/COLOR]'.format(self.addon.getLocalizedString(30032), counters['videos'])), FOLDER),  # videos
+            (self.buildurl('/likedvideos'), xbmcgui.ListItem('{0} [COLOR blue]({1})[/COLOR]'.format(self.addon.getLocalizedString(30033), counters['likedvideos'])), FOLDER),  # liked videos
+            (self.buildurl('/albums'), xbmcgui.ListItem('{0} [COLOR blue]({1})[/COLOR]'.format(self.addon.getLocalizedString(30034), counters['albums'])), FOLDER),  # albums
+            (self.buildurl('/communities'), xbmcgui.ListItem('{0} [COLOR blue]({1})[/COLOR]'.format(self.addon.getLocalizedString(30035), counters['communities'])), FOLDER),  # communities
+            (self.buildurl('/likedcommunities'), xbmcgui.ListItem('{0} [COLOR blue]({1})[/COLOR]'.format(self.addon.getLocalizedString(30036), counters['likedcommunities'])), FOLDER),  # liked communities
+            (self.buildurl('/stats'), xbmcgui.ListItem('{0}'.format(self.addon.getLocalizedString(30037))), FOLDER),  # stats
         ]
         # show main menu list in kodi
         xbmcplugin.setContent(self.handle, 'files')
@@ -617,14 +616,6 @@ class VKAddon():
 
     """ ----- Contextmenu action handlers ----- """
 
-    def addtoalbum(self):
-        """
-        Add video into album.
-        (contextmenu action handler)
-        """
-        pass  # todo
-        # xbmcgui.Dialog().multiselect(heading, options[, autoclose, preselect, useDetails])
-
     def addalbum(self):
         """
         Add new album.
@@ -637,7 +628,7 @@ class VKAddon():
         )
         self.log('New album added: {0}'.format(addedalbum['album_id']))
         self.notify('New album added.')
-        # todo: refresh list view
+        xbmc.executebuiltin('Container.refresh')
 
     def deletealbum(self):
         """
@@ -650,7 +641,7 @@ class VKAddon():
             )
             self.log('Album deleted: {0}'.format(self.urlargs['albumid']))
             self.notify('Album deleted.')
-            # todo: refresh list view
+            xbmc.executebuiltin('Container.refresh')
 
     def deletesearch(self):
         """
@@ -686,17 +677,11 @@ class VKAddon():
         )
         self.log('Like added to video: {0} ({1} likes)'.format(oidid, like['likes']))
         self.notify('Like added to video. ({0} likes)'.format(like['likes']))
+        xbmc.executebuiltin('Container.refresh')
 
     def playalbum(self):
         """
         Play album.
-        (contextmenu action handler)
-        """
-        pass  # todo
-
-    def removefromalbum(self):
-        """
-        Remove video from album.
         (contextmenu action handler)
         """
         pass  # todo
@@ -715,7 +700,7 @@ class VKAddon():
         )
         self.log('Album renamed: {0}'.format(self.urlargs['albumid']))
         self.notify('Album renamed.')
-        # todo: refresh list view
+        xbmc.executebuiltin('Container.refresh')
 
     def reorderalbum(self):
         """
@@ -723,20 +708,35 @@ class VKAddon():
         (contextmenu action handler)
         """
         kwparams = {'album_id': int(self.urlargs['albumid'])}
-        if self.urlargs['beforeid']:
+        if 'beforeid' in self.urlargs:
             kwparams['before'] = int(self.urlargs['beforeid'])
-        elif self.urlargs['afterid']:
-            kwparams['after'] = int(self.urlargs['beforeid'])
+        elif 'afterid' in self.urlargs:
+            kwparams['after'] = int(self.urlargs['afterid'])
         self.vkapi.video.reorderAlbums(**kwparams)
         self.log('Album reordered: {0}'.format(self.urlargs['albumid']))
-        # todo: refresh list view
+        xbmc.executebuiltin('Container.refresh')
 
-    def searchsimilarvideos(self):
+    def setalbumsforvideo(self):
         """
-        Search similar videos.
+        Set album/s for video.
         (contextmenu action handler)
         """
-        pass  # todo
+        oidid = self.buildoidid(self.urlargs['ownerid'], self.urlargs['id'])
+        allalbums = []  # todo: get all albums
+        if xbmcgui.Dialog().multiselect('Set album/s for video', allalbums):
+            pass
+        """
+        albumtitle = self.vkapi.video.getAlbumById(album_id=int(self.urlargs['albumid']))['title']
+        albumtitle = xbmcgui.Dialog().input('EDIT ALBUM TITLE', albumtitle)
+        self.vkapi.video.editAlbum(
+            album_id=int(self.urlargs['albumid']),
+            title=str(albumtitle),
+            privacy=['3']  # 3=onlyme  # todo: editable?
+        )
+        """
+        self.log('Album/s set for video: {0}'.format(oidid))
+        self.notify('Album/s set for video.')
+        xbmc.executebuiltin('Container.refresh')
 
     def unfollowcommunity(self):
         """
@@ -765,6 +765,7 @@ class VKAddon():
         )
         self.log('Like deleted from video: {0} ({1} likes)'.format(oidid, unlike['likes']))
         self.notify('Like deleted from video. ({0} likes)'.format(unlike['likes']))
+        xbmc.executebuiltin('Container.refresh')
 
 
 class VKAddonError(Exception):

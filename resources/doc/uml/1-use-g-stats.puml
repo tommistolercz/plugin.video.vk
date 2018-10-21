@@ -1,0 +1,14 @@
+@startuml
+left to right direction
+
+'user
+actor "User" as user
+note "Kodi user with\nVK.com accout" as n
+    user . n
+
+'stats
+rectangle "Stats" <<package>> {
+    user -- (List stats)
+}
+
+@enduml

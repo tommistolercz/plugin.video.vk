@@ -16,6 +16,8 @@ msgstr ""
 "Language: cs_CZ\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
+# Addon settings (30000+)
+
 msgctxt "#30000"
 msgid "GENERAL"
 msgstr "OBECNÉ"
@@ -37,12 +39,12 @@ msgid "Search also own videos"
 msgstr "Hledat také vlastní videa"
 
 msgctxt "#30005"
-msgid "Search videos longer than [minutes]"
-msgstr "Hledat videa delší než [minut]"
+msgid "Search videos longer than [min.]"
+msgstr "Hledat videa delší než [min.]"
 
 msgctxt "#30006"
-msgid "Search videos shorter than [minutes]"
-msgstr "Hledat videa kratší než [minut]"
+msgid "Search videos shorter than [min.]"
+msgstr "Hledat videa kratší než [min.]"
 
 msgctxt "#30007"
 msgid "Sort searched videos"
@@ -59,3 +61,59 @@ msgstr "Podle délky"
 msgctxt "#30010"
 msgid "By relevance"
 msgstr "Podle relevance"
+
+# Addon init (30020+)
+
+msgctxt "#30020"
+msgid "Enter your VK login/email"
+msgstr "Zadejte své VK uživ. jméno/email"
+
+msgctxt "#30021"
+msgid "Enter your VK password"
+msgstr "Zadejte své VK heslo"
+
+msgctxt "#30022"
+msgid "VK authorization error!"
+msgstr "Chyba VK autorizace!"
+
+msgctxt "#30023"
+msgid "VK API error!"
+msgstr "Chyba VK API!"
+
+msgctxt "#30024"
+msgid "Addon routing error!"
+msgstr "Chyba routingu!"
+
+# Addon menu (30030+)
+
+msgctxt "#30030"
+msgid "SEARCH"
+msgstr "HLEDAT"
+
+msgctxt "#30031"
+msgid "SEARCH HISTORY"
+msgstr "HISTORIE HLEDÁNÍ"
+
+msgctxt "#30032"
+msgid "VIDEOS"
+msgstr "VIDEA"
+
+msgctxt "#30033"
+msgid "LIKED VIDEOS"
+msgstr "OBLÍBENÁ VIDEA"
+
+msgctxt "#30034"
+msgid "ALBUMS"
+msgstr "ALBA"
+
+msgctxt "#30035"
+msgid "COMMUNITIES"
+msgstr "KOMUNITY"
+
+msgctxt "#30036"
+msgid "LIKED COMMUNITIES"
+msgstr "OBLÍBENÉ KOMUNITY"
+
+msgctxt "#30037"
+msgid "STATS"
+msgstr "STATISTIKY"

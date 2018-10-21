@@ -1,0 +1,19 @@
+@startuml
+left to right direction
+
+'user
+actor "User" as user
+note "Kodi user with\nVK.com accout" as n
+    user . n
+
+'my likes
+rectangle "My likes" <<package>> {
+    user -- (List liked videos)
+    user -- (List liked communities)
+    user -- (Like video)
+    user -- (Unlike video)
+    user -- (Like community)
+    user -- (Unlike community)
+}
+
+@enduml

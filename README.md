@@ -41,10 +41,9 @@ Kodi add-on for watching videos from VK.com social network.
     - [x] List album videos
     - [x] Add album
     - [x] Rename album
-    - [ ] Reorder album up/down
+    - [x] Reorder album up/down
     - [x] Delete album
-    - [ ] Add video to album
-    - [ ] Remove video from album
+    - [ ] Set album/s for video
     - [ ] Play album
 - My communities
     - [x] List communities

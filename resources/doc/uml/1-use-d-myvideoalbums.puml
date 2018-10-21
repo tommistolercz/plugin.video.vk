@@ -1,0 +1,21 @@
+@startuml
+left to right direction
+
+'user
+actor "User" as user
+note "Kodi user with\nVK.com accout" as n
+    user . n
+
+'my video albums
+rectangle "My video albums" <<package>> {
+    user -- (List albums)
+    user -- (List album videos)
+    user -- (Add album)
+    user -- (Rename album)
+    user -- (Reorder album up/down)
+    user -- (Delete album)
+    user -- (Set album/s for video)
+    user -- (Play album)
+}
+
+@enduml
