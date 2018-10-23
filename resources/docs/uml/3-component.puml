@@ -1,0 +1,34 @@
+@startuml
+left to right direction
+skinparam componentBackgroundColor<<addon>> Orange
+
+'kodi app
+node "Local/mobile device running Kodi" {
+    frame "Kodi" <<application>> {
+        component "plugin.video.vk" <<addon>> as addon
+        interface "Python API" as pyapi
+        component "Kodi" as kodi
+        pyapi <. addon : "python 2.x"
+        kodi - pyapi
+    }
+}
+
+'vk.com
+cloud "Internet" {
+    frame "VK.com" {
+        component "VK" as vk
+    }
+    interface "OAuth2" as auth
+    interface "API" as api
+    interface "Web" as web
+    auth -- vk
+    api -- vk
+    web -- vk
+}
+
+addon ..> auth : "https"
+addon ..> api : "https/json"    
+addon ..> web : "https"        
+kodi ..> web : "hls"
+
+@enduml

@@ -2,34 +2,32 @@
 
 Kodi add-on for watching videos from VK.com social network.
 
-### Requirements:
+## Requirements
 
-- [Kodi](https://kodi.tv) 17.x or newer
+- [Kodi](https://kodi.tv) 17.x or newer<br>
+    (tested on: Kodi 17.6/macOS High Sierra, Kodi 17.6/LibreELEC 8.x, Kodi 18.0-beta3/Win 7)
+
 - [VK.com](https://vk.com) user account
 
-(Tested on Kodi 17.6/macOS High Sierra, Kodi 17.6/LibreELEC 8.x, Kodi 18.0-beta3/Win 7)
+## Installation
 
-### Installation:
+1. Download the add-on zip file:<br>
+    [plugin.video.vk-1.0.0.zip](http://github.com/tommistolercz/plugin.video.vk/archive/plugin.video.vk-1.0.0.zip) 
+        ([latest release](http://github.com/tommistolercz/plugin.video.vk/releases/latest))
 
-1. Download the add-on zip file:
-
-[plugin.video.vk-1.0.0.zip](http://) (latest)
-
-2. Then in Kodi:
-
-- Settings > Add-ons > Install from zip file
-- List downloaded zip file, select it then select OK
-
+2. Then in Kodi:<br>
+    Settings > Add-ons > Install from zip file... (list and select downloaded file, press OK)
+    
 (More detailed instructions available [here](https://kodi.wiki/view/HOW-TO:Install_add-ons_from_zip_files).)
 
-### Features:
+## Features
 
-**v1.0.0 [WIP]**
+### v1.0.0 **[WIP]**
 
 - Search
     - [x] Search videos
     - [x] List searched videos
-    - [ ] Search similar videos
+    - [ ] Search similar videos **[WIP]**
     - [x] List search history
     - [ ] Edit search
     - [ ] Delete search
@@ -43,7 +41,7 @@ Kodi add-on for watching videos from VK.com social network.
     - [x] Rename album
     - [x] Reorder album up/down
     - [x] Delete album
-    - [ ] Set album/s for video
+    - [ ] Set album/s for video **[WIP]**
     - [ ] Play album
 - My communities
     - [x] List communities
@@ -63,3 +61,11 @@ Kodi add-on for watching videos from VK.com social network.
     - [x] Authorize add-on (OAuth2 support using user access token, user credentials only required on first run and no longer stored by add-on)
     - [x] User-friendly listings incl. pagination, HD thumbs, item counters, auto switching view modes, ...
     - [x] EN/CZ translations
+
+### Backlog
+
+- [ ] Search videos with suggestions ([script.module.autocompletion](https://github.com/phil65/script.module.autocompletion) integration)
+
+## Docs
+
+Documentation is available [here](./resources/docs/DOCS.md).
