@@ -1,38 +1,40 @@
 """
 TESTCASES
----------
+=========
 todo: define/describe list of all groups/testcases
-todo: map to usecases
 
-1) Common (addon install, setup, firstrun, authorization, ...)
+1) Common
 - install addon from github (new installation)
-- run with default settings
+- first run with default settings
+- authorize addon by entering user credentials
 - ...
 
 2) Search
+- search videos by entering a new query, then use any cm action for any searched video.
 - ...
 
 3) My videos
 - ...
 
-4) my video albums
-- use set album/s for video cma for user having 0 albums
-- use 'set albums for video' cm action for user having >100 albums
+4) My video albums
+- use set album/s for video cm action for user having 0 albums
+- use set albums for video cm action for user having >100 albums
 - ...
 
-5) my communities
+5) My communities
 - ...
 
-6) my likes
+6) My likes
 - ...
 
-7) stats
+7) Stats
 - ...
 
 """
 
 import unittest
 import addon
+
 
 # test vk user
 TEST_VK_USER = {
@@ -47,7 +49,7 @@ ASSERT_TEST_VK_USER = {
 }
 
 # test vk api video object
-# (Home > Albums > Outdoor > Easy beach life)
+# (Albums > Outdoor > Easy beach life)
 TEST_VIDEO = {
     u'album_id': 52553483,
     u'can_add': 1,
