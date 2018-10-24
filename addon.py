@@ -342,8 +342,8 @@ class VKAddon():
                     ('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30058)), 'RunPlugin({0})'.format(self.buildurl('/renamealbum', {'albumid': album['id']}))),
                     ('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30059)), 'RunPlugin({0})'.format(self.buildurl('/reorderalbum', {'albumid': album['id'], 'beforeid': beforeid}))),
                     ('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30060)), 'RunPlugin({0})'.format(self.buildurl('/reorderalbum', {'albumid': album['id'], 'afterid': afterid}))),
-                    ('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30061)), 'RunPlugin({0})'.format(self.buildurl('/addalbum'))),
-                    ('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30062)), 'RunPlugin({0})'.format(self.buildurl('/deletealbum', {'albumid': album['id']}))),
+                    ('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30062)), 'RunPlugin({0})'.format(self.buildurl('/addalbum'))),
+                    ('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30061)), 'RunPlugin({0})'.format(self.buildurl('/deletealbum', {'albumid': album['id']}))),
                 ]
             )
             listitems.append(
