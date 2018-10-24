@@ -12,8 +12,8 @@ Kodi add-on for watching videos from VK.com social network.
 ## Installation
 
 1. Download the add-on zip file:<br>
-    [plugin.video.vk-1.0.0.zip](http://github.com/tommistolercz/plugin.video.vk/archive/plugin.video.vk-1.0.0.zip) 
-
+    [plugin.video.vk-1.0.0-develop.zip](http://github.com/tommistolercz/plugin.video.vk/archive/plugin.video.vk-1.0.0-develop.zip) 
+    
 2. Then in Kodi:<br>
     Settings > Add-ons > Install from zip file... (list and select downloaded file, press OK)
     
