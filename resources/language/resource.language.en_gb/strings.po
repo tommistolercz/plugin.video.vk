@@ -84,7 +84,7 @@ msgctxt "#30024"
 msgid "Addon routing error!"
 msgstr ""
 
-# Addon menu (30030+)
+# Addon main menu (30030+)
 
 msgctxt "#30030"
 msgid "SEARCH"
@@ -103,7 +103,7 @@ msgid "LIKED VIDEOS"
 msgstr ""
 
 msgctxt "#30034"
-msgid "ALBUMS"
+msgid "VIDEO ALBUMS"
 msgstr ""
 
 msgctxt "#30035"
@@ -116,4 +116,139 @@ msgstr ""
 
 msgctxt "#30037"
 msgid "STATS"
+msgstr ""
+
+# Context menu actions (30050+)
+
+msgctxt "#30050"
+msgid "Unlike video"
+msgstr ""
+
+msgctxt "#30051"
+msgid "Like video"
+msgstr ""
+
+msgctxt "#30052"
+msgid "Set albums for video"
+msgstr ""
+
+msgctxt "#30053"
+msgid "Search similar"
+msgstr ""
+
+msgctxt "#30054"
+msgid "Unlike community"
+msgstr ""
+
+msgctxt "#30055"
+msgid "Like community"
+msgstr ""
+
+msgctxt "#30056"
+msgid "Unfollow community"
+msgstr ""
+
+msgctxt "#30057"
+msgid "Play album as playlist"
+msgstr ""
+
+msgctxt "#30058"
+msgid "Rename album"
+msgstr ""
+
+msgctxt "#30059"
+msgid "Move up"
+msgstr ""
+
+msgctxt "#30060"
+msgid "Move down"
+msgstr ""
+
+msgctxt "#30061"
+msgid "Delete album"
+msgstr ""
+
+msgctxt "#30062"
+msgid "Add album"
+msgstr ""
+
+msgctxt "#30063"
+msgid "Edit search"
+msgstr ""
+
+msgctxt "#30064"
+msgid "Delete search"
+msgstr ""
+
+# Play (30080+)
+
+msgctxt "#30080"
+msgid "Resolving error!"
+msgstr ""
+
+# Search (30090+)
+
+msgctxt "#30090"
+msgid "Enter the search query:"
+msgstr ""
+
+msgctxt "#30091"
+msgid "{0} videos found."
+msgstr ""
+
+# Albums (30110+)
+
+msgctxt "#30110"
+msgid "Enter the album title:"
+msgstr ""
+
+msgctxt "#30111"
+msgid "Album added."
+msgstr ""
+
+msgctxt "#30112"
+msgid "Confirmation:"
+msgstr ""
+
+msgctxt "#30113"
+msgid "Do you want to delete the album?"
+msgstr ""
+
+msgctxt "#30114"
+msgid "Album deleted."
+msgstr ""
+
+msgctxt "#30115"
+msgid "Edit the album title:"
+msgstr ""
+
+msgctxt "#30116"
+msgid "Album renamed."
+msgstr ""
+
+msgctxt "#30117"
+msgid "Set the albums for video:"
+msgstr ""
+
+msgctxt "#30118"
+msgid "Albums set."
+msgstr ""
+
+# Likes (30130+)
+
+msgctxt "#30130"
+msgid "Like added to video. ({0} likes)"
+msgstr ""
+
+msgctxt "#30131"
+msgid "Like deleted from video."
+msgstr ""
+
+# Stats (30150+)
+
+
+# Others (30200+)
+
+msgctxt "#30200"
+msgid "NEXT PAGE"
 msgstr ""

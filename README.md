@@ -13,7 +13,6 @@ Kodi add-on for watching videos from VK.com social network.
 
 1. Download the add-on zip file:<br>
     [plugin.video.vk-1.0.0.zip](http://github.com/tommistolercz/plugin.video.vk/archive/plugin.video.vk-1.0.0.zip) 
-        ([latest release](http://github.com/tommistolercz/plugin.video.vk/releases/latest))
 
 2. Then in Kodi:<br>
     Settings > Add-ons > Install from zip file... (list and select downloaded file, press OK)
@@ -33,7 +32,7 @@ Kodi add-on for watching videos from VK.com social network.
     - [ ] Delete search
 - My videos
     - [x] List videos
-    - [x] Play video (incl. 1080p, 720p)
+    - [x] Play video (HD support incl. 1080p)
 - My video albums
     - [x] List albums
     - [x] List album videos
@@ -41,7 +40,7 @@ Kodi add-on for watching videos from VK.com social network.
     - [x] Rename album
     - [x] Reorder album up/down
     - [x] Delete album
-    - [ ] Set album/s for video **[WIP]**
+    - [x] Set albums for video
     - [ ] Play album
 - My communities
     - [x] List communities
@@ -64,7 +63,9 @@ Kodi add-on for watching videos from VK.com social network.
 
 ### Backlog
 
+- [ ] List video news/updates
 - [ ] Search videos with suggestions ([script.module.autocompletion](https://github.com/phil65/script.module.autocompletion) integration)
+- [ ] Auto-generated session playlists
 
 ## Docs
 

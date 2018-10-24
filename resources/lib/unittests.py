@@ -1,9 +1,38 @@
+"""
+TESTCASES
+---------
+todo: define/describe list of all groups/testcases
+todo: map to usecases
+
+1) Common (addon install, setup, firstrun, authorization, ...)
+- install addon from github (new installation)
+- run with default settings
+- ...
+
+2) Search
+- ...
+
+3) My videos
+- ...
+
+4) my video albums
+- use set album/s for video cma for user having 0 albums
+- use 'set albums for video' cm action for user having >100 albums
+- ...
+
+5) my communities
+- ...
+
+6) my likes
+- ...
+
+7) stats
+- ...
+
+"""
+
 import unittest
-
 import addon
-
-
-# TEST DATA
 
 # test vk user
 TEST_VK_USER = {
@@ -40,8 +69,6 @@ ASSERT_TEST_VIDEO = {
     'playablestreams': None,  # todo
 }
 
-
-# TEST CASES
 
 class VKAddonTestCase(unittest.TestCase):
 
