@@ -1,7 +1,6 @@
 """
-TESTCASES
-=========
-todo: define/describe list of all groups/testcases
+TESTS:
+# todo: describe list of all testcases/tests
 
 1) Common
 - install addon from github (new installation)
@@ -36,51 +35,58 @@ import unittest
 import addon
 
 
-# test vk user
+# test data: vk user
 TEST_VK_USER = {
     'credentials': {
         'login': 'tweakcz@icloud.com',
         'password': None,  # todo
     },
 }
-ASSERT_TEST_VK_USER = {
+TEST_VK_USER_ASSERT = {
     'id': '252651698',
     'accesstoken': None,  # todo
 }
 
-# test vk api video object
-# (Albums > Outdoor > Easy beach life)
+# test data: vk api video object (video albums > outdoor > easy beach life)
 TEST_VIDEO = {
-    u'album_id': 52553483,
-    u'can_add': 1,
-    u'comments': 0,
-    u'date': 1399413471,
-    u'description': u'Cuba, Cayo Largo del Sol Island. Be nudist.',
-    u'duration': 317,
-    u'id': 168471765,
-    u'owner_id': 243422351,
-    u'photo_130': u'https://pp.userapi.com/c540505/u232253052/video/s_aa659be6.jpg',
-    u'photo_320': u'https://pp.userapi.com/c540505/u232253052/video/l_e3a199a7.jpg',
-    u'player': u'https://vk.com/video_ext.php?oid=243422351&id=168471765&hash=ba1f2675a67139a0&__ref=vk.api&api_hash=1539001490e6625aa046a6203649_GI2TENRVGE3DSOA',
-    u'title': u'Easy Beach Life',
-    u'views': 12,
+    'album_id': 52553483,
+    'can_add': 1,
+    'comments': 0,
+    'date': 1399413471,
+    'description': 'Cuba, Cayo Largo del Sol Island. Be nudist.',
+    'duration': 317,
+    'id': 168471765,
+    'owner_id': 243422351,
+    'photo_130': 'https://pp.userapi.com/c540505/u232253052/video/s_aa659be6.jpg',
+    'photo_320': 'https://pp.userapi.com/c540505/u232253052/video/l_e3a199a7.jpg',
+    'player': 'https://vk.com/video_ext.php?oid=243422351&id=168471765&hash=ba1f2675a67139a0&__ref=vk.api&api_hash=1539001490e6625aa046a6203649_GI2TENRVGE3DSOA',
+    'title': 'Easy Beach Life',
+    'views': 12,
 }
-ASSERT_TEST_VIDEO = {
+TEST_VIDEO_ASSERT = {
     'oidid': '243422351_168471765',
     'url': 'https://vk.com/al_video.php?act=show_inline&al=1&video=243422351_168471765',
-    'playablestreams': None,  # todo
 }
 
 
+# testcases/tests
 class VKAddonTestCase(unittest.TestCase):
 
     def setUp(self):
+        """
+        Set up test environment
+        """
         self.vkaddon = addon.VKAddon()
 
     def test_buildoidid(self):
+        """
+        Test buildoidid() helper 
+        (example)
+        """
         oidid = self.vkaddon.buildoidid(TEST_VIDEO['owner_id'], TEST_VIDEO['id'])
-        self.assertEqual(oidid, ASSERT_TEST_VIDEO['oidid'])
+        self.assertEqual(oidid, TEST_VIDEO_ASSERT['oidid'])
 
 
+# run tests
 if __name__ == '__main__':
     unittest.main()

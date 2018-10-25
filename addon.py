@@ -28,7 +28,7 @@ FOLDER, NOT_FOLDER = (True, False)
 
 VK_API_APP_ID = '6432748'
 VK_API_SCOPE = 'email,friends,groups,offline,stats,status,video,wall'
-VK_API_VERSION = '5.85'  # todo 5.87
+VK_API_VERSION = '5.85'  # todo: '5.87'
 VK_API_LANG = 'ru'
 VK_VIDEOINFO_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246'
 ADDON_DATA_FILE_COOKIEJAR = '.cookiejar'
@@ -51,8 +51,8 @@ class VKAddon():
             if self.addon.getSetting('vkuseraccesstoken') == '':
                 self.vksession = vk.AuthSession(
                     VK_API_APP_ID,
-                    xbmcgui.Dialog().input(self.addon.getLocalizedString(30020)),  # enter vk user login
-                    xbmcgui.Dialog().input(self.addon.getLocalizedString(30021), option=xbmcgui.ALPHANUM_HIDE_INPUT),  # enter vk user pass
+                    xbmcgui.Dialog().input(self.addon.getLocalizedString(30020)),
+                    xbmcgui.Dialog().input(self.addon.getLocalizedString(30021), option=xbmcgui.ALPHANUM_HIDE_INPUT),
                     VK_API_SCOPE
                 )
                 self.addon.setSetting('vkuseraccesstoken', self.vksession.access_token)
@@ -63,16 +63,16 @@ class VKAddon():
                 self.vksession.requests_session.cookies = self.loadcookies()
         except vk.exceptions.VkAuthError:
             self.log('VK authorization error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30022), icon=xbmcgui.NOTIFICATION_ERROR)  # vk auth error
+            self.notify(self.addon.getLocalizedString(30022), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
         # create vk api, enable api usage tracking
         try:
             self.vkapi = vk.API(self.vksession, v=VK_API_VERSION, lang=VK_API_LANG)
-            tracking = bool(self.vkapi.stats.trackVisitor())  # noqa
-            # self.log('VK API object created. API usage tracking: {0}'.format(tracking))
+            hastracking = bool(self.vkapi.stats.trackVisitor())  # noqa
+            # self.log('VK API object created. API usage tracking: {0}'.format(hastracking))
         except vk.exceptions.VkAPIError:
             self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30023), icon=xbmcgui.NOTIFICATION_ERROR)  # vk api error
+            self.notify(self.addon.getLocalizedString(30023), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
         # parse addon url
         self.urlbase = 'plugin://' + self.addon.getAddonInfo('id')
@@ -119,7 +119,7 @@ class VKAddon():
             self.routing[self.urlpath]()
         except KeyError:
             self.log('Addon routing error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30024), icon=xbmcgui.NOTIFICATION_ERROR)  # addon routing error
+            self.notify(self.addon.getLocalizedString(30024), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
 
     def buildoidid(self, ownerid, id):
@@ -219,19 +219,17 @@ class VKAddon():
         (helper)
         :param listdata: dict
         """
-        # list type
-        listtype = self.urlpath  # one of ['/communities', '/likedcommunities']
+        # list type, one of: /communities, /likedcommunities
+        listtype = self.urlpath
         # create list items for communities
         listitems = []
-        _namekey = 'title' if listtype == '/likedcommunities' else 'name'  # ugly!
+        _namekey = 'title' if listtype == '/likedcommunities' else 'name'
         for community in listdata['items']:
             if listtype == '/likedcommunities':
-                community['id'] = community['id'].split('_')[2]  # ugly!
-            li = xbmcgui.ListItem(
-                label=community[_namekey],
-            )
+                community['id'] = community['id'].split('_')[2]
+            li = xbmcgui.ListItem(label=community[_namekey])
             li.setArt({'thumb': community['photo_200']})
-            # todo: use infolabels (plot, ...) for showing community details?
+            # todo: use other infolabels (plot, ...) for showing community details?
             li.addContextMenuItems(
                 [
                     ('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30054)), 'RunPlugin({0})'.format(self.buildurl('/unlikecommunity', {'communityid': community['id']}))),
@@ -261,8 +259,8 @@ class VKAddon():
         (helper)
         :param listdata: dict
         """
-        # list type
-        listtype = self.urlpath  # one of ['/videos', '/searchedvideos', '/albumvideos', '/communityvideos', '/likedvideos']
+        # list type, one of: /videos, /searchedvideos, /albumvideos, /communityvideos, /likedvideos
+        listtype = self.urlpath
         # create list items for videos
         listitems = []
         for video in listdata['items']:
@@ -349,7 +347,7 @@ class VKAddon():
             listitems.append(
                 (self.buildurl('/albumvideos', {'albumid': album['id']}), li, FOLDER)
             )
-        # add paginator item  # todo: def
+        # add paginator item
         if int(albums['count']) > int(self.addon.getSetting('itemsperpage')):
             if int(albums['count']) > int(self.urlargs['offset']) + int(self.addon.getSetting('itemsperpage')):
                 self.urlargs['offset'] = int(self.urlargs['offset']) + self.addon.getSetting('itemsperpage')
@@ -581,10 +579,10 @@ class VKAddon():
         # if not passed, let user to enter a new search query
         if 'q' not in self.urlargs:
             self.urlargs['q'] = xbmcgui.Dialog().input(self.addon.getLocalizedString(30090))  # todo: bug when cancel dialog (esc)
-        # if not passed, reset paging offset
+        # set default paging offset
         if 'offset' not in self.urlargs:
             self.urlargs['offset'] = 0
-        # request vk api for searching videos
+        # request vk api for searched videos
         searchedvideos = self.vkapi.video.search(
             extended=1,
             hd=1,
@@ -600,7 +598,7 @@ class VKAddon():
         # notify user on results count
         if int(self.urlargs['offset']) == 0:
             self.notify(self.addon.getLocalizedString(30091).format(searchedvideos['count']))
-        # update search history  # todo: only once!
+        # update search history  # todo: bug: only once!
         searchhistory = self.loadsearchhistory()
         searchhistory['items'].append(
             {
