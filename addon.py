@@ -28,7 +28,7 @@ FOLDER, NOT_FOLDER = (True, False)
 
 VK_API_APP_ID = '6432748'
 VK_API_SCOPE = 'email,friends,groups,offline,stats,status,video,wall'
-VK_API_VERSION = '5.85'  # todo: '5.87'
+VK_API_VERSION = '5.87'
 VK_API_LANG = 'ru'
 VK_VIDEOINFO_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246'
 ADDON_DATA_FILE_COOKIEJAR = '.cookiejar'
@@ -557,16 +557,17 @@ class VKAddon():
             for m in matches:
                 qual = int(m[0])
                 playables[qual] = m[1]
-            self.log('Resolving ok, playable stream/s found: {0}'.format(playables))
             if not playables:
                 raise VKAddonError('Resolving error!')
         except VKAddonError:
             self.log('Resolving error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30080), icon=xbmcgui.NOTIFICATION_ERROR)
             return
-        # create item for kodi player (using max avail. quality)
-        xbmcplugin.setContent(self.handle, 'videos')
+        # create item for kodi player (using max quality stream)
+        self.log('Resolving ok, playable stream/s found: {0}'.format(playables))
         maxqual = max(playables.keys())
+        self.log('Using max quality: {0}'.format(maxqual))
+        xbmcplugin.setContent(self.handle, 'videos')
         li = xbmcgui.ListItem(path=playables[maxqual])
         xbmcplugin.setResolvedUrl(self.handle, True, li)
 
