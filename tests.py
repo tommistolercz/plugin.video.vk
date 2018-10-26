@@ -6,7 +6,7 @@ TESTS:
 - install addon from github (new installation)
 - first run with default settings
 - authorize addon by entering user credentials
-- ...
+- run addon with cookies expired
 
 2) Search
 - search videos by entering a new query, then use any cm action for any searched video.

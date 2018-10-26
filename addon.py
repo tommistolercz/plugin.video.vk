@@ -559,7 +559,7 @@ class VKAddon():
                 playables[qual] = m[1]
             if not playables:
                 raise VKAddonError('Resolving error!')
-        except VKAddonError:
+        except VKAddonError:  # todo: [bug] also raising due to unhandled cookies expiration
             self.log('Resolving error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30080), icon=xbmcgui.NOTIFICATION_ERROR)
             return
