@@ -290,7 +290,7 @@ class VKAddon():
             else:
                 cmi.append(('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30051)), 'RunPlugin({0})'.format(self.buildurl('/likevideo', {'ownerid': video['owner_id'], 'id': video['id']}))))
             cmi.append(('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30052)), 'RunPlugin({0})'.format(self.buildurl('/setalbumsforvideo', {'ownerid': video['owner_id'], 'id': video['id']}))))
-            cmi.append(('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30053)), 'RunPlugin({0})'.format(self.buildurl('/searchsimilar', {'q': video['title']}))))
+            cmi.append(('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30053)), 'RunPlugin({0})'.format(self.buildurl('/searchsimilar', {'q': video['title'], 'edit': 1}))))
             li.addContextMenuItems(cmi)
             listitems.append(
                 (self.buildurl('/play', {'ownerid': video['owner_id'], 'id': video['id']}), li, NOT_FOLDER)
@@ -321,7 +321,7 @@ class VKAddon():
         albums = self.vkapi.video.getAlbums(
             extended=1,
             offset=int(self.urlargs['offset']),
-            count=int(self.addon.getSetting('itemsperpage')),
+            count=100,  # todo: ugly! (api's max=100, default=50)
         )
         # create list items for albums
         listitems = []
@@ -484,17 +484,16 @@ class VKAddon():
         listitems = []
         for search in sorted(searchhistory['items'], key=lambda x: x['timestamp'], reverse=True):
             li = xbmcgui.ListItem(
-                label=search['q'],
-                label2=datetime.datetime.fromtimestamp(search['timestamp']).strftime('%d.%m.%Y'),  # todo: ts->dt
+                label='{0} [COLOR blue]({1})[/COLOR]'.format(search['query'], search['results'])
             )
             li.addContextMenuItems(
                 [
-                    ('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30063)), 'RunPlugin({0})'.format(self.buildurl('/editsearch', {'q': search['q']}))),
-                    ('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30064)), 'RunPlugin({0})'.format(self.buildurl('/deletesearch', {'q': search['q']}))),
+                    ('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30063)), 'RunPlugin({0})'.format(self.buildurl('/editsearch', {'q': search['query']}))),
+                    ('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30064)), 'RunPlugin({0})'.format(self.buildurl('/deletesearch', {'q': search['query']}))),
                 ]
             )
             listitems.append(
-                (self.buildurl('/search', {'q': search['q']}), li, FOLDER)
+                (self.buildurl('/search', {'q': search['query']}), li, FOLDER)
             )
         # show search history list in kodi, even if empty
         xbmcplugin.setContent(self.handle, 'files')
@@ -579,6 +578,8 @@ class VKAddon():
         # if not passed, let user to enter a new search query
         if 'q' not in self.urlargs:
             self.urlargs['q'] = xbmcgui.Dialog().input(self.addon.getLocalizedString(30090))  # todo: bug when cancel dialog (esc)
+        elif 'q' in self.urlargs and 'edit' in self.urlargs:
+            self.urlargs['q'] = xbmcgui.Dialog().input(self.addon.getLocalizedString(30090), defaultt=self.urlargs['q'])  # todo: bug when cancel dialog (esc)
         # set default paging offset
         if 'offset' not in self.urlargs:
             self.urlargs['offset'] = 0
@@ -595,20 +596,21 @@ class VKAddon():
             offset=int(self.urlargs['offset']),
             count=int(self.addon.getSetting('itemsperpage')),
         )
-        # notify user on results count
+        # only once:
         if int(self.urlargs['offset']) == 0:
+            # update search history
+            searchhistory = self.loadsearchhistory()
+            searchhistory['items'].append(
+                {
+                    'count': 1,
+                    'query': str(self.urlargs['q']),
+                    'results': int(searchedvideos['count']),
+                    'timestamp': int(time.time()),
+                }
+            )
+            self.savesearchhistory(searchhistory)
+            # notify user on results count
             self.notify(self.addon.getLocalizedString(30091).format(searchedvideos['count']))
-        # update search history  # todo: bug: only once!
-        searchhistory = self.loadsearchhistory()
-        searchhistory['items'].append(
-            {
-                'q': str(self.urlargs['q']),
-                'results': int(searchedvideos['count']),
-                'timestamp': int(time.time()),  # todo: ts->dt
-                'count': 1,
-            }
-        )
-        self.savesearchhistory(searchhistory)
         # build list of searched videos
         self.buildlistofvideos(searchedvideos)
 
