@@ -24,10 +24,16 @@ Kodi add-on for watching videos from VK.com social network.
 
 ### v1.0.0 **[WIP]**
 
+- Common
+    - [x] Edit add-on settings
+    - [x] List add-on main menu
+    - [x] Authorize add-on (OAuth2 support using user access token, user credentials only required on first run and no longer stored by add-on)
+    - [x] User-friendly listings (incl. pagination, HD thumbs, item counters, auto switching view modes, ...)
+    - [x] EN/CZ translations    
 - Search
     - [x] Search videos
     - [x] List searched videos
-    - [ ] Search similar videos **[WIP]**
+    - [ ] Search similar videos
     - [x] List search history
     - [ ] Edit search
     - [ ] Delete search
@@ -56,18 +62,9 @@ Kodi add-on for watching videos from VK.com social network.
     - [ ] Unlike community
 - Stats
     - [ ] List stats
-- Common
-    - [x] Edit add-on settings
-    - [x] Authorize add-on (OAuth2 support using user access token, user credentials only required on first run and no longer stored by add-on)
-    - [x] User-friendly listings incl. pagination, HD thumbs, item counters, auto switching view modes, ...
-    - [x] EN/CZ translations
 
-### Backlog
-
-- [ ] List video news/updates
-- [ ] Search videos with suggestions ([script.module.autocompletion](https://github.com/phil65/script.module.autocompletion) integration)
-- [ ] Auto-generated session playlists
+[Backlog](https://github.com/tommistolercz/plugin.video.vk/milestones/backlog)
 
 ## Docs
 
-Documentation is available [here](./resources/docs/DOCS.md).
+Some documentation is available [here](./resources/docs/DOCS.md).
