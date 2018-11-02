@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 TESTS:
 # todo: describe list of all testcases/tests

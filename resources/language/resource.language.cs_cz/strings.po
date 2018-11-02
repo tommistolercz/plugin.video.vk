@@ -62,6 +62,14 @@ msgctxt "#30010"
 msgid "By relevance"
 msgstr "Podle relevance"
 
+msgctxt "#30011"
+msgid "Switch view mode for videos"
+msgstr "Přepínat zobrazení pro videa"
+
+msgctxt "#30012"
+msgid "View mode [id]"
+msgstr "Typ zobrazení [id]"
+
 # Addon init (30020+)
 
 msgctxt "#30020"
@@ -83,6 +91,10 @@ msgstr "Chyba VK API!"
 msgctxt "#30024"
 msgid "Addon routing error!"
 msgstr "Chyba routingu!"
+
+msgctxt "#30025"
+msgid "Missing data file error!"
+msgstr "Chyba datového souboru!"
 
 # Addon main menu (30030+)
 
@@ -173,12 +185,8 @@ msgid "Add album"
 msgstr "Přidat album"
 
 msgctxt "#30063"
-msgid "Edit search"
-msgstr "Upravit dotaz"
-
-msgctxt "#30064"
 msgid "Delete search"
-msgstr "Smazat dotaz"
+msgstr "Smazat hledání"
 
 # Play (30080+)
 
@@ -195,6 +203,10 @@ msgstr "Zadejte hledaný dotaz:"
 msgctxt "#30091"
 msgid "{0} videos found."
 msgstr "{0} videí nalezeno."
+
+msgctxt "#30092"
+msgid "Search deleted."
+msgstr "Hledání smazáno."
 
 # Albums (30110+)
 
@@ -245,7 +257,6 @@ msgid "Like deleted from video."
 msgstr "Odebráno z oblíbených videí."
 
 # Stats (30150+)
-
 
 # Others (30200+)
 

@@ -4,6 +4,8 @@
         <setting label="30001" id="vkuseraccesstoken" type="text" default=""/>
         <setting type="sep"/>
         <setting label="30002" id="itemsperpage" type="number" default="200"/>
+        <setting label="30011" id="switchviewmodeforvideos" type="bool" default="true"/>
+        <setting label="30012" id="viewmodeid" subsetting="true" visible="eq(-1,true)" type="number" default="500"/>
         <setting type="sep"/>
         <setting label="30003" id="searchadult" type="bool" default="true"/>
         <setting label="30004" id="searchown" type="bool" default="false"/>

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 __all__ = ['VKAddon', 'VKAddonError']
 
 
@@ -7,7 +8,6 @@ import os
 import pickle
 import re
 import sys
-import time
 import urllib
 try:
     import urlparse  # py2
@@ -30,18 +30,18 @@ VK_API_APP_ID = '6432748'
 VK_API_SCOPE = 'email,friends,groups,offline,stats,status,video,wall'
 VK_API_VERSION = '5.87'
 VK_API_LANG = 'ru'
-VK_VIDEOINFO_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246'
+VK_VIDEOINFO_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.1 Safari/605.1.15'
 ADDON_DATA_FILE_COOKIEJAR = '.cookiejar'
-ADDON_DATA_FILE_SEARCH = 'search.json'
+ADDON_DATA_FILE_SEARCH = 'searchhistory.json'
 
 
 class VKAddon():
     """
-    Addon class encapsulating all its logic and data.
+    Addon class encapsulating all its data and logic.
     """
     def __init__(self):
         """
-        Initialize and manage all that controlling stuff during runtime ;-)
+        Initialize addon and manage all that controlling stuff at runtime ;-)
         """
         self.addon = xbmcaddon.Addon()
         self.handle = int(sys.argv[1])
@@ -65,11 +65,14 @@ class VKAddon():
             self.log('VK authorization error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30022), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
+        except VKAddonError:
+            self.log('Missing data file error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30025), icon=xbmcgui.NOTIFICATION_ERROR)
+            exit()
         # create vk api, enable api usage tracking
         try:
             self.vkapi = vk.API(self.vksession, v=VK_API_VERSION, lang=VK_API_LANG)
-            hastracking = bool(self.vkapi.stats.trackVisitor())  # noqa
-            # self.log('VK API object created. API usage tracking: {0}'.format(hastracking))
+            istracked = bool(self.vkapi.stats.trackVisitor())  # noqa
         except vk.exceptions.VkAPIError:
             self.log('VK API error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30023), icon=xbmcgui.NOTIFICATION_ERROR)
@@ -103,7 +106,6 @@ class VKAddon():
             '/addalbum': self.addalbum,
             '/deletealbum': self.deletealbum,
             '/deletesearch': self.deletesearch,
-            '/editsearch': self.editsearch,
             '/likecommunity': self.likecommunity,
             '/likevideo': self.likevideo,
             '/playalbum': self.playalbum,
@@ -151,10 +153,13 @@ class VKAddon():
         (helper)
         :returns: obj
         """
-        cookiejar = {}
         fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_COOKIEJAR)
-        with open(fp, 'rb') as f:
-            cookiejar = pickle.load(f)
+        try:
+            with open(fp, 'rb') as f:
+                cookiejar = pickle.load(f)
+        except OSError:
+            # file not exists
+            raise VKAddonError('Missing data file error!')
         return cookiejar
 
     def loadsearchhistory(self):
@@ -163,12 +168,13 @@ class VKAddon():
         (helper)
         :returns: dict
         """
-        searchhistory = {}
         fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_SEARCH)
-        with open(fp) as f:
-            searchhistory = json.load(f)
-        if 'items' not in searchhistory:
-            searchhistory['items'] = []
+        try:
+            with open(fp) as f:
+                searchhistory = json.load(f)
+        except OSError:
+            # file not exists
+            searchhistory = {'count': 0, 'items': []}
         return searchhistory
 
     def log(self, msg, level=xbmc.LOGDEBUG):
@@ -188,7 +194,7 @@ class VKAddon():
         :param msg: str;
         :param icon: int; xbmcgui.NOTIFICATION_INFO (default)
         """
-        heading = '{0} ({1})'.format(self.addon.getAddonInfo('name'), self.addon.getAddonInfo('id'))
+        heading = '{0}'.format(self.addon.getAddonInfo('name'))
         xbmcgui.Dialog().notification(heading, msg, icon)
 
     def savecookies(self, cookiejar):
@@ -209,9 +215,28 @@ class VKAddon():
         """
         fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_SEARCH)
         with open(fp, 'w') as f:
-            json.dump(searchhistory, f)
+            json.dump(searchhistory, f, indent=4)
 
-    """ ----- Menu action handlers ----- """
+    def updatesearchhistory(self, search):
+        """
+        Append search to search history if query is unique, else re-append updated one.
+        (helper)
+        :param search: dict(query=str, resultsCount=int)
+        """
+        searchhistory = self.loadsearchhistory()
+        existing = None
+        for i, item in enumerate(searchhistory['items']):
+            if item['query'] == search['query']:
+                existing = searchhistory['items'].pop(i)
+                break
+        search['usesCount'] = 1 if not existing else existing['usesCount'] + 1
+        search['lastUsed'] = datetime.datetime.now().isoformat()
+        searchhistory['items'].append(search)
+        if not existing:
+            searchhistory['count'] += 1
+        self.savesearchhistory(searchhistory)
+
+    # ===== Menu action handlers =====
 
     def buildlistofcommunities(self, listdata):
         """
@@ -290,7 +315,7 @@ class VKAddon():
             else:
                 cmi.append(('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30051)), 'RunPlugin({0})'.format(self.buildurl('/likevideo', {'ownerid': video['owner_id'], 'id': video['id']}))))
             cmi.append(('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30052)), 'RunPlugin({0})'.format(self.buildurl('/setalbumsforvideo', {'ownerid': video['owner_id'], 'id': video['id']}))))
-            cmi.append(('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30053)), 'RunPlugin({0})'.format(self.buildurl('/searchsimilar', {'q': video['title'], 'edit': 1}))))
+            cmi.append(('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30053)), 'RunPlugin({0})'.format(self.buildurl('/searchsimilar', {'editq': video['title']}))))
             li.addContextMenuItems(cmi)
             listitems.append(
                 (self.buildurl('/play', {'ownerid': video['owner_id'], 'id': video['id']}), li, NOT_FOLDER)
@@ -302,8 +327,10 @@ class VKAddon():
                 listitems.append(
                     (self.buildurl(self.urlpath, self.urlargs), xbmcgui.ListItem('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30200))), FOLDER)
                 )
+        # if enabled, switch kodi view mode for videos
+        if self.addon.getSetting('switchviewmodeforvideos') == 'true':
+            xbmc.executebuiltin('Container.SetViewMode({0})'.format(int(self.addon.getSetting('viewmodeid'))))
         # show video list in kodi, even if empty
-        xbmc.executebuiltin('Container.SetViewMode(500)')  # todo: viewmode as usersetting
         xbmcplugin.setContent(self.handle, 'videos')
         xbmcplugin.addDirectoryItems(self.handle, listitems, len(listitems))
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_NONE)
@@ -315,7 +342,7 @@ class VKAddon():
         (menu action handler)
         """
         # set default paging offset
-        if 'offset' not in self.urlargs:
+        if 'offset' not in self.urlargs:  # todo: better: int(self.urlargs.get('offset', 0))
             self.urlargs['offset'] = 0
         # request vk api for albums
         albums = self.vkapi.video.getAlbums(
@@ -478,18 +505,17 @@ class VKAddon():
         List search history.
         (menu action handler)
         """
-        # load search history data
+        # load search history
         searchhistory = self.loadsearchhistory()
-        # create list items for search history sorted by timestamp reversed
+        # create list items for search history sorted by lastUsed reversed
         listitems = []
-        for search in sorted(searchhistory['items'], key=lambda x: x['timestamp'], reverse=True):
+        for search in sorted(searchhistory['items'], key=lambda x: x['lastUsed'], reverse=True):
             li = xbmcgui.ListItem(
-                label='{0} [COLOR blue]({1})[/COLOR]'.format(search['query'], search['results'])
+                label='{0} [COLOR blue]({1})[/COLOR]'.format(search['query'], search['resultsCount'])
             )
             li.addContextMenuItems(
                 [
-                    ('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30063)), 'RunPlugin({0})'.format(self.buildurl('/editsearch', {'q': search['query']}))),
-                    ('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30064)), 'RunPlugin({0})'.format(self.buildurl('/deletesearch', {'q': search['query']}))),
+                    ('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30063)), 'RunPlugin({0})'.format(self.buildurl('/deletesearch', {'q': search['query']}))),
                 ]
             )
             listitems.append(
@@ -576,11 +602,9 @@ class VKAddon():
         Search videos.
         (menu action handler)
         """
-        # if not passed, let user to enter a new search query
+        # if not passed, let user enter/edit a search query
         if 'q' not in self.urlargs:
-            self.urlargs['q'] = xbmcgui.Dialog().input(self.addon.getLocalizedString(30090))  # todo: bug when cancel dialog (esc)
-        elif 'q' in self.urlargs and 'edit' in self.urlargs:
-            self.urlargs['q'] = xbmcgui.Dialog().input(self.addon.getLocalizedString(30090), defaultt=self.urlargs['q'])  # todo: bug when cancel dialog (esc)
+            self.urlargs['q'] = xbmcgui.Dialog().input(self.addon.getLocalizedString(30090), defaultt=self.urlargs.get('editq', ''))  # todo: bug when cancel dialog (esc)
         # set default paging offset
         if 'offset' not in self.urlargs:
             self.urlargs['offset'] = 0
@@ -597,25 +621,20 @@ class VKAddon():
             offset=int(self.urlargs['offset']),
             count=int(self.addon.getSetting('itemsperpage')),
         )
-        # only once:
-        if int(self.urlargs['offset']) == 0:
+        if int(self.urlargs['offset']) == 0:  # todo: sure?
             # update search history
-            searchhistory = self.loadsearchhistory()
-            searchhistory['items'].append(
+            self.updatesearchhistory(
                 {
-                    'count': 1,
                     'query': str(self.urlargs['q']),
-                    'results': int(searchedvideos['count']),
-                    'timestamp': int(time.time()),
+                    'resultsCount': int(searchedvideos['count']),
                 }
             )
-            self.savesearchhistory(searchhistory)
-            # notify user on results count
+            # notify results count
             self.notify(self.addon.getLocalizedString(30091).format(searchedvideos['count']))
         # build list of searched videos
         self.buildlistofvideos(searchedvideos)
 
-    """ ----- Contextmenu action handlers ----- """
+    # ===== Contextmenu action handlers =====
 
     def addalbum(self):
         """
@@ -649,14 +668,16 @@ class VKAddon():
         Delete search from history.
         (contextmenu action handler)
         """
-        pass
-
-    def editsearch(self):
-        """
-        Edit search in search history.
-        (contextmenu action handler)
-        """
-        pass  # todo
+        searchhistory = self.loadsearchhistory()
+        for i, item in enumerate(searchhistory['items']):
+            if item['query'] == self.urlargs['q']:
+                searchhistory['items'].pop(i)
+                break
+        searchhistory['count'] -= 1
+        self.savesearchhistory(searchhistory)
+        self.log('Search deleted: {0}'.format(self.urlargs['q']))
+        self.notify(self.addon.getLocalizedString(30092))
+        xbmc.executebuiltin('Container.refresh')
 
     def likecommunity(self):
         """
@@ -798,9 +819,11 @@ class VKAddon():
 class VKAddonError(Exception):
     """
     Exception type raised for all addon errors.
-    :param errmsg: str
     """
     def __init__(self, errmsg):
+        """
+        :param errmsg: str
+        """
         self.errmsg = errmsg
 
 

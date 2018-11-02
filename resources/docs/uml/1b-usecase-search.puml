@@ -12,7 +12,6 @@ rectangle "Search" <<package>> {
     user -- (List searched videos)
     user -- (Search similar videos)
     user -- (List search history)
-    user -- (Edit search)
     user -- (Delete search)
 }
 

@@ -17,7 +17,6 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 # Addon settings (30000+)
-
 msgctxt "#30000"
 msgid "GENERAL"
 msgstr ""
@@ -62,8 +61,15 @@ msgctxt "#30010"
 msgid "By relevance"
 msgstr ""
 
-# Addon init (30020+)
+msgctxt "#30011"
+msgid "Switch view mode for videos"
+msgstr ""
 
+msgctxt "#30012"
+msgid "View mode [id]"
+msgstr ""
+
+# Addon init (30020+)
 msgctxt "#30020"
 msgid "Enter your VK login/email"
 msgstr ""
@@ -84,8 +90,11 @@ msgctxt "#30024"
 msgid "Addon routing error!"
 msgstr ""
 
-# Addon main menu (30030+)
+msgctxt "#30025"
+msgid "Missing data file error!"
+msgstr ""
 
+# Addon main menu (30030+)
 msgctxt "#30030"
 msgid "SEARCH"
 msgstr ""
@@ -119,7 +128,6 @@ msgid "STATS"
 msgstr ""
 
 # Context menu actions (30050+)
-
 msgctxt "#30050"
 msgid "Unlike video"
 msgstr ""
@@ -173,21 +181,15 @@ msgid "Add album"
 msgstr ""
 
 msgctxt "#30063"
-msgid "Edit search"
-msgstr ""
-
-msgctxt "#30064"
 msgid "Delete search"
 msgstr ""
 
 # Play (30080+)
-
 msgctxt "#30080"
 msgid "Resolving error!"
 msgstr ""
 
 # Search (30090+)
-
 msgctxt "#30090"
 msgid "Enter the search query:"
 msgstr ""
@@ -196,8 +198,11 @@ msgctxt "#30091"
 msgid "{0} videos found."
 msgstr ""
 
-# Albums (30110+)
+msgctxt "#30092"
+msgid "Search deleted."
+msgstr ""
 
+# Albums (30110+)
 msgctxt "#30110"
 msgid "Enter the album title:"
 msgstr ""
@@ -235,7 +240,6 @@ msgid "Albums set."
 msgstr ""
 
 # Likes (30130+)
-
 msgctxt "#30130"
 msgid "Like added to video. ({0} likes)"
 msgstr ""
@@ -246,9 +250,7 @@ msgstr ""
 
 # Stats (30150+)
 
-
 # Others (30200+)
-
 msgctxt "#30200"
 msgid "NEXT PAGE"
 msgstr ""

@@ -13,19 +13,18 @@
 		{
 			"file_exclude_patterns":
 			[
-				"addon.pyc",
-				"resources/lib/vk/logs.pyo",
-				"resources/.DS_Store",
-				"resources/lib/vk/exceptions.pyo",
-				"resources/lib/vk/utils.pyo",
-				"vk.sublime-workspace",
 				"resources/lib/vk/logs.pyc",
-				"resources/lib/vk/api.pyc",
-				"resources/lib/vk/__init__.pyo",
 				"resources/lib/vk/mixins.pyo",
+				"vk.sublime-workspace",
+				"resources/lib/vk/__init__.pyo",
+				"resources/lib/vk/api.pyo",
+				"resources/lib/vk/exceptions.pyo",
 				"resources/lib/vk/__init__.pyc",
-				"resources/lib/vk/utils.pyc",
-				"resources/lib/vk/api.pyo"
+				"resources/lib/vk/api.pyc",
+				"resources/.DS_Store",
+				"resources/lib/vk/logs.pyo",
+				"resources/lib/vk/utils.pyo",
+				"resources/lib/vk/utils.pyc"
 			],
 			"folder_exclude_patterns":
 			[
@@ -37,7 +36,7 @@
 	{
 		"extra_paths":
 		[
-			"/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages",  /* Kodistubs */
+			"/Library/Frameworks/Python.framework/Versions/3.6/lib/python3.6/site-packages"
 		]
 	}
 }
