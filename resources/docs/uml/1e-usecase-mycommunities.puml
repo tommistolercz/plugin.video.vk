@@ -10,7 +10,7 @@ note "Kodi user with\nVK.com accout" as n
 rectangle "My communities" <<package>> {
    user -- (List communities)
    user -- (List community videos)
-   user -- (Unfollow community)
+   user -- (Leave community)
 }
 
 @enduml

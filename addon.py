@@ -106,6 +106,7 @@ class VKAddon():
             '/addalbum': self.addalbum,
             '/deletealbum': self.deletealbum,
             '/deletesearch': self.deletesearch,
+            '/leavecommunity': self.leavecommunity,
             '/likecommunity': self.likecommunity,
             '/likevideo': self.likevideo,
             '/playalbum': self.playalbum,
@@ -113,7 +114,6 @@ class VKAddon():
             '/reorderalbum': self.reorderalbum,
             '/searchsimilar': self.searchvideos,  # reuse
             '/setalbumsforvideo': self.setalbumsforvideo,
-            '/unfollowcommunity': self.unfollowcommunity,
             '/unlikecommunity': self.unlikecommunity,
             '/unlikevideo': self.unlikevideo,
         }
@@ -254,14 +254,15 @@ class VKAddon():
                 community['id'] = community['id'].split('_')[2]
             li = xbmcgui.ListItem(label=community[_namekey])
             li.setArt({'thumb': community['photo_200']})
-            # todo: use other infolabels (plot, ...) for showing community details?
-            li.addContextMenuItems(
-                [
-                    ('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30054)), 'RunPlugin({0})'.format(self.buildurl('/unlikecommunity', {'communityid': community['id']}))),
-                    ('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30055)), 'RunPlugin({0})'.format(self.buildurl('/likecommunity', {'communityid': community['id']}))),
-                    ('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30056)), 'RunPlugin({0})'.format(self.buildurl('/unfollowcommunity', {'communityid': community['id']}))),
-                ]
-            )
+            # todo: use other infolabels i.e. plot for showing more community details?
+            # cm actions
+            cmi = []
+            if listtype == '/likedcommunities':  # todo: no api support (i.e. isliked flag) for communities at the list-level
+                cmi.append(('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30054)), 'RunPlugin({0})'.format(self.buildurl('/unlikecommunity', {'communityid': community['id']}))))
+            else:
+                cmi.append(('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30055)), 'RunPlugin({0})'.format(self.buildurl('/likecommunity', {'communityid': community['id']}))))
+            cmi.append(('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30056)), 'RunPlugin({0})'.format(self.buildurl('/leavecommunity', {'communityid': community['id']}))))
+            li.addContextMenuItems(cmi)
             listitems.append(
                 (self.buildurl('/communityvideos', {'ownerid': '-{0}'.format(community['id'])}), li, FOLDER)  # negative id required
             )
@@ -679,12 +680,29 @@ class VKAddon():
         self.notify(self.addon.getLocalizedString(30092))
         xbmc.executebuiltin('Container.refresh')
 
+    def leavecommunity(self):
+        """
+        Leave community.
+        (contextmenu action handler)
+        """
+        isleft = self.vkapi.groups.leave(  # noqa
+            group_id=int(self.urlargs['communityid'])
+        )
+        self.log('Community was left: {0}'.format(self.urlargs['communityid']))
+        self.notify(self.addon.getLocalizedString(30140))
+        xbmc.executebuiltin('Container.refresh')
+
     def likecommunity(self):
         """
         Like community.
         (contextmenu action handler)
         """
-        pass
+        isliked = self.vkapi.fave.addGroup(  # noqa
+            group_id=int(self.urlargs['communityid'])
+        )
+        self.log('Like added to community: {0}'.format(self.urlargs['communityid']))
+        self.notify(self.addon.getLocalizedString(30132))
+        xbmc.executebuiltin('Container.refresh')
 
     def likevideo(self):
         """
@@ -786,19 +804,17 @@ class VKAddon():
             self.notify(self.addon.getLocalizedString(30118))
             xbmc.executebuiltin('Container.refresh')
 
-    def unfollowcommunity(self):
-        """
-        Unfollow community.
-        (contextmenu action handler)
-        """
-        pass  # todo
-
     def unlikecommunity(self):
         """
         Unlike community.
         (contextmenu action handler)
         """
-        pass  # todo
+        isunliked = self.vkapi.fave.removeGroup(  # noqa
+            group_id=int(self.urlargs['communityid'])
+        )
+        self.log('Like deleted from community: {0}'.format(self.urlargs['communityid']))
+        self.notify(self.addon.getLocalizedString(30133))
+        xbmc.executebuiltin('Container.refresh')
 
     def unlikevideo(self):
         """

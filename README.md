@@ -51,14 +51,14 @@ Kodi add-on for watching videos from VK.com social network.
 - My communities
     - [x] List communities
     - [x] List community videos
-    - [ ] Unfollow community
+    - [x] Leave community
 - My likes
     - [x] List liked videos
     - [x] List liked communities
     - [x] Like video
     - [x] Unlike video
-    - [ ] Like community
-    - [ ] Unlike community
+    - [x] Like community
+    - [x] Unlike community
 - Stats
     - [ ] List stats
 

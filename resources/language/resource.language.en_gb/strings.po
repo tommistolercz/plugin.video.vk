@@ -153,7 +153,7 @@ msgid "Like community"
 msgstr ""
 
 msgctxt "#30056"
-msgid "Unfollow community"
+msgid "Leave community"
 msgstr ""
 
 msgctxt "#30057"
@@ -246,6 +246,20 @@ msgstr ""
 
 msgctxt "#30131"
 msgid "Like deleted from video."
+msgstr ""
+
+msgctxt "#30132"
+msgid "Like added to community."
+msgstr ""
+
+msgctxt "#30133"
+msgid "Like deleted from community."
+msgstr ""
+
+# Communities (30140+)
+
+msgctxt "#30140"
+msgid "Community was left."
 msgstr ""
 
 # Stats (30150+)

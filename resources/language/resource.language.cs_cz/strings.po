@@ -48,7 +48,7 @@ msgstr "Hledat videa kratší než [min.]"
 
 msgctxt "#30007"
 msgid "Sort searched videos"
-msgstr "Řadit výsledky vyhledávání"
+msgstr "Řadit nalezená videa"
 
 msgctxt "#30008"
 msgid "By date"
@@ -134,11 +134,11 @@ msgstr "STATISTIKY"
 
 msgctxt "#30050"
 msgid "Unlike video"
-msgstr "Už se mi nelíbí"
+msgstr "Odebrat z oblíbených"
 
 msgctxt "#30051"
 msgid "Like video"
-msgstr "Líbí se mi"
+msgstr "Přidat do oblíbených"
 
 msgctxt "#30052"
 msgid "Set albums for video"
@@ -150,15 +150,15 @@ msgstr "Hledat podobné"
 
 msgctxt "#30054"
 msgid "Unlike community"
-msgstr "Už se mi nelíbí"
+msgstr "Odebrat z oblíbených"
 
 msgctxt "#30055"
 msgid "Like community"
-msgstr "Líbí se mi"
+msgstr "Přidat do oblíbených"
 
 msgctxt "#30056"
-msgid "Unfollow community"
-msgstr "Přestat sledovat"
+msgid "Leave community"
+msgstr "Opustit komunitu"
 
 msgctxt "#30057"
 msgid "Play album as playlist"
@@ -250,11 +250,25 @@ msgstr "Alba nastavena."
 
 msgctxt "#30130"
 msgid "Like added to video. ({0} likes)"
-msgstr "Přidáno mezi oblíbená videa. ({0} uživatelů)"
+msgstr "Video přidáno mezi oblíbené. ({0} uživatelů)"
 
 msgctxt "#30131"
 msgid "Like deleted from video."
-msgstr "Odebráno z oblíbených videí."
+msgstr "Video odebráno z oblíbených."
+
+msgctxt "#30132"
+msgid "Like added to community."
+msgstr "Komunita přidána do oblíbených."
+
+msgctxt "#30133"
+msgid "Like deleted from community."
+msgstr "Komunita odebrána z oblíbených."
+
+# Communities (30140+)
+
+msgctxt "#30140"
+msgid "Community was left."
+msgstr "Komunita opuštěna."
 
 # Stats (30150+)
 
