@@ -134,11 +134,11 @@ msgstr "STATISTIKY"
 
 msgctxt "#30050"
 msgid "Unlike video"
-msgstr "Odebrat z oblíbených"
+msgstr "Odebrat z oblíb. videí"
 
 msgctxt "#30051"
 msgid "Like video"
-msgstr "Přidat do oblíbených"
+msgstr "Přidat do oblíb. videí"
 
 msgctxt "#30052"
 msgid "Set albums for video"
@@ -150,11 +150,11 @@ msgstr "Hledat podobné"
 
 msgctxt "#30054"
 msgid "Unlike community"
-msgstr "Odebrat z oblíbených"
+msgstr "Odebrat z oblíb. komunit"
 
 msgctxt "#30055"
 msgid "Like community"
-msgstr "Přidat do oblíbených"
+msgstr "Přidat do oblíb. komunit"
 
 msgctxt "#30056"
 msgid "Leave community"

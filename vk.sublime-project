@@ -13,17 +13,18 @@
 		{
 			"file_exclude_patterns":
 			[
-				"resources/lib/vk/utils.pyo",
-				"resources/lib/vk/api.pyo",
+				"resources/lib/vk/logs.pyo",
 				"resources/.DS_Store",
-				"resources/lib/vk/utils.pyc",
-				"resources/lib/vk/api.pyc",
 				"resources/lib/vk/mixins.pyo",
 				"resources/lib/vk/logs.pyc",
-				"resources/lib/vk/__init__.pyo",
-				"resources/lib/vk/__init__.pyc",
+				"vk.sublime-workspace",
 				"resources/lib/vk/exceptions.pyo",
-				"resources/lib/vk/logs.pyo"
+				"resources/lib/vk/api.pyc",
+				"resources/lib/vk/__init__.pyc",
+				"resources/lib/vk/utils.pyo",
+				"resources/lib/vk/utils.pyc",
+				"resources/lib/vk/api.pyo",
+				"resources/lib/vk/__init__.pyo"
 			],
 			"folder_exclude_patterns":
 			[
