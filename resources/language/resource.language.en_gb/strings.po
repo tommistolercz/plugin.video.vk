@@ -30,43 +30,55 @@ msgid "Items per page"
 msgstr ""
 
 msgctxt "#30003"
-msgid "Search also adult videos"
+msgid "Force view mode for videos"
 msgstr ""
 
 msgctxt "#30004"
-msgid "Search also own videos"
+msgid "View mode [id]"
 msgstr ""
 
 msgctxt "#30005"
-msgid "Search videos longer than [min.]"
+msgid "Search also adult videos"
 msgstr ""
 
 msgctxt "#30006"
-msgid "Search videos shorter than [min.]"
+msgid "Search also own videos"
 msgstr ""
 
 msgctxt "#30007"
-msgid "Sort searched videos"
+msgid "Search videos with duration"
 msgstr ""
 
 msgctxt "#30008"
-msgid "By date"
+msgid "Any"
 msgstr ""
 
 msgctxt "#30009"
-msgid "By duration"
+msgid "Longer than"
 msgstr ""
 
 msgctxt "#30010"
-msgid "By relevance"
+msgid "Shorter than"
 msgstr ""
 
 msgctxt "#30011"
-msgid "Switch view mode for videos"
+msgid "Duration [minutes]"
 msgstr ""
 
 msgctxt "#30012"
-msgid "View mode [id]"
+msgid "Sort searched videos"
+msgstr ""
+
+msgctxt "#30013"
+msgid "By date"
+msgstr ""
+
+msgctxt "#30014"
+msgid "By duration"
+msgstr ""
+
+msgctxt "#30015"
+msgid "By relevance"
 msgstr ""
 
 # Addon init (30020+)

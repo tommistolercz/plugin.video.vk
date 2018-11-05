@@ -31,44 +31,56 @@ msgid "Items per page"
 msgstr "Položek na stránku"
 
 msgctxt "#30003"
+msgid "Force view mode for videos"
+msgstr "Vynutit zobrazení pro videa"
+
+msgctxt "#30004"
+msgid "View mode [id]"
+msgstr "Typ zobrazení [id]"
+
+msgctxt "#30005"
 msgid "Search also adult videos"
 msgstr "Hledat také videa pro dospělé"
 
-msgctxt "#30004"
+msgctxt "#30006"
 msgid "Search also own videos"
 msgstr "Hledat také vlastní videa"
 
-msgctxt "#30005"
-msgid "Search videos longer than [min.]"
-msgstr "Hledat videa delší než [min.]"
-
-msgctxt "#30006"
-msgid "Search videos shorter than [min.]"
-msgstr "Hledat videa kratší než [min.]"
-
 msgctxt "#30007"
+msgid "Search videos with duration"
+msgstr "Hledat videa s délkou"
+
+msgctxt "#30008"
+msgid "Any"
+msgstr "Nezáleží"
+
+msgctxt "#30009"
+msgid "Longer than"
+msgstr "Delší než"
+
+msgctxt "#30010"
+msgid "Shorter than"
+msgstr "Kratší než"
+
+msgctxt "#30011"
+msgid "Duration [minutes]"
+msgstr "Délka [minut]"
+
+msgctxt "#30012"
 msgid "Sort searched videos"
 msgstr "Řadit nalezená videa"
 
-msgctxt "#30008"
+msgctxt "#30013"
 msgid "By date"
 msgstr "Podle data"
 
-msgctxt "#30009"
+msgctxt "#30014"
 msgid "By duration"
 msgstr "Podle délky"
 
-msgctxt "#30010"
+msgctxt "#30015"
 msgid "By relevance"
 msgstr "Podle relevance"
-
-msgctxt "#30011"
-msgid "Switch view mode for videos"
-msgstr "Přepínat zobrazení pro videa"
-
-msgctxt "#30012"
-msgid "View mode [id]"
-msgstr "Typ zobrazení [id]"
 
 # Addon init (30020+)
 

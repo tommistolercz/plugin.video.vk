@@ -4,13 +4,13 @@
         <setting label="30001" id="vkuseraccesstoken" type="text" default=""/>
         <setting type="sep"/>
         <setting label="30002" id="itemsperpage" type="number" default="200"/>
-        <setting label="30011" id="switchviewmodeforvideos" type="bool" default="true"/>
-        <setting label="30012" id="viewmodeid" subsetting="true" visible="eq(-1,true)" type="number" default="500"/>
+        <setting label="30003" id="forcevideoviewmode" type="bool" default="true"/>
+            <setting label="30004" id="forcevideoviewmodeid" subsetting="true" visible="eq(-1,true)" type="number" default="500"/>
         <setting type="sep"/>
-        <setting label="30003" id="searchadult" type="bool" default="true"/>
-        <setting label="30004" id="searchown" type="bool" default="false"/>
-        <setting label="30005" id="searchlonger" type="number" default="10"/>
-        <setting label="30006" id="searchshorter" type="number" default="60"/>
-        <setting label="30007" id="searchsort" type="enum" lvalues="30008|30009|30010" default="0"/>
+        <setting label="30005" id="searchadult" type="bool" default="true"/>
+        <setting label="30006" id="searchown" type="bool" default="false"/>
+        <setting label="30007" id="searchduration" type="enum" lvalues="30008|30009|30010" default="0"/>
+            <setting label="30011" id="searchdurationmins" subsetting="true" visible="!eq(-1,0)" type="number" default=""/>
+        <setting label="30012" id="searchsort" type="enum" lvalues="30013|30014|30015" default="0"/>
     </category>
 </settings>

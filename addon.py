@@ -325,9 +325,9 @@ class VKAddon():
             listitems.append(
                 (self.buildurl(self.urlpath, self.urlargs), xbmcgui.ListItem('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30200))), FOLDER)
             )
-        # if enabled, switch kodi view mode for videos
-        if self.addon.getSetting('switchviewmodeforvideos') == 'true':
-            xbmc.executebuiltin('Container.SetViewMode({0})'.format(int(self.addon.getSetting('viewmodeid'))))
+        # if enabled, force custom view mode for videos
+        if self.addon.getSetting('forcevideoviewmode') == 'true':
+            xbmc.executebuiltin('Container.SetViewMode({0})'.format(int(self.addon.getSetting('forcevideoviewmodeid'))))
         # show video list in kodi, even if empty
         xbmcplugin.setContent(self.handle, 'videos')
         xbmcplugin.addDirectoryItems(self.handle, listitems, len(listitems))
@@ -600,19 +600,23 @@ class VKAddon():
         # paging offset (default=0)
         self.urlargs['offset'] = self.urlargs.get('offset', 0)
         # request vk api for searched videos
-        searchedvideos = self.vkapi.video.search(
-            extended=1,
-            hd=1,
-            q=str(self.urlargs['q']),
-            adult=1 if self.addon.getSetting('searchadult') == 'true' else 0,  # case sens.!
-            search_own=1 if self.addon.getSetting('searchown') == 'true' else 0,  # case sens.!
-            # longer=int(self.addon.getSetting('searchlonger')) * 60,  # todo: longer or shorter, not both
-            shorter=int(self.addon.getSetting('searchshorter')) * 60,
-            sort=int(self.addon.getSetting('searchsort')),
-            offset=int(self.urlargs['offset']),
-            count=int(self.addon.getSetting('itemsperpage')),
-        )
-        if int(self.urlargs['offset']) == 0:  # todo: sure?
+        kwparams = {
+            'extended': 1,
+            'hd': 1,
+            'q': str(self.urlargs['q']),
+            'adult': 1 if self.addon.getSetting('searchadult') == 'true' else 0,  # case sens.!
+            'search_own': 1 if self.addon.getSetting('searchown') == 'true' else 0,  # case sens.!
+            'sort': int(self.addon.getSetting('searchsort')),
+            'offset': int(self.urlargs['offset']),
+            'count': int(self.addon.getSetting('itemsperpage')),
+        }
+        if self.addon.getSetting('searchduration') == '1':
+            kwparams['longer'] = int(self.addon.getSetting('searchdurationmins')) * 60
+        elif self.addon.getSetting('searchduration') == '2':
+            kwparams['shorter'] = int(self.addon.getSetting('searchdurationmins')) * 60
+        searchedvideos = self.vkapi.video.search(**kwparams)
+        # do the bottom only once  # todo: better?
+        if int(self.urlargs['offset']) == 0:
             # update search history
             self.updatesearchhistory(
                 {
