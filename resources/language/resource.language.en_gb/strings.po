@@ -22,7 +22,7 @@ msgid "GENERAL"
 msgstr ""
 
 msgctxt "#30001"
-msgid "VK API user access token"
+msgid "USER"
 msgstr ""
 
 msgctxt "#30002"
@@ -81,6 +81,10 @@ msgctxt "#30015"
 msgid "By relevance"
 msgstr ""
 
+msgctxt "#30019"
+msgid "VK user access token"
+msgstr ""
+
 # Addon init (30020+)
 msgctxt "#30020"
 msgid "Enter your VK login/email"
@@ -116,23 +120,23 @@ msgid "SEARCH HISTORY"
 msgstr ""
 
 msgctxt "#30032"
-msgid "VIDEOS"
+msgid "MY VIDEOS"
 msgstr ""
 
 msgctxt "#30033"
-msgid "LIKED VIDEOS"
+msgid "MY LIKED VIDEOS"
 msgstr ""
 
 msgctxt "#30034"
-msgid "VIDEO ALBUMS"
+msgid "MY VIDEO ALBUMS"
 msgstr ""
 
 msgctxt "#30035"
-msgid "COMMUNITIES"
+msgid "MY COMMUNITIES"
 msgstr ""
 
 msgctxt "#30036"
-msgid "LIKED COMMUNITIES"
+msgid "MY LIKED COMMUNITIES"
 msgstr ""
 
 msgctxt "#30037"

@@ -33,7 +33,7 @@ VK_API_LANG = 'ru'
 VK_VIDEOINFO_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.1 Safari/605.1.15'
 ADDON_DATA_FILE_COOKIEJAR = '.cookiejar'
 ADDON_DATA_FILE_SEARCH_HISTORY = 'searchhistory.json'
-ADDON_DATA_FILE_USAGE_LOG = 'usage.log'
+COLOR2 = 'blue'  # todo: use in code + settings?
 
 
 class VKAddon():
@@ -475,7 +475,9 @@ class VKAddon():
         try:
             counters = self.vkapi.execute.getMenuCounters()
         except vk.exceptions.VkAPIError:
-            counters = {'videos': '?', 'likedvideos': '?', 'albums': '?', 'communities': '?', 'likedcommunities': '?'}
+            self.log('VK API error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30023), icon=xbmcgui.NOTIFICATION_ERROR)
+            exit()
         # create list items for main menu
         listitems = [
             (self.buildurl('/search'), xbmcgui.ListItem('{0}'.format(self.addon.getLocalizedString(30030))), FOLDER),
@@ -596,7 +598,7 @@ class VKAddon():
         """
         # if not passed, let user enter/edit a search query
         if 'q' not in self.urlargs:
-            self.urlargs['q'] = xbmcgui.Dialog().input(self.addon.getLocalizedString(30090), defaultt=self.urlargs.get('editq', ''))  # todo: bug when cancel dialog (esc)
+            self.urlargs['q'] = xbmcgui.Dialog().input(self.addon.getLocalizedString(30090), defaultt=self.urlargs.get('editq', ''))  # todo: [bug] error when cancelling search query dialog (esc)
         # paging offset (default=0)
         self.urlargs['offset'] = self.urlargs.get('offset', 0)
         # request vk api for searched videos
@@ -679,6 +681,7 @@ class VKAddon():
         Leave community.
         (contextmenu action handler)
         """
+        # todo: [bug] doesn't work, can't leave followed community
         isleft = self.vkapi.groups.leave(  # noqa
             group_id=int(self.urlargs['communityid'])
         )

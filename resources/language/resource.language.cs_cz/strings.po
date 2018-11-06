@@ -23,8 +23,8 @@ msgid "GENERAL"
 msgstr "OBECNÉ"
 
 msgctxt "#30001"
-msgid "VK API user access token"
-msgstr "VK API uživatelský token"
+msgid "USER"
+msgstr "UŽIVATEL"
 
 msgctxt "#30002"
 msgid "Items per page"
@@ -82,6 +82,10 @@ msgctxt "#30015"
 msgid "By relevance"
 msgstr "Podle relevance"
 
+msgctxt "#30019"
+msgid "VK user access token"
+msgstr "VK uživatelský token"
+
 # Addon init (30020+)
 
 msgctxt "#30020"
@@ -119,24 +123,24 @@ msgid "SEARCH HISTORY"
 msgstr "HISTORIE HLEDÁNÍ"
 
 msgctxt "#30032"
-msgid "VIDEOS"
-msgstr "VIDEA"
+msgid "MY VIDEOS"
+msgstr "MÁ VIDEA"
 
 msgctxt "#30033"
-msgid "LIKED VIDEOS"
-msgstr "OBLÍBENÁ VIDEA"
+msgid "MY LIKED VIDEOS"
+msgstr "MÁ OBLÍBENÁ VIDEA"
 
 msgctxt "#30034"
-msgid "VIDEO ALBUMS"
-msgstr "VIDEO ALBA"
+msgid "MY VIDEO ALBUMS"
+msgstr "MÁ VIDEO ALBA"
 
 msgctxt "#30035"
-msgid "COMMUNITIES"
-msgstr "KOMUNITY"
+msgid "MY COMMUNITIES"
+msgstr "MÉ KOMUNITY"
 
 msgctxt "#30036"
-msgid "LIKED COMMUNITIES"
-msgstr "OBLÍBENÉ KOMUNITY"
+msgid "MY LIKED COMMUNITIES"
+msgstr "MÉ OBLÍBENÉ KOMUNITY"
 
 msgctxt "#30037"
 msgid "STATS"
