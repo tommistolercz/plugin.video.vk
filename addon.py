@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# todo: [bug] unicode errors
+# -*- coding: utf-8 -*-
+
 __all__ = ['VKAddon', 'VKAddonError']
 
 
@@ -37,7 +38,7 @@ ADDON_DATA_FILE_SEARCH_HISTORY = 'searchhistory.json'
 COLOR2 = 'blue'  # todo: use in code + settings?
 
 
-class VKAddon():
+class VKAddon():  # todo: [bug] unicode errors
     """
     Addon class encapsulating all its data and logic.
     """
@@ -599,7 +600,7 @@ class VKAddon():
         """
         # if not passed, let user enter/edit a search query
         if 'q' not in self.urlargs:
-            self.urlargs['q'] = xbmcgui.Dialog().input(self.addon.getLocalizedString(30090), defaultt=self.urlargs.get('editq', ''))  # todo: [bug] error when cancelling search query dialog (esc)
+            self.urlargs['q'] = xbmcgui.Dialog().input(self.addon.getLocalizedString(30090), defaultt=self.urlargs.get('editq', ''))  # todo: [bug] error when cancelling search query dialog (returns empty string)
         # paging offset (default=0)
         self.urlargs['offset'] = self.urlargs.get('offset', 0)
         # request vk api for searched videos
@@ -682,7 +683,6 @@ class VKAddon():
         Leave community.
         (contextmenu action handler)
         """
-        # todo: [bug] doesn't work, can't leave followed community
         isleft = self.vkapi.groups.leave(  # noqa
             group_id=int(self.urlargs['communityid'])
         )
