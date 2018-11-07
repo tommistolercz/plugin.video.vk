@@ -17,6 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 # Addon settings (30000+)
+
 msgctxt "#30000"
 msgid "GENERAL"
 msgstr ""

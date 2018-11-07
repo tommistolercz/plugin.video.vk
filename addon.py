@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# todo: [bug] unicode errors
 __all__ = ['VKAddon', 'VKAddonError']
 
 
@@ -353,7 +354,7 @@ class VKAddon():
         listitems = []
         for i, album in enumerate(albums['items']):
             li = xbmcgui.ListItem(
-                label='{0} [COLOR blue]({1})[/COLOR]'.format(album['title'], album['count']),
+                label='{0} [COLOR {color}]({1})[/COLOR]'.format(album['title'], int(album['count']), color=COLOR2),
             )
             if album['count'] > 0:
                 li.setArt({'thumb': album['photo_320']})
@@ -605,7 +606,7 @@ class VKAddon():
         kwparams = {
             'extended': 1,
             'hd': 1,
-            'q': str(self.urlargs['q']),
+            'q': self.urlargs['q'],
             'adult': 1 if self.addon.getSetting('searchadult') == 'true' else 0,  # case sens.!
             'search_own': 1 if self.addon.getSetting('searchown') == 'true' else 0,  # case sens.!
             'sort': int(self.addon.getSetting('searchsort')),
@@ -622,7 +623,7 @@ class VKAddon():
             # update search history
             self.updatesearchhistory(
                 {
-                    'query': str(self.urlargs['q']),
+                    'query': self.urlargs['q'],
                     'resultsCount': int(searchedvideos['count']),
                 }
             )
@@ -640,7 +641,7 @@ class VKAddon():
         """
         albumtitle = xbmcgui.Dialog().input(self.addon.getLocalizedString(30110))
         addedalbum = self.vkapi.video.addAlbum(
-            title=str(albumtitle),
+            title=albumtitle,
             privacy=3  # 3=onlyme
         )
         self.log('New album added: {0}'.format(addedalbum['album_id']))
@@ -732,7 +733,7 @@ class VKAddon():
         albumtitle = xbmcgui.Dialog().input(self.addon.getLocalizedString(30115), albumtitle)
         self.vkapi.video.editAlbum(
             album_id=int(self.urlargs['albumid']),
-            title=str(albumtitle),
+            title=albumtitle,
             privacy=3  # 3=onlyme
         )
         self.log('Album renamed: {0}'.format(self.urlargs['albumid']))
