@@ -16,8 +16,7 @@ msgstr ""
 "Language: en_GB\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-# Addon settings (30000+)
-
+# Addon settings
 msgctxt "#30000"
 msgid "GENERAL"
 msgstr ""
@@ -86,7 +85,7 @@ msgctxt "#30019"
 msgid "VK user access token"
 msgstr ""
 
-# Addon init (30020+)
+# Addon authorization
 msgctxt "#30020"
 msgid "Enter your VK login/email"
 msgstr ""
@@ -95,23 +94,7 @@ msgctxt "#30021"
 msgid "Enter your VK password"
 msgstr ""
 
-msgctxt "#30022"
-msgid "VK authorization error!"
-msgstr ""
-
-msgctxt "#30023"
-msgid "VK API error!"
-msgstr ""
-
-msgctxt "#30024"
-msgid "Addon routing error!"
-msgstr ""
-
-msgctxt "#30025"
-msgid "Missing data file error!"
-msgstr ""
-
-# Addon main menu (30030+)
+# Addon main menu
 msgctxt "#30030"
 msgid "SEARCH"
 msgstr ""
@@ -144,7 +127,7 @@ msgctxt "#30037"
 msgid "STATS"
 msgstr ""
 
-# Context menu actions (30050+)
+# Context menu actions
 msgctxt "#30050"
 msgid "Unlike video"
 msgstr ""
@@ -201,12 +184,7 @@ msgctxt "#30063"
 msgid "Delete search"
 msgstr ""
 
-# Play (30080+)
-msgctxt "#30080"
-msgid "Resolving error!"
-msgstr ""
-
-# Search (30090+)
+# Search
 msgctxt "#30090"
 msgid "Enter the search query:"
 msgstr ""
@@ -219,7 +197,7 @@ msgctxt "#30092"
 msgid "Search deleted."
 msgstr ""
 
-# Albums (30110+)
+# Video albums
 msgctxt "#30110"
 msgid "Enter the album title:"
 msgstr ""
@@ -256,7 +234,7 @@ msgctxt "#30118"
 msgid "Albums set."
 msgstr ""
 
-# Likes (30130+)
+# Likes
 msgctxt "#30130"
 msgid "Like added to video. ({0} likes)"
 msgstr ""
@@ -273,15 +251,38 @@ msgctxt "#30133"
 msgid "Like deleted from community."
 msgstr ""
 
-# Communities (30140+)
-
+# Communities
 msgctxt "#30140"
 msgid "Community was left."
 msgstr ""
 
-# Stats (30150+)
+# Stats
+msgctxt "#30150"
+msgid "Lorem ipsum"
+msgstr ""
 
-# Others (30200+)
-msgctxt "#30200"
+# Paginator
+msgctxt "#30190"
 msgid "NEXT PAGE"
+msgstr ""
+
+# Errors
+msgctxt "#30200"
+msgid "VK authorization error!"
+msgstr ""
+
+msgctxt "#30201"
+msgid "VK API error!"
+msgstr ""
+
+msgctxt "#30202"
+msgid "Routing error!"
+msgstr ""
+
+msgctxt "#30203"
+msgid "Missing data file error!"
+msgstr ""
+
+msgctxt "#30204"
+msgid "Resolving error!"
 msgstr ""

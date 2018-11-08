@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+# todo: [bug] unicode errors
 __all__ = ['VKAddon', 'VKAddonError']
 
 
@@ -25,7 +25,7 @@ sys.path.append(os.path.join(xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('
 import vk  # noqa: E402
 
 
-PY2, PY3 = ((sys.version_info[0] == 2), (sys.version_info[0] == 3))
+PY2, PY3 = ((sys.version_info[0] == 2), (sys.version_info[0] == 3))  # not used
 FOLDER, NOT_FOLDER = (True, False)
 
 VK_API_APP_ID = '6432748'
@@ -38,48 +38,18 @@ ADDON_DATA_FILE_SEARCH_HISTORY = 'searchhistory.json'
 COLOR2 = 'blue'  # todo: use in code + settings?
 
 
-class VKAddon():  # todo: [bug] unicode errors
+class VKAddon():
     """
-    Addon class encapsulating all its data and logic.
+    Addon class.
     """
     def __init__(self):
         """
         Initialize addon and manage all that controlling stuff at runtime ;-)
+        todo: too complex entrypoint
         """
         self.addon = xbmcaddon.Addon()
         self.handle = int(sys.argv[1])
-        # create vk session
-        try:
-            # first run: authorise addon by entering user credentials and obtain new user access token
-            if self.addon.getSetting('vkuseraccesstoken') == '':
-                self.vksession = vk.AuthSession(
-                    VK_API_APP_ID,
-                    xbmcgui.Dialog().input(self.addon.getLocalizedString(30020)),
-                    xbmcgui.Dialog().input(self.addon.getLocalizedString(30021), option=xbmcgui.ALPHANUM_HIDE_INPUT),
-                    VK_API_SCOPE
-                )
-                self.addon.setSetting('vkuseraccesstoken', self.vksession.access_token)
-                self.savecookies(self.vksession.auth_session.cookies)
-            # restore session by sending user access token
-            else:
-                self.vksession = vk.Session(self.addon.getSetting('vkuseraccesstoken'))
-                self.vksession.requests_session.cookies = self.loadcookies()
-        except vk.exceptions.VkAuthError:
-            self.log('VK authorization error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30022), icon=xbmcgui.NOTIFICATION_ERROR)
-            exit()
-        except VKAddonError:
-            self.log('Missing data file error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30025), icon=xbmcgui.NOTIFICATION_ERROR)
-            exit()
-        # create vk api, enable api usage tracking
-        try:
-            self.vkapi = vk.API(self.vksession, v=VK_API_VERSION, lang=VK_API_LANG)
-            istracked = bool(self.vkapi.stats.trackVisitor())  # noqa
-        except vk.exceptions.VkAPIError:
-            self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30023), icon=xbmcgui.NOTIFICATION_ERROR)
-            exit()
+        self.vkapi = self.createvkapi()
         # parse addon url
         self.urlbase = 'plugin://' + self.addon.getAddonInfo('id')
         self.urlpath = sys.argv[0].replace(self.urlbase, '')
@@ -88,7 +58,8 @@ class VKAddon():  # todo: [bug] unicode errors
             self.urlargs = urlparse.parse_qs(sys.argv[2].lstrip('?'))
             for k, v in list(self.urlargs.items()):
                 self.urlargs[k] = v.pop()
-        self.log('Addon URL parsed: {0}'.format(self.buildurl(self.urlpath, self.urlargs)))
+        self.url = self.buildurl(self.urlpath, self.urlargs)
+        self.log('Addon url:{0}'.format(self.url))
         # dispatch addon routing by calling a handler for respective user action
         self.routing = {
             # menu actions:
@@ -122,8 +93,8 @@ class VKAddon():  # todo: [bug] unicode errors
         try:
             self.routing[self.urlpath]()
         except KeyError:
-            self.log('Addon routing error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30024), icon=xbmcgui.NOTIFICATION_ERROR)
+            self.log('Routing error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30202), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
 
     def buildoidid(self, ownerid, id):
@@ -149,7 +120,42 @@ class VKAddon():  # todo: [bug] unicode errors
             url += '?' + urllib.urlencode(urlargs)
         return url
 
-    def loadcookies(self):
+    def createvkapi(self):
+        """
+        Create VK API object.
+        (helper)
+        :returns: obj
+        """
+        try:
+            # authorize addon by entering user credentials to obtain new user access token
+            if self.addon.getSetting('vkuseraccesstoken') == '':
+                self.vksession = vk.AuthSession(
+                    VK_API_APP_ID,
+                    xbmcgui.Dialog().input(self.addon.getLocalizedString(30020)),  # todo: cancelling dialog
+                    xbmcgui.Dialog().input(self.addon.getLocalizedString(30021), option=xbmcgui.ALPHANUM_HIDE_INPUT),  # todo: cancelling dialog
+                    VK_API_SCOPE
+                )
+                self.addon.setSetting('vkuseraccesstoken', self.vksession.access_token)
+                self.savecookiejar(self.vksession.auth_session.cookies)
+            # restore session by sending user access token
+            else:
+                self.vksession = vk.Session(self.addon.getSetting('vkuseraccesstoken'))
+                self.vksession.requests_session.cookies = self.loadcookiejar()
+        except vk.exceptions.VkAuthError:
+            self.log('VK authorization error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30200), icon=xbmcgui.NOTIFICATION_ERROR)
+            exit()
+        try:
+            # create api
+            vkapi = vk.API(self.vksession, v=VK_API_VERSION, lang=VK_API_LANG)
+            istracked = vkapi.stats.trackVisitor()  # noqa
+            return vkapi
+        except vk.exceptions.VkAPIError:
+            self.log('VK API error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
+            exit()
+
+    def loadcookiejar(self):
         """
         Load cookiejar object from addon data file.
         (helper)
@@ -159,10 +165,12 @@ class VKAddon():  # todo: [bug] unicode errors
         try:
             with open(fp, 'rb') as f:
                 cookiejar = pickle.load(f)
+            return cookiejar
         except OSError:
             # file not exists
-            raise VKAddonError('Missing data file error!')
-        return cookiejar
+            self.log('Missing data file: {0}'.format(ADDON_DATA_FILE_COOKIEJAR), level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30203), icon=xbmcgui.NOTIFICATION_ERROR)
+            exit()
 
     def loadsearchhistory(self):
         """
@@ -199,7 +207,7 @@ class VKAddon():  # todo: [bug] unicode errors
         heading = '{0}'.format(self.addon.getAddonInfo('name'))
         xbmcgui.Dialog().notification(heading, msg, icon)
 
-    def savecookies(self, cookiejar):
+    def savecookiejar(self, cookiejar):
         """
         Save cookiejar object into addon data file.
         (helper)
@@ -272,7 +280,7 @@ class VKAddon():  # todo: [bug] unicode errors
         if int(self.urlargs['offset']) + int(self.addon.getSetting('itemsperpage')) < listdata['count']:
             self.urlargs['offset'] = int(self.urlargs['offset']) + int(self.addon.getSetting('itemsperpage'))
             listitems.append(
-                (self.buildurl(self.urlpath, self.urlargs), xbmcgui.ListItem('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30200))), FOLDER)
+                (self.buildurl(self.urlpath, self.urlargs), xbmcgui.ListItem('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30190))), FOLDER)
             )
         # show community list in kodi, even if empty
         xbmcplugin.setContent(self.handle, 'files')
@@ -325,7 +333,7 @@ class VKAddon():  # todo: [bug] unicode errors
         if int(self.urlargs['offset']) + int(self.addon.getSetting('itemsperpage')) < listdata['count']:
             self.urlargs['offset'] = int(self.urlargs['offset']) + int(self.addon.getSetting('itemsperpage'))
             listitems.append(
-                (self.buildurl(self.urlpath, self.urlargs), xbmcgui.ListItem('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30200))), FOLDER)
+                (self.buildurl(self.urlpath, self.urlargs), xbmcgui.ListItem('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30190))), FOLDER)
             )
         # if enabled, force custom view mode for videos
         if self.addon.getSetting('forcevideoviewmode') == 'true':
@@ -379,7 +387,7 @@ class VKAddon():  # todo: [bug] unicode errors
         if int(self.urlargs['offset']) + albumsperpage < albums['count']:
             self.urlargs['offset'] = int(self.urlargs['offset']) + albumsperpage
             listitems.append(
-                (self.buildurl(self.urlpath, self.urlargs), xbmcgui.ListItem('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30200))), FOLDER)
+                (self.buildurl(self.urlpath, self.urlargs), xbmcgui.ListItem('[COLOR blue]{0}[/COLOR]'.format(self.addon.getLocalizedString(30190))), FOLDER)
             )
         # show album list in kodi, even if empty
         xbmcplugin.setContent(self.handle, 'files')
@@ -478,7 +486,7 @@ class VKAddon():  # todo: [bug] unicode errors
             counters = self.vkapi.execute.getMenuCounters()
         except vk.exceptions.VkAPIError:
             self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30023), icon=xbmcgui.NOTIFICATION_ERROR)
+            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
         # create list items for main menu
         listitems = [
@@ -583,7 +591,7 @@ class VKAddon():  # todo: [bug] unicode errors
                 raise VKAddonError('Resolving error!')
         except VKAddonError:  # todo: [bug] also raising due to unhandled cookies expiration
             self.log('Resolving error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30080), icon=xbmcgui.NOTIFICATION_ERROR)
+            self.notify(self.addon.getLocalizedString(30204), icon=xbmcgui.NOTIFICATION_ERROR)
             return
         # create item for kodi player (using max quality stream)
         self.log('Resolving ok, playable stream/s found: {0}'.format(playables))
