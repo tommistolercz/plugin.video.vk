@@ -105,23 +105,23 @@ msgstr "HISTORIE HLEDÁNÍ"
 
 msgctxt "#30032"
 msgid "MY VIDEOS"
-msgstr "MÁ VIDEA"
+msgstr "MOJE VIDEA"
 
 msgctxt "#30033"
 msgid "MY LIKED VIDEOS"
-msgstr "MÁ OBLÍBENÁ VIDEA"
+msgstr "MOJE OBLÍBENÁ VIDEA"
 
 msgctxt "#30034"
 msgid "MY VIDEO ALBUMS"
-msgstr "MÁ VIDEO ALBA"
+msgstr "MOJE VIDEO ALBA"
 
 msgctxt "#30035"
 msgid "MY COMMUNITIES"
-msgstr "MÉ KOMUNITY"
+msgstr "MOJE KOMUNITY"
 
 msgctxt "#30036"
 msgid "MY LIKED COMMUNITIES"
-msgstr "MÉ OBLÍBENÉ KOMUNITY"
+msgstr "MOJE OBLÍBENÉ KOMUNITY"
 
 msgctxt "#30037"
 msgid "STATS"
