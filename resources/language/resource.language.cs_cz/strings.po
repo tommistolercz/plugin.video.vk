@@ -81,9 +81,13 @@ msgctxt "#30015"
 msgid "By relevance"
 msgstr "Podle relevance"
 
-msgctxt "#30019"
+msgctxt "#30018"
 msgid "VK user access token"
 msgstr "VK uživatelský token"
+
+msgctxt "#30019"
+msgid "LOGOUT"
+msgstr "ODHLÁSIT"
 
 # Addon authorization
 msgctxt "#30020"
@@ -93,6 +97,11 @@ msgstr "Zadejte své VK uživ. jméno/email"
 msgctxt "#30021"
 msgid "Enter your VK password"
 msgstr "Zadejte své VK heslo"
+
+# Logout
+msgctxt "#30025"
+msgid "User logged out."
+msgstr "Uživatel odhlášen."
 
 # Addon main menu
 msgctxt "#30030"

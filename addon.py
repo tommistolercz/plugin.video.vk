@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# todo: [bug] unicode errors (kodi iOS)
+# coding=utf-8
+# todo: [bug] unicode errors (kodi ios)
 __all__ = ['VKAddon', 'VKAddonError']
 
 
@@ -74,6 +74,7 @@ class VKAddon():
             '/likevideo': self.likevideo,
             '/likedcommunities': self.listlikedcommunities,
             '/likedvideos': self.listlikedvideos,
+            '/logout': self.logout,
             '/play': self.playvideo,
             '/playalbum': self.playalbum,
             '/renamealbum': self.renamealbum,
@@ -89,14 +90,12 @@ class VKAddon():
         }
         try:
             handler = self.routing[self.urlpath]
-            self.log('Routing dispatched by calling handler: {0}'.format(handler))
+            self.log('Routing dispatched by calling handler: {0}'.format(handler.__name__))
             handler()
         except KeyError:
             self.log('Routing error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30202), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
-
-    # ===== Helpers =====
 
     def buildoidid(self, ownerid, id):
         """
@@ -129,28 +128,31 @@ class VKAddon():
         """
         try:
             # obtain new user access token by authorizing addon using user credentials
-            if self.addon.getSetting('vkuseraccesstoken') == '':  # todo: [feat] logout button in settings
-                self.vksession = vk.AuthSession(
-                    VK_API_APP_ID,
-                    # todo: [bug] treat empty inputs or dialog cancelling
-                    xbmcgui.Dialog().input(self.addon.getLocalizedString(30020)),
-                    xbmcgui.Dialog().input(self.addon.getLocalizedString(30021), option=xbmcgui.ALPHANUM_HIDE_INPUT),
-                    VK_API_SCOPE
-                )
+            if self.addon.getSetting('vkuseraccesstoken') == '':
+                credentials = {
+                    'login': xbmcgui.Dialog().input(self.addon.getLocalizedString(30020)),
+                    'password': xbmcgui.Dialog().input(self.addon.getLocalizedString(30021), option=xbmcgui.ALPHANUM_HIDE_INPUT)
+                }
+                if not all(credentials.values()):
+                    raise vk.exceptions.VkAuthError()
+                self.vksession = vk.AuthSession(VK_API_APP_ID, credentials['login'], credentials['password'], VK_API_SCOPE)
+                self.log('VK session created by authorizing addon using user credentials.')
                 self.addon.setSetting('vkuseraccesstoken', self.vksession.access_token)
                 self.savecookiejar(self.vksession.auth_session.cookies)
             # restore session by sending user access token
             else:
                 self.vksession = vk.Session(self.addon.getSetting('vkuseraccesstoken'))
+                self.log('VK session restored using user access token.')
                 self.vksession.requests_session.cookies = self.loadcookiejar()
         except vk.exceptions.VkAuthError:
             self.log('VK authorization error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30200), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
-        try:  # todo: [bug] try...except every api request
+        try:
             # create api
             vkapi = vk.API(self.vksession, v=VK_API_VERSION, lang=VK_API_LANG)
             istracked = vkapi.stats.trackVisitor()  # noqa
+            self.log('VK API object created.')
             return vkapi
         except vk.exceptions.VkAPIError:
             self.log('VK API error!', level=xbmc.LOGERROR)
@@ -167,6 +169,7 @@ class VKAddon():
         try:
             with open(fp, 'rb') as f:
                 cookiejar = pickle.load(f)
+            self.log('Cookiejar data file loaded: {0}'.format(cookiejar))
             return cookiejar
         except OSError:
             # file not exists
@@ -176,7 +179,7 @@ class VKAddon():
 
     def loadsearchhistory(self):
         """
-        load search history data from addon data file.
+        load search history from addon data file.
         (helper)
         :returns: dict
         """
@@ -184,9 +187,9 @@ class VKAddon():
         try:
             with open(fp) as f:
                 searchhistory = json.load(f)
-        except OSError:
-            # file not exists
-            searchhistory = {'count': 0, 'items': []}
+        except OSError:  # file not exists
+            searchhistory = {u'count': 0, u'items': []}
+        self.log('Search history data file loaded: {0}'.format(searchhistory))
         return searchhistory
 
     def log(self, msg, level=xbmc.LOGDEBUG):
@@ -203,7 +206,7 @@ class VKAddon():
         """
         Notify user using uniform style.
         (helper)
-        :param msg: str;
+        :param msg: string
         :param icon: int; xbmcgui.NOTIFICATION_INFO (default)
         """
         heading = '{0}'.format(self.addon.getAddonInfo('name'))
@@ -218,16 +221,18 @@ class VKAddon():
         fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_COOKIEJAR)
         with open(fp, 'wb') as f:
             pickle.dump(cookiejar, f)
+        self.log('Cookiejar data file saved: {0}'.format(cookiejar))
 
     def savesearchhistory(self, searchhistory):
         """
-        Save search history data into addon data file.
+        Save search history into addon data file.
         (helper)
         :param searchhistory: dict
         """
         fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_SEARCH_HISTORY)
         with open(fp, 'w') as f:
             json.dump(searchhistory, f, indent=4)
+        self.log('Search history data file saved: {0}'.format(searchhistory))
 
     def updatesearchhistory(self, search):
         """
@@ -238,12 +243,13 @@ class VKAddon():
         searchhistory = self.loadsearchhistory()
         existing = None
         for i, item in enumerate(searchhistory['items']):
-            if item['query'] == search['query']:
+            if item['query'].lower() == search['query'].lower():
                 existing = searchhistory['items'].pop(i)
                 break
         search['usesCount'] = 1 if not existing else existing['usesCount'] + 1
         search['lastUsed'] = datetime.datetime.now().isoformat()
         searchhistory['items'].append(search)
+        self.log('Search history updated: {0}'.format(search))
         if not existing:
             searchhistory['count'] += 1
         self.savesearchhistory(searchhistory)
@@ -256,11 +262,14 @@ class VKAddon():
         (contextmenu action handler)
         """
         albumtitle = xbmcgui.Dialog().input(self.addon.getLocalizedString(30110))
-        addedalbum = self.vkapi.video.addAlbum(
+        if not albumtitle:
+            return
+        # todo: [bug] try...except every api request
+        album = self.vkapi.video.addAlbum(
             title=albumtitle,
             privacy=3  # 3=onlyme
         )
-        self.log('New album added: {0}'.format(addedalbum['album_id']))
+        self.log('Album added: {0}'.format(album['album_id']))
         self.notify(self.addon.getLocalizedString(30111))
         xbmc.executebuiltin('Container.refresh')
 
@@ -648,6 +657,20 @@ class VKAddon():
         # build list of videos
         self.buildlistofvideos(videos)
 
+    def logout(self):
+        """
+        Logout user.
+        (settings action handler)
+        """
+        # reset user access token
+        self.addon.setSetting('vkuseraccesstoken', '')
+        # delete cookiejar data file
+        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_COOKIEJAR)
+        if os.path.isfile(fp):
+            os.remove(fp)
+        self.log('User logged out by resetting access token and deleting cookiejar data file.')
+        self.notify(self.addon.getLocalizedString(30025))
+
     def playalbum(self):
         """
         Play album.
@@ -694,8 +717,12 @@ class VKAddon():
         Rename album.
         (contextmenu action handler)
         """
-        albumtitle = self.vkapi.video.getAlbumById(album_id=int(self.urlargs['albumid']))['title']
-        albumtitle = xbmcgui.Dialog().input(self.addon.getLocalizedString(30115), albumtitle)
+        album = self.vkapi.video.getAlbumById(
+            album_id=int(self.urlargs['albumid'])
+        )
+        albumtitle = xbmcgui.Dialog().input(self.addon.getLocalizedString(30115), defaultt=album['title'])
+        if not albumtitle:
+            return
         self.vkapi.video.editAlbum(
             album_id=int(self.urlargs['albumid']),
             title=albumtitle,
@@ -727,12 +754,14 @@ class VKAddon():
         # paging offset (default=0)
         self.urlargs['offset'] = self.urlargs.get('offset', 0)
         if int(self.urlargs['offset']) == 0:  # only once!
-            # ask user for entering a search query (or for editing one passed from /searchsimilar)
-            while self.urlargs.get('q', '') == '':
+            # if not in urlargs, ask user for entering a search query (or editing one passed from /searchsimilar)
+            if 'q' not in self.urlargs:
                 self.urlargs['q'] = xbmcgui.Dialog().input(self.addon.getLocalizedString(30090), defaultt=self.urlargs.get('qdef', ''))
+            if not self.urlargs['q']:
+                return
         # request vk api for searched videos
         try:
-            kwparams = {
+            params = {
                 'extended': 1,
                 'hd': 1,
                 'q': self.urlargs['q'],
@@ -743,10 +772,10 @@ class VKAddon():
                 'count': int(self.addon.getSetting('itemsperpage')),
             }
             if self.addon.getSetting('searchduration') == '1':
-                kwparams['longer'] = int(self.addon.getSetting('searchdurationmins')) * 60
+                params['longer'] = int(self.addon.getSetting('searchdurationmins')) * 60
             elif self.addon.getSetting('searchduration') == '2':
-                kwparams['shorter'] = int(self.addon.getSetting('searchdurationmins')) * 60
-            searchedvideos = self.vkapi.video.search(**kwparams)
+                params['shorter'] = int(self.addon.getSetting('searchdurationmins')) * 60
+            searchedvideos = self.vkapi.video.search(**params)
             self.log('Searched videos: {0}'.format(searchedvideos))
         except vk.exceptions.VkAPIError:
             self.log('VK API error!', level=xbmc.LOGERROR)
@@ -756,7 +785,7 @@ class VKAddon():
             # update search history
             lastsearch = {'query': self.urlargs['q'], 'resultsCount': int(searchedvideos['count'])}
             self.updatesearchhistory(lastsearch)
-            # notify search results count
+            # notify user of search results count
             self.notify(self.addon.getLocalizedString(30091).format(searchedvideos['count']))
         # build list of searched videos
         self.buildlistofvideos(searchedvideos)
@@ -841,11 +870,8 @@ class VKAddonError(Exception):
     """
     Exception type for addon errors.
     """
-    def __init__(self, errmsg):
-        """
-        :param errmsg: str
-        """
-        self.errmsg = errmsg
+    def __init__(self, msg=None):
+        self.msg = msg
 
 
 if __name__ == '__main__':

@@ -12,6 +12,7 @@
         <setting label="30012" id="searchsort" type="enum" lvalues="30013|30014|30015" default="0"/>
     </category>
     <category label="30001">
-        <setting label="30019" id="vkuseraccesstoken" type="text" default=""/>
+        <setting label="30018" id="vkuseraccesstoken" type="text" default=""/>
+        <setting label="30019" id="vkuserlogout" type="action" action="RunPlugin(plugin://plugin.video.vk/logout)"/>
     </category>
 </settings>

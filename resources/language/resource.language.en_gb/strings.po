@@ -81,8 +81,12 @@ msgctxt "#30015"
 msgid "By relevance"
 msgstr ""
 
-msgctxt "#30019"
+msgctxt "#30018"
 msgid "VK user access token"
+msgstr ""
+
+msgctxt "#30019"
+msgid "LOGOUT"
 msgstr ""
 
 # Addon authorization
@@ -92,6 +96,11 @@ msgstr ""
 
 msgctxt "#30021"
 msgid "Enter your VK password"
+msgstr ""
+
+# Logout
+msgctxt "#30025"
+msgid "User logged out."
 msgstr ""
 
 # Addon main menu
