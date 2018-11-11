@@ -11,6 +11,7 @@ rectangle "Common" <<package>> {
     user -- (Edit addon settings)
     user -- (Authorize addon)
     user -- (List main menu)
+    user -- (Logout)
 }
 
 @enduml

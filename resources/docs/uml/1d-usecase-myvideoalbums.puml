@@ -15,7 +15,6 @@ rectangle "My video albums" <<package>> {
     user -- (Reorder album up/down)
     user -- (Delete album)
     user -- (Set album/s for video)
-    user -- (Play album)
 }
 
 @enduml

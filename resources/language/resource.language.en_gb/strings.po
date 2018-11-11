@@ -165,10 +165,6 @@ msgctxt "#30056"
 msgid "Leave community"
 msgstr ""
 
-msgctxt "#30057"
-msgid "Play album as playlist"
-msgstr ""
-
 msgctxt "#30058"
 msgid "Rename album"
 msgstr ""
@@ -245,19 +241,19 @@ msgstr ""
 
 # Likes
 msgctxt "#30130"
-msgid "Like added to video. ({0} likes)"
+msgid "Video liked."
 msgstr ""
 
 msgctxt "#30131"
-msgid "Like deleted from video."
+msgid "Video unliked."
 msgstr ""
 
 msgctxt "#30132"
-msgid "Like added to community."
+msgid "Community liked."
 msgstr ""
 
 msgctxt "#30133"
-msgid "Like deleted from community."
+msgid "Community unliked."
 msgstr ""
 
 # Communities

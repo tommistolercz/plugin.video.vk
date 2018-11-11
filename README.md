@@ -28,6 +28,7 @@ Kodi add-on for watching videos from VK.com social network.
     - [x] Edit add-on settings
     - [x] List add-on main menu
     - [x] Authorize add-on (OAuth2 support using user access token, user credentials only required on first run and no longer stored by add-on)
+    - [x] Logout
     - [x] User-friendly listings (incl. pagination, HD thumbs, item counters, auto switching view modes, ...)
     - [x] EN/CZ translations
 - Search
@@ -47,7 +48,6 @@ Kodi add-on for watching videos from VK.com social network.
     - [x] Reorder album up/down
     - [x] Delete album
     - [x] Set albums for video
-    - [ ] Play album
 - My communities
     - [x] List communities
     - [x] List community videos

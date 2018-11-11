@@ -139,11 +139,11 @@ msgstr "STATISTIKY"
 # Context menu actions
 msgctxt "#30050"
 msgid "Unlike video"
-msgstr "Odebrat z oblíb. videí"
+msgstr "Už se mi nelíbí"
 
 msgctxt "#30051"
 msgid "Like video"
-msgstr "Přidat do oblíb. videí"
+msgstr "Líbí se mi"
 
 msgctxt "#30052"
 msgid "Set albums for video"
@@ -155,19 +155,15 @@ msgstr "Hledat podobné"
 
 msgctxt "#30054"
 msgid "Unlike community"
-msgstr "Odebrat z oblíb. komunit"
+msgstr "Už se mi nelíbí"
 
 msgctxt "#30055"
 msgid "Like community"
-msgstr "Přidat do oblíb. komunit"
+msgstr "Líbí se mi"
 
 msgctxt "#30056"
 msgid "Leave community"
 msgstr "Opustit komunitu"
-
-msgctxt "#30057"
-msgid "Play album as playlist"
-msgstr "Přehrát vše v albu"
 
 msgctxt "#30058"
 msgid "Rename album"
@@ -245,19 +241,19 @@ msgstr "Alba nastavena."
 
 # Likes
 msgctxt "#30130"
-msgid "Like added to video. ({0} likes)"
-msgstr "Video přidáno mezi oblíbené. ({0} uživatelů)"
+msgid "Video liked."
+msgstr "Video přidáno do oblíbených."
 
 msgctxt "#30131"
-msgid "Like deleted from video."
+msgid "Video unliked."
 msgstr "Video odebráno z oblíbených."
 
 msgctxt "#30132"
-msgid "Like added to community."
+msgid "Community liked."
 msgstr "Komunita přidána do oblíbených."
 
 msgctxt "#30133"
-msgid "Like deleted from community."
+msgid "Community unliked."
 msgstr "Komunita odebrána z oblíbených."
 
 # Communities
