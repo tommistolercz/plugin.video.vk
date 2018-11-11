@@ -104,7 +104,7 @@ class VKAddon():
         (helper)
         :param ownerid: int; video owner id
         :param id: int; video id
-        :returns: str; video oidid
+        :returns: string; video oidid
         """
         return '{0}_{1}'.format(ownerid, id)
 
@@ -112,9 +112,9 @@ class VKAddon():
         """
         Build addon url.
         (helper)
-        :param urlpath: str; action name
+        :param urlpath: string; action name
         :param urlargs: dict; action params, default=None
-        :returns: str; addon url (plugin://...)
+        :returns: string; addon url (plugin://...)
         """
         url = self.urlbase + urlpath
         if urlargs is not None and len(list(urlargs)) > 0:
@@ -197,7 +197,7 @@ class VKAddon():
         """
         Log message into default Kodi.log using an uniform style.
         (helper)
-        :param msg: str
+        :param msg: string
         :param level: xbmc.LOGDEBUG (default)
         """
         msg = '{0}: {1}'.format(self.addon.getAddonInfo('id'), msg)
@@ -239,7 +239,7 @@ class VKAddon():
         """
         Append search to search history if query is unique, else re-append updated one.
         (helper)
-        :param search: dict(query=str, resultsCount=int)
+        :param search: dict(query=string, resultsCount=int)
         """
         searchhistory = self.loadsearchhistory()
         existing = None
