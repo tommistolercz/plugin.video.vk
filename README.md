@@ -67,7 +67,7 @@ Kodi add-on for watching videos from VK.com social network.
 
 ### Backlog
 
-[Backlog](https://github.com/tommistolercz/plugin.video.vk/milestones/backlog) for future features and ideas.
+Future features and ideas [backlog](https://github.com/tommistolercz/plugin.video.vk/milestones/backlog).
 
 ## Docs
 
