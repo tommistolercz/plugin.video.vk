@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.vk" name="VK" version="1.0.0" provider-name="TomMistolerCZ">
+	<requires>
+		<import addon="xbmc.python" version="2.25.0"/>
+		<import addon="script.module.requests" version="2.8.1"/>
+	</requires>
+	<extension point="xbmc.python.pluginsource" library="addon.py">
+		<provides>video</provides>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary lang="en_GB">VK for Kodi</summary>
+		<description lang="en_GB">Kodi add-on for watching videos from VK.com social network.</description>
+		<disclaimer lang="en_GB">Author does not host or distribute any of the content displayed by this add-on.</disclaimer>
+		<summary lang="cs_CZ">VK pro Kodi</summary>
+		<description lang="cs_CZ">Kodi doplněk pro přehrávání videí ze sociální sítě VK.com.</description>
+		<disclaimer lang="cs_CZ">Autor doplňku se nepodílí na tvorbě či distribuci obsahu zobrazovaného tímto doplňkem.</disclaimer>
+		<platform>all</platform>
+		<license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
+		<forum></forum>
+		<website>https://www.vk.com</website>
+		<source>https://github.com/tommistolercz/plugin.video.vk</source>
+		<email></email>
+		<news></news>
+		<assets>
+			<icon>resources/icon.png</icon>
+			<screenshot>resources/media/screenshot1.jpg</screenshot>
+			<screenshot>resources/media/screenshot2.jpg</screenshot>
+			<screenshot>resources/media/screenshot3.jpg</screenshot>
+		</assets>
+	</extension>
+</addon>

@@ -1,0 +1,17 @@
+@startuml
+left to right direction
+
+'user
+actor "User" as user
+note "Kodi user with\nVK.com accout" as n
+    user . n
+
+'common
+rectangle "Common" <<package>> {
+    user -- (Edit addon settings)
+    user -- (Authorize addon)
+    user -- (List main menu)
+    user -- (Logout)
+}
+
+@enduml

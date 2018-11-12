@@ -1,0 +1,293 @@
+# Kodi Media Center language file
+# Addon Name: VK
+# Addon id: plugin.video.vk
+# Addon Provider: TomMistolerCZ
+msgid ""
+msgstr ""
+"Project-Id-Version: KODI Addons\n"
+"Report-Msgid-Bugs-To: http://trac.kodi.tv/\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Kodi Translation Team\n"
+"Language-Team: Czech (Czech Republic) (http://www.transifex.com/projects/p/kodi-main/language/cs_CZ/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: cs_CZ\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+# Addon settings
+msgctxt "#30000"
+msgid "GENERAL"
+msgstr "OBECNÉ"
+
+msgctxt "#30001"
+msgid "USER"
+msgstr "UŽIVATEL"
+
+msgctxt "#30002"
+msgid "Items per page"
+msgstr "Položek na stránku"
+
+msgctxt "#30003"
+msgid "Force view mode for videos"
+msgstr "Vynutit zobrazení pro videa"
+
+msgctxt "#30004"
+msgid "View mode [id]"
+msgstr "Typ zobrazení [id]"
+
+msgctxt "#30005"
+msgid "Search also adult videos"
+msgstr "Hledat také videa pro dospělé"
+
+msgctxt "#30006"
+msgid "Search also own videos"
+msgstr "Hledat také vlastní videa"
+
+msgctxt "#30007"
+msgid "Search videos with duration"
+msgstr "Hledat videa s délkou"
+
+msgctxt "#30008"
+msgid "Any"
+msgstr "Nezáleží"
+
+msgctxt "#30009"
+msgid "Longer than"
+msgstr "Delší než"
+
+msgctxt "#30010"
+msgid "Shorter than"
+msgstr "Kratší než"
+
+msgctxt "#30011"
+msgid "Duration [minutes]"
+msgstr "Délka [minut]"
+
+msgctxt "#30012"
+msgid "Sort searched videos"
+msgstr "Řadit nalezená videa"
+
+msgctxt "#30013"
+msgid "By date"
+msgstr "Podle data"
+
+msgctxt "#30014"
+msgid "By duration"
+msgstr "Podle délky"
+
+msgctxt "#30015"
+msgid "By relevance"
+msgstr "Podle relevance"
+
+msgctxt "#30018"
+msgid "VK user access token"
+msgstr "VK uživatelský token"
+
+msgctxt "#30019"
+msgid "LOGOUT"
+msgstr "ODHLÁSIT"
+
+# Addon authorization
+msgctxt "#30020"
+msgid "Enter your VK login/email"
+msgstr "Zadejte své VK uživ. jméno/email"
+
+msgctxt "#30021"
+msgid "Enter your VK password"
+msgstr "Zadejte své VK heslo"
+
+# Logout
+msgctxt "#30025"
+msgid "User logged out."
+msgstr "Uživatel odhlášen."
+
+# Addon main menu
+msgctxt "#30030"
+msgid "SEARCH"
+msgstr "HLEDAT"
+
+msgctxt "#30031"
+msgid "SEARCH HISTORY"
+msgstr "HISTORIE HLEDÁNÍ"
+
+msgctxt "#30032"
+msgid "MY VIDEOS"
+msgstr "MOJE VIDEA"
+
+msgctxt "#30033"
+msgid "MY LIKED VIDEOS"
+msgstr "MOJE OBLÍBENÁ VIDEA"
+
+msgctxt "#30034"
+msgid "MY VIDEO ALBUMS"
+msgstr "MOJE VIDEO ALBA"
+
+msgctxt "#30035"
+msgid "MY COMMUNITIES"
+msgstr "MOJE KOMUNITY"
+
+msgctxt "#30036"
+msgid "MY LIKED COMMUNITIES"
+msgstr "MOJE OBLÍBENÉ KOMUNITY"
+
+msgctxt "#30037"
+msgid "STATS"
+msgstr "STATISTIKY"
+
+# Context menu actions
+msgctxt "#30050"
+msgid "Unlike video"
+msgstr "Už se mi nelíbí"
+
+msgctxt "#30051"
+msgid "Like video"
+msgstr "Líbí se mi"
+
+msgctxt "#30052"
+msgid "Set albums for video"
+msgstr "Zařadit do alb"
+
+msgctxt "#30053"
+msgid "Search similar"
+msgstr "Hledat podobné"
+
+msgctxt "#30054"
+msgid "Unlike community"
+msgstr "Už se mi nelíbí"
+
+msgctxt "#30055"
+msgid "Like community"
+msgstr "Líbí se mi"
+
+msgctxt "#30056"
+msgid "Leave community"
+msgstr "Opustit komunitu"
+
+msgctxt "#30058"
+msgid "Rename album"
+msgstr "Přejmenovat album"
+
+msgctxt "#30059"
+msgid "Move up"
+msgstr "Posunout nahoru"
+
+msgctxt "#30060"
+msgid "Move down"
+msgstr "Posunout dolů"
+
+msgctxt "#30061"
+msgid "Delete album"
+msgstr "Smazat album"
+
+msgctxt "#30062"
+msgid "Add album"
+msgstr "Přidat album"
+
+msgctxt "#30063"
+msgid "Delete search"
+msgstr "Smazat hledání"
+
+# Search
+msgctxt "#30090"
+msgid "Enter the search query:"
+msgstr "Zadejte hledaný dotaz:"
+
+msgctxt "#30091"
+msgid "{0} videos found."
+msgstr "{0} videí nalezeno."
+
+msgctxt "#30092"
+msgid "Search deleted."
+msgstr "Hledání smazáno."
+
+# Video albums
+msgctxt "#30110"
+msgid "Enter the album title:"
+msgstr "Zadejte název alba:"
+
+msgctxt "#30111"
+msgid "Album added."
+msgstr "Album přidáno."
+
+msgctxt "#30112"
+msgid "Confirmation:"
+msgstr "Potvrzení:"
+
+msgctxt "#30113"
+msgid "Do you want to delete the album?"
+msgstr "Chcete smazat album?"
+
+msgctxt "#30114"
+msgid "Album deleted."
+msgstr "Album smazáno."
+
+msgctxt "#30115"
+msgid "Edit the album title:"
+msgstr "Upravte název alba:"
+
+msgctxt "#30116"
+msgid "Album renamed."
+msgstr "Album přejmenováno."
+
+msgctxt "#30117"
+msgid "Set the albums for video:"
+msgstr "Nastavte alba pro video:"
+
+msgctxt "#30118"
+msgid "Albums set."
+msgstr "Alba nastavena."
+
+# Likes
+msgctxt "#30130"
+msgid "Video liked."
+msgstr "Video přidáno do oblíbených."
+
+msgctxt "#30131"
+msgid "Video unliked."
+msgstr "Video odebráno z oblíbených."
+
+msgctxt "#30132"
+msgid "Community liked."
+msgstr "Komunita přidána do oblíbených."
+
+msgctxt "#30133"
+msgid "Community unliked."
+msgstr "Komunita odebrána z oblíbených."
+
+# Communities
+msgctxt "#30140"
+msgid "Community was left."
+msgstr "Komunita opuštěna."
+
+# Stats
+msgctxt "#30150"
+msgid "Lorem ipsum"
+msgstr "Lorem ipsum"
+
+# Paginator
+msgctxt "#30190"
+msgid "NEXT PAGE"
+msgstr "DALŠÍ STRANA"
+
+# Errors
+msgctxt "#30200"
+msgid "VK authorization error!"
+msgstr "Chyba VK autorizace!"
+
+msgctxt "#30201"
+msgid "VK API error!"
+msgstr "Chyba VK API!"
+
+msgctxt "#30202"
+msgid "Routing error!"
+msgstr "Chyba routingu!"
+
+msgctxt "#30203"
+msgid "Missing data file error!"
+msgstr "Chyba datového souboru!"
+
+msgctxt "#30204"
+msgid "Resolving error!"
+msgstr "Chyba resolveru!"
