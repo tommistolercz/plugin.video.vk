@@ -3,6 +3,8 @@
 
 """
 VK for Kodi (plugin.video.vk)
+v1.0.0
+https://github.com/tommistolercz/plugin.video.vk
 """
 
 
@@ -280,7 +282,7 @@ class VKAddon():
     def buildlistofcommunities(self, listdata):
         """
         Build list of communities.
-        (handler helper)  # todo: [bug] refactor?
+        (handler helper)
         :param listdata: dict
         """
         # list type: /communities, /likedcommunities
@@ -297,7 +299,7 @@ class VKAddon():
             cmi = []
             if listtype == '/likedcommunities':
                 cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30054), color=COLOR_ALT), 'Container.Update({0})'.format(self.buildurl('/unlikecommunity', {'communityid': community['id']}))))
-            else:  # todo: [bug] no api support for determining if community is liked in /communities
+            else:
                 cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30055), color=COLOR_ALT), 'Container.Update({0})'.format(self.buildurl('/likecommunity', {'communityid': community['id']}))))
             cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30056), color=COLOR_ALT), 'Container.Update({0})'.format(self.buildurl('/leavecommunity', {'communityid': community['id']}))))
             li.addContextMenuItems(cmi)
@@ -319,7 +321,7 @@ class VKAddon():
     def buildlistofvideos(self, listdata):
         """
         Build list of videos.
-        (handler helper)  # todo: [bug] refactor?
+        (handler helper)
         :param listdata: dict
         """
         # list type: /albumvideos, /communityvideos, /likedvideos, /search, /searchsimilar, /videos
@@ -636,7 +638,7 @@ class VKAddon():
             (self.buildurl('/communities'), xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(self.addon.getLocalizedString(30035), counters['communities'], color=COLOR_ALT)), FOLDER),
             (self.buildurl('/likedvideos'), xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(self.addon.getLocalizedString(30033), counters['likedvideos'], color=COLOR_ALT)), FOLDER),
             (self.buildurl('/likedcommunities'), xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(self.addon.getLocalizedString(30036), counters['likedcommunities'], color=COLOR_ALT)), FOLDER),
-            (self.buildurl('/stats'), xbmcgui.ListItem('{0}'.format(self.addon.getLocalizedString(30037))), FOLDER),
+            # (self.buildurl('/stats'), xbmcgui.ListItem('{0}'.format(self.addon.getLocalizedString(30037))), FOLDER),
         ]
         # show main menu list in kodi
         xbmcplugin.setContent(self.handle, 'files')
@@ -674,20 +676,8 @@ class VKAddon():
         """
         List stats.
         (menu action handler)
-        Metrics:
-            - totals:
-                - timeUsageTotal
-                - countVideosPlayedTotal
-            - session (current):
-                - timeUsageSession
-                - countVideosPlayedSession
-            - session stats:
-                - timeUsageSessionAvg
-                - timeUsageSessionMax
-                - countVideosPlayedSessionAvg
-                - countVideosPlayedSessionMax
         """
-        pass  # todo: [feat] stats
+        pass  # todo: [feat] list usage stats
 
     def listvideos(self):
         """
@@ -735,7 +725,7 @@ class VKAddon():
             vi = self.vksession.requests_session.get(
                 url='https://vk.com/al_video.php?act=show_inline&al=1&video={0}'.format(oidid),
                 headers={'User-Agent': VK_VIDEOINFO_UA},
-                # logged user's cookies sent autom.
+                # +logged user's cookies sent autom.
             )
             self.log('Resolving video url: {0}'.format(vi.url))
             matches = re.findall(r'"url(\d+)":"([^"]+)"', vi.text.replace('\\', ''))
@@ -745,7 +735,7 @@ class VKAddon():
                 playables[qual] = m[1]
             if not playables:
                 raise VKAddonError()
-        except VKAddonError:  # todo: [bug] resolving error also occured due to unhandled cookies (expiration? ip range?)
+        except VKAddonError:
             self.log('Resolving error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30204), icon=xbmcgui.NOTIFICATION_ERROR)
             return
@@ -853,7 +843,7 @@ class VKAddon():
             # get user albums
             albums = self.vkapi.video.getAlbums(
                 need_system=0,
-                count=100  # todo: [bug] ugly! (100=api's max) in /setalbumsforvideo
+                count=100  # ugly! todo: [feat] pageable multiselect dialog for /setalbumsforvideo?
             )
             # get current album ids for video
             albumidspre = self.vkapi.video.getAlbumsByVideo(
