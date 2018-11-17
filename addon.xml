@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.vk" name="VK" version="1.0.0" provider-name="TomMistolerCZ">
+<addon id="plugin.video.vk" name="VK" version="1.1.0" provider-name="TomMistolerCZ">
 	<requires>
 		<import addon="xbmc.python" version="2.25.0"/>
 		<import addon="script.module.requests" version="2.8.1"/>
@@ -20,7 +20,7 @@
 		<website>https://www.vk.com</website>
 		<source>https://github.com/tommistolercz/plugin.video.vk</source>
 		<email></email>
-		<news></news>
+		<news>v1.1.0: added a stats feature</news>
 		<assets>
 			<icon>resources/icon.png</icon>
 			<screenshot>resources/media/screenshot1.jpg</screenshot>

@@ -3,7 +3,7 @@
 
 """
 VK for Kodi (plugin.video.vk)
-v1.0.0
+v1.1.0
 https://github.com/tommistolercz/plugin.video.vk
 """
 
@@ -638,7 +638,7 @@ class VKAddon():
             (self.buildurl('/communities'), xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(self.addon.getLocalizedString(30035), counters['communities'], color=COLOR_ALT)), FOLDER),
             (self.buildurl('/likedvideos'), xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(self.addon.getLocalizedString(30033), counters['likedvideos'], color=COLOR_ALT)), FOLDER),
             (self.buildurl('/likedcommunities'), xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(self.addon.getLocalizedString(30036), counters['likedcommunities'], color=COLOR_ALT)), FOLDER),
-            # (self.buildurl('/stats'), xbmcgui.ListItem('{0}'.format(self.addon.getLocalizedString(30037))), FOLDER),
+            (self.buildurl('/stats'), xbmcgui.ListItem('{0}'.format(self.addon.getLocalizedString(30037))), FOLDER),
         ]
         # show main menu list in kodi
         xbmcplugin.setContent(self.handle, 'files')
