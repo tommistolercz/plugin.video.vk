@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 # coding=utf-8
 
@@ -10,6 +11,7 @@ https://github.com/tommistolercz/plugin.video.vk
 
 import datetime
 import json
+import logging
 import os
 import pickle
 import re
@@ -39,7 +41,8 @@ VK_API_LANG = 'ru'
 VK_VIDEOINFO_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.1 Safari/605.1.15'
 ADDON_DATA_FILE_COOKIEJAR = '.cookiejar'
 ADDON_DATA_FILE_SEARCH_HISTORY = 'searchhistory.json'
-COLOR_ALT = 'blue'
+ADDON_DATA_FILE_USAGE_LOG = 'usage.log'
+COLOR_ALT = 'blue'  # todo: [bug] use neutral gray vs. as user setting?
 
 
 class VKAddon():
@@ -50,8 +53,8 @@ class VKAddon():
         """
         Initialize addon and manage all that controlling stuff at runtime ;-)
         """
-        self.addon = xbmcaddon.Addon()
         self.handle = int(sys.argv[1])
+        self.addon = xbmcaddon.Addon()
         self.vkapi = self.createvkapi()
         # parse addon url
         self.urlbase = 'plugin://' + self.addon.getAddonInfo('id')
@@ -63,6 +66,8 @@ class VKAddon():
                 self.urlargs[k] = v.pop()
         self.url = self.buildurl(self.urlpath, self.urlargs)
         self.log('Addon url parsed: {0}'.format(self.url))
+        # log url for usage stats
+        self.logusage(self.url)
         # dispatch addon routing by calling a handler for respective user action
         self.routing = {
             '/': self.listmainmenu,
@@ -205,6 +210,21 @@ class VKAddon():
         msg = '{0}: {1}'.format(self.addon.getAddonInfo('id'), msg)
         xbmc.log(msg, level)
 
+    def logusage(self, url):
+        """
+        Log url into additional addon usage.log.
+        (helper)
+        :param url: string
+        """
+        logging.basicConfig(
+            level=logging.INFO,
+            filename=os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_USAGE_LOG),
+            filemode='a',
+            format='\t'.join(['%(asctime)s', '%(levelname)s', '%(message)s']),
+        )
+        usagelogger = logging.getLogger(self.addon.getAddonInfo('id'))
+        usagelogger.info(msg=url)
+
     def notify(self, msg, icon=xbmcgui.NOTIFICATION_INFO):
         """
         Notify user using uniform style.
@@ -212,7 +232,7 @@ class VKAddon():
         :param msg: string
         :param icon: int; xbmcgui.NOTIFICATION_INFO (default)
         """
-        heading = '{0}'.format(self.addon.getAddonInfo('name'))
+        heading = self.addon.getAddonInfo('name')
         xbmcgui.Dialog().notification(heading, msg, icon)
 
     def savecookiejar(self, cookiejar):
@@ -263,6 +283,7 @@ class VKAddon():
         """
         Add new album.
         (contextmenu action handler)
+        plugin://plugin.video.vk/addalbum
         """
         albumtitle = xbmcgui.Dialog().input(self.addon.getLocalizedString(30110))
         if not albumtitle:
@@ -378,6 +399,7 @@ class VKAddon():
         """
         Delete album.
         (contextmenu action handler)
+        plugin://plugin.video.vk/deletealbum?albumid={}
         """
         if not xbmcgui.Dialog().yesno(self.addon.getLocalizedString(30112), self.addon.getLocalizedString(30113)):
             return
@@ -396,6 +418,7 @@ class VKAddon():
         """
         Delete search from history.
         (contextmenu action handler)
+        plugin://plugin.video.vk/deletesearch?...
         """
         searchhistory = self.loadsearchhistory()
         for i, item in enumerate(searchhistory['items']):
@@ -411,6 +434,7 @@ class VKAddon():
         """
         Leave community.
         (contextmenu action handler)
+        plugin://plugin.video.vk/leavecommunity?...
         """
         try:
             self.vkapi.groups.leave(
@@ -427,6 +451,7 @@ class VKAddon():
         """
         Like community.
         (contextmenu action handler)
+        plugin://plugin.video.vk/likecommunity?...
         """
         try:
             self.vkapi.fave.addGroup(
@@ -443,6 +468,7 @@ class VKAddon():
         """
         Like video.
         (contextmenu action handler)
+        plugin://plugin.video.vk/likevideo?...
         """
         oidid = self.buildoidid(self.urlargs['ownerid'], self.urlargs['id'])
         try:
@@ -462,6 +488,7 @@ class VKAddon():
         """
         List user's albums.
         (menu action handler)
+        plugin://plugin.video.vk/albums?...
         """
         # paging offset (default=0)
         self.urlargs['offset'] = self.urlargs.get('offset', 0)
@@ -515,6 +542,7 @@ class VKAddon():
         """
         List user's album videos.
         (menu action handler)
+        plugin://plugin.video.vk/albumvideos?...
         """
         # paging offset (default=0)
         self.urlargs['offset'] = self.urlargs.get('offset', 0)
@@ -537,6 +565,7 @@ class VKAddon():
         """
         List user's communities.
         (menu action handler)
+        plugin://plugin.video.vk/communities?...
         """
         # paging offset (default=0)
         self.urlargs['offset'] = self.urlargs.get('offset', 0)
@@ -558,6 +587,7 @@ class VKAddon():
         """
         List user's community videos.
         (menu action handler)
+        plugin://plugin.video.vk/communityvideos?...
         """
         # paging offset (default=0)
         self.urlargs['offset'] = self.urlargs.get('offset', 0)
@@ -580,6 +610,7 @@ class VKAddon():
         """
         List user's liked communities.
         (menu action handler)
+        plugin://plugin.video.vk/likedcommunities?...
         """
         # paging offset (default=0)
         self.urlargs['offset'] = self.urlargs.get('offset', 0)
@@ -600,6 +631,7 @@ class VKAddon():
         """
         List user's liked videos.
         (menu action handler)
+        plugin://plugin.video.vk/likedvideos?...
         """
         # paging offset (default=0)
         self.urlargs['offset'] = self.urlargs.get('offset', 0)
@@ -621,6 +653,7 @@ class VKAddon():
         """
         List main menu.
         (menu action handler)
+        plugin://plugin.video.vk/
         """
         # request vk api for menu counters (stored function)
         try:
@@ -650,6 +683,7 @@ class VKAddon():
         """
         List search history.
         (menu action handler)
+        plugin://plugin.video.vk/searchhistory?...
         """
         # load search history
         searchhistory = self.loadsearchhistory()
@@ -676,6 +710,21 @@ class VKAddon():
         """
         List stats.
         (menu action handler)
+        plugin://plugin.video.vk/stats
+
+        Metrics:
+        firstRun [d.m.yyyy]
+        lastRun [d.m.yyyy]
+        usageTimeTotal [dd:hh:mm]
+        usageTimeSession [hh:mm:ss]
+        usageTimeSessionAvg [hh:mm:ss]
+        usageTimeSessionMax [hh:mm:ss]
+        sessionsCountTotal [int]
+        playedVideosCountTotal [int]
+        playedVideosCountSession [int]
+        playedVideosCountSessionAvg [float]
+        playedVideosCountSessionMax [float]
+        ...
         """
         pass  # todo: [feat] list usage stats
 
@@ -683,6 +732,7 @@ class VKAddon():
         """
         List user's videos.
         (menu action handler)
+        plugin://plugin.video.vk/videos?...
         """
         # paging offset (default=0)
         self.urlargs['offset'] = self.urlargs.get('offset', 0)
@@ -704,6 +754,7 @@ class VKAddon():
         """
         Logout user.
         (settings action handler)
+        plugin://plugin.video.vk/logout
         """
         # reset user access token
         self.addon.setSetting('vkuseraccesstoken', '')
@@ -718,6 +769,7 @@ class VKAddon():
         """
         Play video.
         (menu action handler)
+        plugin://plugin.video.vk/play?...
         """
         oidid = self.buildoidid(self.urlargs['ownerid'], self.urlargs['id'])
         # resolve playable streams via vk videoinfo api (hack)
@@ -751,6 +803,7 @@ class VKAddon():
         """
         Rename album.
         (contextmenu action handler)
+        plugin://plugin.video.vk/renamealbum?...
         """
         try:
             album = self.vkapi.video.getAlbumById(
@@ -775,6 +828,7 @@ class VKAddon():
         """
         Reorder album.
         (contextmenu action handler)
+        plugin://plugin.video.vk/reorderalbum?...
         """
         try:
             params = {'album_id': int(self.urlargs['albumid'])}
@@ -793,6 +847,7 @@ class VKAddon():
         """
         Search videos.
         (menu action handler)
+        plugin://plugin.video.vk/search?
         """
         # paging offset (default=0)
         self.urlargs['offset'] = self.urlargs.get('offset', 0)
@@ -800,6 +855,9 @@ class VKAddon():
             # if not in urlargs, ask user for entering a search query (or editing one passed from /searchsimilar)
             if 'q' not in self.urlargs:
                 self.urlargs['q'] = xbmcgui.Dialog().input(self.addon.getLocalizedString(30090), defaultt=self.urlargs.get('qdef', ''))
+                # todo: [feat] autocompletion
+                # ac = AutoCompletion.get_autocomplete_items(self.urlargs['q'])
+                # self.log(ac)
             if not self.urlargs['q']:
                 return
         # request vk api for searched videos
@@ -837,6 +895,7 @@ class VKAddon():
         """
         Set album/s for video.
         (contextmenu action handler)
+        plugin://plugin.video.vk/setalbumsforvideo?...
         """
         oidid = self.buildoidid(self.urlargs['ownerid'], self.urlargs['id'])
         try:
@@ -889,6 +948,7 @@ class VKAddon():
         """
         Unlike community.
         (contextmenu action handler)
+        plugin://plugin.video.vk/unlikecommunity?...
         """
         try:
             self.vkapi.fave.removeGroup(
@@ -905,6 +965,7 @@ class VKAddon():
         """
         Unlike video.
         (contextmenu action handler)
+        plugin://plugin.video.vk/unlikevideo?...
         """
         oidid = self.buildoidid(self.urlargs['ownerid'], self.urlargs['id'])
         try:
