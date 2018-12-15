@@ -98,7 +98,7 @@ class VKAddon():
         }
         try:
             handler = self.routing[self.urlpath]
-            self.log('Routing dispatched by calling handler: {0}'.format(handler.__name__))
+            self.log('Routing dispatched using handler: {0}'.format(handler.__name__))
             handler()
         except KeyError:
             self.log('Routing error!', level=xbmc.LOGERROR)
@@ -711,20 +711,19 @@ class VKAddon():
         List stats.
         (menu action handler)
         plugin://plugin.video.vk/stats
-
         Metrics:
-        firstRun [d.m.yyyy]
-        lastRun [d.m.yyyy]
-        usageTimeTotal [dd:hh:mm]
-        usageTimeSession [hh:mm:ss]
-        usageTimeSessionAvg [hh:mm:ss]
-        usageTimeSessionMax [hh:mm:ss]
-        sessionsCountTotal [int]
-        playedVideosCountTotal [int]
-        playedVideosCountSession [int]
-        playedVideosCountSessionAvg [float]
-        playedVideosCountSessionMax [float]
-        ...
+            firstRun [d.m.yyyy]
+            lastRun [d.m.yyyy]
+            usageTimeTotal [dd:hh:mm]
+            usageTimeSession [hh:mm:ss]
+            usageTimeSessionAvg [hh:mm:ss]
+            usageTimeSessionMax [hh:mm:ss]
+            sessionsCountTotal [int]
+            playedVideosCountTotal [int]
+            playedVideosCountSession [int]
+            playedVideosCountSessionAvg [float]
+            playedVideosCountSessionMax [float]
+            ...
         """
         pass  # todo: [feat] list usage stats
 

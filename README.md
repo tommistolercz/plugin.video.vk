@@ -62,12 +62,38 @@ Kodi add-on for watching videos from VK.com social network.
 ### v1.1.0 **[WIP]**
 
 - Stats
+    - [x] Track addon usage (usage.log)
     - [ ] List usage stats
 
 ### Backlog
 
-Future features and ideas [backlog](https://github.com/tommistolercz/plugin.video.vk/milestones/backlog).
+Future features and ideas backlog:
 
+- [ ] Auto copy name of playing video to clipboard
+- [ ] Keyboard shortcuts for addon
+- [ ] Played videos: list of all videos played by user
+- [ ] Autoremove duplicated videos from album/list
+- [ ] Setting for alternative color
+- [ ] Search history items counter: getsearchhistorycounter() helper, show in main menu: SEARCH HISTORY (32)
+- [ ] More detailed community lists
+- [ ] use other info-labels (i.e. plot,...) for showing more details
+- [ ] Download video: context menu action (video item), youtube-dl module integration
+- [ ] Recently set albums: when use set albums for video context action, the recently set albums is saved and available for repetitive use.
+- [ ] Import videos from favourites.xml
+- [ ] Video news/updates
+- [ ] Go to community the video belongs to
+- [ ] Enable more sort methods for search history list
+- [ ] Share video: context menu action (video item): sharing method: email?, recent recipients list?
+- [ ] Add setting for custom path to addon data files (enable user to have the search history data synced among devices (using cloud services like Google Drive, Dropbox, etc)
+- [ ] Auto-generated session playlists
+- [ ] Set correct info-labels to show video's resolution in lists (without playing it): api serves video resolution in video object's width/height attributes (optional), set correct info-labels to show in Kodi
+- [ ] VK API data analyzer
+- [ ] Search videos with suggestions: plugin.program.autocompletion integration
+- [ ] Try to utilize some free face/image recognition API:
+    - [Face++](https://console.faceplusplus.com/dashboard), [docs](https://console.faceplusplus.com/documents/6329700)
+    - search results analyzer: recommends which of searched videos are best to play (i.e. creates playlist) based on stats data, likes, preferences, ...)
+    - detect faces (cm action)
+    
 ## Docs
 
 Some dev docs available [here](./resources/docs/DOCS.md).
