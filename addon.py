@@ -27,7 +27,7 @@ import xbmcaddon
 import xbmcgui
 import xbmcplugin
 
-sys.path.append(os.path.join(xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('path')), 'resources', 'lib'))
+sys.path.append(os.path.join(xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('path')).decode('utf-8'), 'resources', 'lib'))
 import vk  # noqa: E402
 
 
@@ -173,7 +173,7 @@ class VKAddon():
         (helper)
         :returns: obj
         """
-        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_COOKIEJAR)
+        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')).decode('utf-8'), ADDON_DATA_FILE_COOKIEJAR)
         try:
             with open(fp, 'rb') as f:
                 cookiejar = pickle.load(f)
@@ -191,12 +191,12 @@ class VKAddon():
         (helper)
         :returns: dict
         """
-        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_SEARCH_HISTORY)
+        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')).decode('utf-8'), ADDON_DATA_FILE_SEARCH_HISTORY)
         try:
             with open(fp) as f:
                 searchhistory = json.load(f)
         except OSError:  # file not exists
-            searchhistory = {u'count': 0, u'items': []}
+            searchhistory = {u'items': []}
         self.log('Search history data file loaded: {0}'.format(searchhistory))
         return searchhistory
 
@@ -218,14 +218,14 @@ class VKAddon():
         """
         logging.basicConfig(
             level=logging.INFO,
-            filename=os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_USAGE_LOG),
+            filename=os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')).decode('utf-8'), ADDON_DATA_FILE_USAGE_LOG),
             filemode='a',
             format='\t'.join(['%(asctime)s', '%(levelname)s', '%(message)s']),
         )
         usagelogger = logging.getLogger(self.addon.getAddonInfo('id'))
         usagelogger.info(msg=url)
 
-    def notify(self, msg, icon=xbmcgui.NOTIFICATION_INFO):
+    def notify(self, msg, icon=xbmcgui.NOTIFICATION_INFO):  # todo: do not self.notify() user on success (commented)
         """
         Notify user using uniform style.
         (helper)
@@ -241,7 +241,7 @@ class VKAddon():
         (helper)
         :param cookiejar: obj
         """
-        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_COOKIEJAR)
+        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')).decode('utf-8'), ADDON_DATA_FILE_COOKIEJAR)
         with open(fp, 'wb') as f:
             pickle.dump(cookiejar, f)
         self.log('Cookiejar data file saved: {0}'.format(cookiejar))
@@ -252,7 +252,7 @@ class VKAddon():
         (helper)
         :param searchhistory: dict
         """
-        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_SEARCH_HISTORY)
+        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')).decode('utf-8'), ADDON_DATA_FILE_SEARCH_HISTORY)
         with open(fp, 'w') as f:
             json.dump(searchhistory, f, indent=4)
         self.log('Search history data file saved: {0}'.format(searchhistory))
@@ -273,8 +273,6 @@ class VKAddon():
         search['lastUsed'] = datetime.datetime.now().isoformat()
         searchhistory['items'].append(search)
         self.log('Search history updated: {0}'.format(search))
-        if not existing:
-            searchhistory['count'] += 1
         self.savesearchhistory(searchhistory)
 
     # ===== Action handlers =====
@@ -298,7 +296,7 @@ class VKAddon():
             self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
         self.log('Album added: {0}'.format(album['album_id']))
-        self.notify(self.addon.getLocalizedString(30111))
+        # self.notify(self.addon.getLocalizedString(30111))
 
     def buildlistofcommunities(self, listdata):
         """
@@ -412,7 +410,7 @@ class VKAddon():
             self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
         self.log('Album deleted: {0}'.format(self.urlargs['albumid']))
-        self.notify(self.addon.getLocalizedString(30114))
+        # self.notify(self.addon.getLocalizedString(30114))
 
     def deletesearch(self):
         """
@@ -425,10 +423,9 @@ class VKAddon():
             if item['query'] == self.urlargs['q']:
                 searchhistory['items'].pop(i)
                 break
-        searchhistory['count'] -= 1
         self.savesearchhistory(searchhistory)
         self.log('Search deleted: {0}'.format(self.urlargs['q']))
-        self.notify(self.addon.getLocalizedString(30092))
+        # self.notify(self.addon.getLocalizedString(30092))
 
     def leavecommunity(self):
         """
@@ -445,7 +442,7 @@ class VKAddon():
             self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
         self.log('Community was left: {0}'.format(self.urlargs['communityid']))
-        self.notify(self.addon.getLocalizedString(30140))
+        # self.notify(self.addon.getLocalizedString(30140))
 
     def likecommunity(self):
         """
@@ -462,7 +459,7 @@ class VKAddon():
             self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
         self.log('Community liked: {0}'.format(self.urlargs['communityid']))
-        self.notify(self.addon.getLocalizedString(30132))
+        # self.notify(self.addon.getLocalizedString(30132))
 
     def likevideo(self):
         """
@@ -482,7 +479,7 @@ class VKAddon():
             self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
         self.log('Video liked: {0}'.format(oidid))
-        self.notify(self.addon.getLocalizedString(30130))
+        # self.notify(self.addon.getLocalizedString(30130))
 
     def listalbums(self):
         """
@@ -758,7 +755,7 @@ class VKAddon():
         # reset user access token
         self.addon.setSetting('vkuseraccesstoken', '')
         # delete cookiejar data file
-        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')), ADDON_DATA_FILE_COOKIEJAR)
+        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')).decode('utf-8'), ADDON_DATA_FILE_COOKIEJAR)
         if os.path.isfile(fp):
             os.remove(fp)
         self.log('User logged out by resetting access token and deleting cookiejar data file.')
@@ -821,7 +818,7 @@ class VKAddon():
             self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
         self.log('Album renamed: {0}'.format(self.urlargs['albumid']))
-        self.notify(self.addon.getLocalizedString(30116))
+        # self.notify(self.addon.getLocalizedString(30116))
 
     def reorderalbum(self):
         """
@@ -886,7 +883,7 @@ class VKAddon():
             lastsearch = {'query': self.urlargs['q'], 'resultsCount': int(searchedvideos['count'])}
             self.updatesearchhistory(lastsearch)
             # notify user of search results count
-            self.notify(self.addon.getLocalizedString(30091).format(searchedvideos['count']))
+            # self.notify(self.addon.getLocalizedString(30091).format(searchedvideos['count']))
         # build list of searched videos
         self.buildlistofvideos(searchedvideos)
 
@@ -941,7 +938,7 @@ class VKAddon():
             self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
         self.log('Albums set for video: {0} {1}=>{2}'.format(oidid, albumidspre, albumidssel))
-        self.notify(self.addon.getLocalizedString(30118))
+        # self.notify(self.addon.getLocalizedString(30118))
 
     def unlikecommunity(self):
         """
@@ -958,7 +955,7 @@ class VKAddon():
             self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
         self.log('Community unliked: {0}'.format(self.urlargs['communityid']))
-        self.notify(self.addon.getLocalizedString(30133))
+        # self.notify(self.addon.getLocalizedString(30133))
 
     def unlikevideo(self):
         """
@@ -978,7 +975,7 @@ class VKAddon():
             self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
         self.log('Video unliked: {0}'.format(oidid))
-        self.notify(self.addon.getLocalizedString(30131))
+        # self.notify(self.addon.getLocalizedString(30131))
 
 
 class VKAddonError(Exception):
