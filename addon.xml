@@ -20,9 +20,7 @@
 		<website>https://www.vk.com</website>
 		<source>https://github.com/tommistolercz/plugin.video.vk</source>
 		<email></email>
-		<news>v1.1.0:
-        - added: usage stats
-		</news>
+		<news></news>
 		<assets>
 			<icon>resources/icon.png</icon>
 			<screenshot>resources/media/screenshot1.jpg</screenshot>

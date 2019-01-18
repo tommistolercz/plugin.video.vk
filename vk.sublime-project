@@ -13,17 +13,29 @@
 		{
 			"file_exclude_patterns":
 			[
-				"resources/lib/vk/logs.pyo",
 				"resources/lib/vk/mixins.pyo",
-				"resources/lib/vk/utils.pyo",
-				"resources/lib/vk/utils.pyc",
-				"resources/lib/vk/logs.pyc",
-				"vk.sublime-workspace",
-				"resources/lib/vk/__init__.pyc",
+				"resources/lib/tinydb/version.pyc",
+				"resources/lib/tinydb/storages.pyo",
+				"resources/lib/tinydb/storages.pyc",
 				"resources/lib/vk/exceptions.pyo",
-				"resources/lib/vk/api.pyo",
 				"resources/lib/vk/api.pyc",
-				"resources/lib/vk/__init__.pyo"
+				"resources/lib/tinydb/utils.pyc",
+				"vk.sublime-workspace",
+				"resources/lib/tinydb/utils.pyo",
+				"resources/lib/tinydb/__init__.pyo",
+				"resources/lib/tinydb/__init__.pyc",
+				"resources/lib/tinydb/version.pyo",
+				"resources/lib/vk/logs.pyo",
+				"resources/lib/tinydb/database.pyc",
+				"resources/lib/vk/logs.pyc",
+				"resources/lib/tinydb/queries.pyc",
+				"resources/lib/vk/utils.pyo",
+				"resources/lib/vk/__init__.pyc",
+				"resources/lib/vk/utils.pyc",
+				"resources/lib/vk/__init__.pyo",
+				"resources/lib/tinydb/queries.pyo",
+				"resources/lib/tinydb/database.pyo",
+				"resources/lib/vk/api.pyo"
 			],
 			"folder_exclude_patterns":
 			[

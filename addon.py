@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 # coding=utf-8
 
@@ -8,19 +7,16 @@ v1.1.0
 https://github.com/tommistolercz/plugin.video.vk
 """
 
-
 import datetime
-import json
-import logging
 import os
 import pickle
 import re
 import sys
 import urllib
 try:
-    import urlparse  # py2
+    import urlparse  # PY2
 except ImportError:
-    import urllib.parse as urlparse  # py3
+    import urllib.parse as urlparse  # PY3
 
 import xbmc
 import xbmcaddon
@@ -28,21 +24,20 @@ import xbmcgui
 import xbmcplugin
 
 sys.path.append(os.path.join(xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('path')).decode('utf-8'), 'resources', 'lib'))
+import tinydb  # noqa: E402
 import vk  # noqa: E402
 
 
-PY2, PY3 = ((sys.version_info[0] == 2), (sys.version_info[0] == 3))  # not used
 FOLDER, NOT_FOLDER = (True, False)
-
+ALT_COLOR = 'blue'
 VK_API_APP_ID = '6432748'
 VK_API_SCOPE = 'email,friends,groups,offline,stats,status,video,wall'
-VK_API_VERSION = '5.87'
-VK_API_LANG = 'ru'
-VK_VIDEOINFO_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.1 Safari/605.1.15'
-ADDON_DATA_FILE_COOKIEJAR = '.cookiejar'
-ADDON_DATA_FILE_SEARCH_HISTORY = 'searchhistory.json'
-ADDON_DATA_FILE_USAGE_LOG = 'usage.log'
-COLOR_ALT = 'blue'  # todo: [bug] use neutral gray vs. as user setting?
+VK_API_VERSION = '5.92'  # https://vk.com/dev/versions
+VK_API_LANG = 'en'
+ADDON_DATA_FILE_COOKIES = 'cookiejar.txt'
+ADDON_DATA_FILE_DB = 'db.json'
+TBL_ADDON_REQUESTS = 'addonRequests'
+TBL_SEARCH_HISTORY = 'searchHistory'
 
 
 class VKAddon():
@@ -51,12 +46,14 @@ class VKAddon():
     """
     def __init__(self):
         """
-        Initialize addon and manage all that controlling stuff at runtime ;-)
+        Initialize addon and dispatch addon routing.
         """
+        # init addon/components
         self.handle = int(sys.argv[1])
         self.addon = xbmcaddon.Addon()
-        self.vkapi = self.createvkapi()
-        # parse addon url
+        self.db = self.initdb()
+        self.vkapi = self.initvkapi()
+        # parse addon request url
         self.urlbase = 'plugin://' + self.addon.getAddonInfo('id')
         self.urlpath = sys.argv[0].replace(self.urlbase, '')
         self.urlargs = {}
@@ -65,81 +62,75 @@ class VKAddon():
             for k, v in list(self.urlargs.items()):
                 self.urlargs[k] = v.pop()
         self.url = self.buildurl(self.urlpath, self.urlargs)
-        self.log('Addon url parsed: {0}'.format(self.url))
-        # log url for usage stats
-        self.logusage(self.url)
-        # dispatch addon routing by calling a handler for respective user action
-        self.routing = {
+        self.log('Addon request url parsed: {0}'.format(self.url))
+        # track addon requests for usage stats (future feature)
+        request = {
+            'dt': datetime.datetime.now().isoformat(),
+            'url': self.url,
+        }
+        self.db.table(TBL_ADDON_REQUESTS).insert(request)
+        # dispatch addon routing
+        routing = {
+            # common
             '/': self.listmainmenu,
-            '/addalbum': self.addalbum,
-            '/albums': self.listalbums,
-            '/albumvideos': self.listalbumvideos,
-            '/communities': self.listcommunities,
-            '/communityvideos': self.listcommunityvideos,
-            '/deletealbum': self.deletealbum,
-            '/deletesearch': self.deletesearch,
-            '/leavecommunity': self.leavecommunity,
-            '/likecommunity': self.likecommunity,
-            '/likevideo': self.likevideo,
-            '/likedcommunities': self.listlikedcommunities,
-            '/likedvideos': self.listlikedvideos,
             '/logout': self.logout,
-            '/play': self.playvideo,
+            # videos
+            '/searchvideos': self.listsearchedvideos,
+            '/videos': self.listvideos,
+            '/likedvideos': self.listlikedvideos,
+            '/albumvideos': self.listalbumvideos,
+            '/communityvideos': self.listcommunityvideos,
+            '/playvideo': self.playvideo,
+            '/likevideo': self.likevideo,
+            '/unlikevideo': self.unlikevideo,
+            '/addvideotoalbums': self.addvideotoalbums,
+            # video albums
+            '/albums': self.listalbums,
             '/renamealbum': self.renamealbum,
             '/reorderalbum': self.reorderalbum,
-            '/search': self.searchvideos,
-            '/searchhistory': self.listsearchhistory,
-            '/searchsimilar': self.searchvideos,  # reuse!
-            '/setalbumsforvideo': self.setalbumsforvideo,
-            '/stats': self.liststats,
+            '/deletealbum': self.deletealbum,
+            '/createalbum': self.createalbum,
+            # communities
+            '/communities': self.listcommunities,
+            '/likedcommunities': self.listlikedcommunities,
+            '/likecommunity': self.likecommunity,
             '/unlikecommunity': self.unlikecommunity,
-            '/unlikevideo': self.unlikevideo,
-            '/videos': self.listvideos,
+            '/unfollowcommunity': self.unfollowcommunity,
+            # search history
+            '/searchhistory': self.listsearchhistory,
+            '/deletesearch': self.deletesearch,
         }
         try:
-            handler = self.routing[self.urlpath]
+            handler = routing[self.urlpath]
             self.log('Routing dispatched using handler: {0}'.format(handler.__name__))
             handler()
         except KeyError:
             self.log('Routing error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30202), icon=xbmcgui.NOTIFICATION_ERROR)
+            self.notify(self.addon.getLocalizedString(30022), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
 
-    def buildoidid(self, ownerid, id):
-        """
-        Build a full video identifier, aka oidid.
-        (helper)
-        :param ownerid: int; video owner id
-        :param id: int; video id
-        :returns: string; video oidid
-        """
-        return '{0}_{1}'.format(ownerid, id)
+    # ----- helpers -----
 
-    def buildurl(self, urlpath, urlargs=None):
+    def initdb(self):
         """
-        Build addon url.
-        (helper)
-        :param urlpath: string; action name
-        :param urlargs: dict; action params, default=None
-        :returns: string; addon url (plugin://...)
+        Init TinyDB object.
+        :returns: obj
         """
-        url = self.urlbase + urlpath
-        if urlargs is not None and len(list(urlargs)) > 0:
-            url += '?' + urllib.urlencode(urlargs)
-        return url
+        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')).decode('utf-8'), ADDON_DATA_FILE_DB)
+        db = tinydb.TinyDB(fp, indent=4, sort_keys=False)
+        return db
 
-    def createvkapi(self):
+    def initvkapi(self):
         """
-        Create VK API object.
-        (helper)
+        Init VK API object.
         :returns: obj
         """
         try:
             # obtain new user access token by authorizing addon using user credentials
             if self.addon.getSetting('vkuseraccesstoken') == '':
                 credentials = {
-                    'login': xbmcgui.Dialog().input(self.addon.getLocalizedString(30020)),
-                    'password': xbmcgui.Dialog().input(self.addon.getLocalizedString(30021), option=xbmcgui.ALPHANUM_HIDE_INPUT)
+                    'login': xbmcgui.Dialog().input(self.addon.getLocalizedString(30030)),
+                    'password': xbmcgui.Dialog().input(self.addon.getLocalizedString(30031), option=xbmcgui.ALPHANUM_HIDE_INPUT)
                 }
                 if not all(credentials.values()):
                     raise vk.exceptions.VkAuthError()
@@ -154,26 +145,46 @@ class VKAddon():
                 self.vksession.requests_session.cookies = self.loadcookiejar()
         except vk.exceptions.VkAuthError:
             self.log('VK authorization error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30200), icon=xbmcgui.NOTIFICATION_ERROR)
+            self.notify(self.addon.getLocalizedString(30020), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
         try:
             # create api
             vkapi = vk.API(self.vksession, v=VK_API_VERSION, lang=VK_API_LANG)
-            istracked = vkapi.stats.trackVisitor()  # noqa
+            vkapi.stats.trackVisitor()
             self.log('VK API object created.')
             return vkapi
         except vk.exceptions.VkAPIError:
             self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
+            self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
+
+    def buildurl(self, urlpath, urlargs=None):
+        """
+        Build addon url.
+        :param urlpath: string; action name
+        :param urlargs: dict; action params, default=None
+        :returns: string; addon url (plugin://...)
+        """
+        url = self.urlbase + urlpath
+        if urlargs is not None and len(list(urlargs)) > 0:
+            url += '?' + urllib.urlencode(urlargs)
+        return url
+
+    def buildoidid(self, ownerid, id):
+        """
+        Build a full video identifier, aka oidid.
+        :param ownerid: int; video owner id
+        :param id: int; video id
+        :returns: string; video oidid
+        """
+        return '{0}_{1}'.format(ownerid, id)
 
     def loadcookiejar(self):
         """
         Load cookiejar object from addon data file.
-        (helper)
         :returns: obj
         """
-        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')).decode('utf-8'), ADDON_DATA_FILE_COOKIEJAR)
+        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')).decode('utf-8'), ADDON_DATA_FILE_COOKIES)
         try:
             with open(fp, 'rb') as f:
                 cookiejar = pickle.load(f)
@@ -181,679 +192,95 @@ class VKAddon():
             return cookiejar
         except OSError:
             # file not exists
-            self.log('Missing data file: {0}'.format(ADDON_DATA_FILE_COOKIEJAR), level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30203), icon=xbmcgui.NOTIFICATION_ERROR)
+            self.log('Addon data file error: {0}'.format(ADDON_DATA_FILE_COOKIES), level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30023), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
 
-    def loadsearchhistory(self):
+    def savecookiejar(self, cookiejar):
         """
-        load search history from addon data file.
-        (helper)
-        :returns: dict
+        Save cookiejar object into addon data file.
+        :param cookiejar: obj
         """
-        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')).decode('utf-8'), ADDON_DATA_FILE_SEARCH_HISTORY)
-        try:
-            with open(fp) as f:
-                searchhistory = json.load(f)
-        except OSError:  # file not exists
-            searchhistory = {u'items': []}
-        self.log('Search history data file loaded: {0}'.format(searchhistory))
-        return searchhistory
+        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')).decode('utf-8'), ADDON_DATA_FILE_COOKIES)
+        with open(fp, 'wb') as f:
+            pickle.dump(cookiejar, f)
+        self.log('Cookiejar data file saved: {0}'.format(cookiejar))
 
     def log(self, msg, level=xbmc.LOGDEBUG):
         """
         Log message into default Kodi.log using an uniform style.
-        (helper)
         :param msg: string
         :param level: xbmc.LOGDEBUG (default)
         """
         msg = '{0}: {1}'.format(self.addon.getAddonInfo('id'), msg)
         xbmc.log(msg, level)
 
-    def logusage(self, url):
-        """
-        Log url into additional addon usage.log.
-        (helper)
-        :param url: string
-        """
-        logging.basicConfig(
-            level=logging.INFO,
-            filename=os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')).decode('utf-8'), ADDON_DATA_FILE_USAGE_LOG),
-            filemode='a',
-            format='\t'.join(['%(asctime)s', '%(levelname)s', '%(message)s']),
-        )
-        usagelogger = logging.getLogger(self.addon.getAddonInfo('id'))
-        usagelogger.info(msg=url)
-
-    def notify(self, msg, icon=xbmcgui.NOTIFICATION_INFO):  # todo: do not self.notify() user on success (commented)
+    def notify(self, msg, icon=xbmcgui.NOTIFICATION_INFO):
         """
         Notify user using uniform style.
-        (helper)
         :param msg: string
         :param icon: int; xbmcgui.NOTIFICATION_INFO (default)
         """
         heading = self.addon.getAddonInfo('name')
         xbmcgui.Dialog().notification(heading, msg, icon)
 
-    def savecookiejar(self, cookiejar):
-        """
-        Save cookiejar object into addon data file.
-        (helper)
-        :param cookiejar: obj
-        """
-        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')).decode('utf-8'), ADDON_DATA_FILE_COOKIEJAR)
-        with open(fp, 'wb') as f:
-            pickle.dump(cookiejar, f)
-        self.log('Cookiejar data file saved: {0}'.format(cookiejar))
-
-    def savesearchhistory(self, searchhistory):
-        """
-        Save search history into addon data file.
-        (helper)
-        :param searchhistory: dict
-        """
-        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')).decode('utf-8'), ADDON_DATA_FILE_SEARCH_HISTORY)
-        with open(fp, 'w') as f:
-            json.dump(searchhistory, f, indent=4)
-        self.log('Search history data file saved: {0}'.format(searchhistory))
-
-    def updatesearchhistory(self, search):
-        """
-        Append search to search history if query is unique, else re-append updated one.
-        (helper)
-        :param search: dict(query=string, resultsCount=int)
-        """
-        searchhistory = self.loadsearchhistory()
-        existing = None
-        for i, item in enumerate(searchhistory['items']):
-            if item['query'].lower() == search['query'].lower():
-                existing = searchhistory['items'].pop(i)
-                break
-        search['usesCount'] = 1 if not existing else existing['usesCount'] + 1
-        search['lastUsed'] = datetime.datetime.now().isoformat()
-        searchhistory['items'].append(search)
-        self.log('Search history updated: {0}'.format(search))
-        self.savesearchhistory(searchhistory)
-
-    # ===== Action handlers =====
-
-    def addalbum(self):
-        """
-        Add new album.
-        (contextmenu action handler)
-        plugin://plugin.video.vk/addalbum
-        """
-        albumtitle = xbmcgui.Dialog().input(self.addon.getLocalizedString(30110))
-        if not albumtitle:
-            return
-        try:
-            album = self.vkapi.video.addAlbum(
-                title=albumtitle,
-                privacy=3,  # 3=onlyme
-            )
-        except vk.exceptions.VkAPIError:
-            self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
-            exit()
-        self.log('Album added: {0}'.format(album['album_id']))
-        # self.notify(self.addon.getLocalizedString(30111))
-
-    def buildlistofcommunities(self, listdata):
-        """
-        Build list of communities.
-        (handler helper)
-        :param listdata: dict
-        """
-        # list type: /communities, /likedcommunities
-        listtype = self.urlpath
-        # create list items for communities
-        listitems = []
-        _namekey = 'title' if listtype == '/likedcommunities' else 'name'
-        for community in listdata['items']:
-            if listtype == '/likedcommunities':
-                community['id'] = community['id'].split('_')[2]
-            li = xbmcgui.ListItem(community[_namekey])
-            li.setArt({'thumb': community['photo_200']})
-            # cm actions
-            cmi = []
-            if listtype == '/likedcommunities':
-                cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30054), color=COLOR_ALT), 'Container.Update({0})'.format(self.buildurl('/unlikecommunity', {'communityid': community['id']}))))
-            else:
-                cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30055), color=COLOR_ALT), 'Container.Update({0})'.format(self.buildurl('/likecommunity', {'communityid': community['id']}))))
-            cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30056), color=COLOR_ALT), 'Container.Update({0})'.format(self.buildurl('/leavecommunity', {'communityid': community['id']}))))
-            li.addContextMenuItems(cmi)
-            listitems.append(
-                (self.buildurl('/communityvideos', {'ownerid': '-{0}'.format(community['id'])}), li, FOLDER)  # negative id required
-            )
-        # paginator item
-        if int(self.urlargs['offset']) + int(self.addon.getSetting('itemsperpage')) < listdata['count']:
-            self.urlargs['offset'] = int(self.urlargs['offset']) + int(self.addon.getSetting('itemsperpage'))
-            listitems.append(
-                (self.buildurl(self.urlpath, self.urlargs), xbmcgui.ListItem('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30190), color=COLOR_ALT)), FOLDER)
-            )
-        # show community list in kodi, even if empty
-        xbmcplugin.setContent(self.handle, 'files')
-        xbmcplugin.addDirectoryItems(self.handle, listitems, len(listitems))
-        xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_NONE)
-        xbmcplugin.endOfDirectory(self.handle)
-
-    def buildlistofvideos(self, listdata):
-        """
-        Build list of videos.
-        (handler helper)
-        :param listdata: dict
-        """
-        # list type: /albumvideos, /communityvideos, /likedvideos, /search, /searchsimilar, /videos
-        listtype = self.urlpath
-        # create list items for videos
-        listitems = []
-        for video in listdata['items']:
-            li = xbmcgui.ListItem(video['title'])
-            li.setProperty('IsPlayable', 'true')
-            li.setInfo(
-                type='video',
-                infoLabels={
-                    'title': video['title'],
-                    'plot': video['description'],
-                    'duration': video['duration'],
-                    'date': datetime.datetime.fromtimestamp(video['date']).strftime('%d.%m.%Y'),
-                }
-            )
-            if 'photo_800' in video:
-                maxthumb = video['photo_800']
-            elif 'photo_640' in video:
-                maxthumb = video['photo_640']
-            else:
-                maxthumb = video['photo_320']
-            li.setArt({'thumb': maxthumb})
-            # cm actions
-            cmi = []
-            if (listtype == '/likedvideos') or ('likes' in video and video['likes']['user_likes'] == 1):  # isliked
-                cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30050), color=COLOR_ALT), 'Container.Update({0})'.format(self.buildurl('/unlikevideo', {'ownerid': video['owner_id'], 'id': video['id']}))))
-            else:
-                cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30051), color=COLOR_ALT), 'Container.Update({0})'.format(self.buildurl('/likevideo', {'ownerid': video['owner_id'], 'id': video['id']}))))
-            cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30052), color=COLOR_ALT), 'Container.Update({0})'.format(self.buildurl('/setalbumsforvideo', {'ownerid': video['owner_id'], 'id': video['id']}))))
-            cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30053), color=COLOR_ALT), 'Container.Update({0})'.format(self.buildurl('/searchsimilar', {'qdef': video['title']}))))
-            li.addContextMenuItems(cmi)
-            listitems.append(
-                (self.buildurl('/play', {'ownerid': video['owner_id'], 'id': video['id']}), li, NOT_FOLDER)
-            )
-        # paginator item
-        if int(self.urlargs['offset']) + int(self.addon.getSetting('itemsperpage')) < listdata['count']:
-            self.urlargs['offset'] = int(self.urlargs['offset']) + int(self.addon.getSetting('itemsperpage'))
-            listitems.append(
-                (self.buildurl(self.urlpath, self.urlargs), xbmcgui.ListItem('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30190), color=COLOR_ALT)), FOLDER)
-            )
-        # if enabled, force custom view mode for videos
-        if self.addon.getSetting('forcevideoviewmode') == 'true':
-            xbmc.executebuiltin('Container.SetViewMode({0})'.format(int(self.addon.getSetting('forcevideoviewmodeid'))))
-        # show video list in kodi, even if empty
-        xbmcplugin.setContent(self.handle, 'videos')
-        xbmcplugin.addDirectoryItems(self.handle, listitems, len(listitems))
-        xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_NONE)
-        xbmcplugin.endOfDirectory(self.handle)
-
-    def deletealbum(self):
-        """
-        Delete album.
-        (contextmenu action handler)
-        plugin://plugin.video.vk/deletealbum?albumid={}
-        """
-        if not xbmcgui.Dialog().yesno(self.addon.getLocalizedString(30112), self.addon.getLocalizedString(30113)):
-            return
-        try:
-            self.vkapi.video.deleteAlbum(
-                album_id=int(self.urlargs['albumid']),
-            )
-        except vk.exceptions.VkAPIError:
-            self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
-            exit()
-        self.log('Album deleted: {0}'.format(self.urlargs['albumid']))
-        # self.notify(self.addon.getLocalizedString(30114))
-
-    def deletesearch(self):
-        """
-        Delete search from history.
-        (contextmenu action handler)
-        plugin://plugin.video.vk/deletesearch?...
-        """
-        searchhistory = self.loadsearchhistory()
-        for i, item in enumerate(searchhistory['items']):
-            if item['query'] == self.urlargs['q']:
-                searchhistory['items'].pop(i)
-                break
-        self.savesearchhistory(searchhistory)
-        self.log('Search deleted: {0}'.format(self.urlargs['q']))
-        # self.notify(self.addon.getLocalizedString(30092))
-
-    def leavecommunity(self):
-        """
-        Leave community.
-        (contextmenu action handler)
-        plugin://plugin.video.vk/leavecommunity?...
-        """
-        try:
-            self.vkapi.groups.leave(
-                group_id=int(self.urlargs['communityid'])
-            )
-        except vk.exceptions.VkAPIError:
-            self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
-            exit()
-        self.log('Community was left: {0}'.format(self.urlargs['communityid']))
-        # self.notify(self.addon.getLocalizedString(30140))
-
-    def likecommunity(self):
-        """
-        Like community.
-        (contextmenu action handler)
-        plugin://plugin.video.vk/likecommunity?...
-        """
-        try:
-            self.vkapi.fave.addGroup(
-                group_id=int(self.urlargs['communityid'])
-            )
-        except vk.exceptions.VkAPIError:
-            self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
-            exit()
-        self.log('Community liked: {0}'.format(self.urlargs['communityid']))
-        # self.notify(self.addon.getLocalizedString(30132))
-
-    def likevideo(self):
-        """
-        Like video.
-        (contextmenu action handler)
-        plugin://plugin.video.vk/likevideo?...
-        """
-        oidid = self.buildoidid(self.urlargs['ownerid'], self.urlargs['id'])
-        try:
-            self.vkapi.likes.add(
-                type='video',
-                owner_id=int(self.urlargs['ownerid']),
-                item_id=int(self.urlargs['id']),
-            )
-        except vk.exceptions.VkAPIError:
-            self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
-            exit()
-        self.log('Video liked: {0}'.format(oidid))
-        # self.notify(self.addon.getLocalizedString(30130))
-
-    def listalbums(self):
-        """
-        List user's albums.
-        (menu action handler)
-        plugin://plugin.video.vk/albums?...
-        """
-        # paging offset (default=0)
-        self.urlargs['offset'] = self.urlargs.get('offset', 0)
-        # workaround due api's max=100
-        albumsperpage = int(self.addon.getSetting('itemsperpage')) if int(self.addon.getSetting('itemsperpage')) <= 100 else 100
-        # request vk api for albums
-        try:
-            albums = self.vkapi.video.getAlbums(
-                extended=1,
-                offset=int(self.urlargs['offset']),
-                count=albumsperpage,
-            )
-        except vk.exceptions.VkAPIError:
-            self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
-            exit()
-        # create list items for albums
-        listitems = []
-        for i, album in enumerate(albums['items']):
-            li = xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(album['title'], int(album['count']), color=COLOR_ALT))
-            if album['count'] > 0:
-                li.setArt({'thumb': album['photo_320']})
-            # before/after album ids for reordering
-            beforeid = albums['items'][i - 1]['id'] if i > 0 else None
-            afterid = albums['items'][i + 1]['id'] if i < len(albums['items']) - 1 else None
-            li.addContextMenuItems(
-                [
-                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30058), color=COLOR_ALT), 'Container.Update({0})'.format(self.buildurl('/renamealbum', {'albumid': album['id']}))),
-                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30059), color=COLOR_ALT), 'Container.Update({0})'.format(self.buildurl('/reorderalbum', {'albumid': album['id'], 'beforeid': beforeid}))),
-                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30060), color=COLOR_ALT), 'Container.Update({0})'.format(self.buildurl('/reorderalbum', {'albumid': album['id'], 'afterid': afterid}))),
-                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30062), color=COLOR_ALT), 'Container.Update({0})'.format(self.buildurl('/addalbum'))),
-                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30061), color=COLOR_ALT), 'Container.Update({0})'.format(self.buildurl('/deletealbum', {'albumid': album['id']}))),
-                ]
-            )
-            listitems.append(
-                (self.buildurl('/albumvideos', {'albumid': album['id']}), li, FOLDER)
-            )
-        # paginator item
-        if int(self.urlargs['offset']) + albumsperpage < albums['count']:
-            self.urlargs['offset'] = int(self.urlargs['offset']) + albumsperpage
-            listitems.append(
-                (self.buildurl(self.urlpath, self.urlargs), xbmcgui.ListItem('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30190), color=COLOR_ALT)), FOLDER)
-            )
-        # show album list in kodi, even if empty
-        xbmcplugin.setContent(self.handle, 'files')
-        xbmcplugin.addDirectoryItems(self.handle, listitems, len(listitems))
-        xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_NONE)
-        xbmcplugin.endOfDirectory(self.handle)
-
-    def listalbumvideos(self):
-        """
-        List user's album videos.
-        (menu action handler)
-        plugin://plugin.video.vk/albumvideos?...
-        """
-        # paging offset (default=0)
-        self.urlargs['offset'] = self.urlargs.get('offset', 0)
-        # request vk api for album videos
-        try:
-            albumvideos = self.vkapi.video.get(
-                extended=1,
-                album_id=int(self.urlargs['albumid']),
-                offset=int(self.urlargs['offset']),
-                count=int(self.addon.getSetting('itemsperpage')),
-            )
-        except vk.exceptions.VkAPIError:
-            self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
-            exit()
-        # build list of album videos
-        self.buildlistofvideos(albumvideos)
-
-    def listcommunities(self):
-        """
-        List user's communities.
-        (menu action handler)
-        plugin://plugin.video.vk/communities?...
-        """
-        # paging offset (default=0)
-        self.urlargs['offset'] = self.urlargs.get('offset', 0)
-        # request vk api for communities data
-        try:
-            communities = self.vkapi.groups.get(
-                extended=1,
-                offset=int(self.urlargs['offset']),
-                count=int(self.addon.getSetting('itemsperpage')),
-            )
-        except vk.exceptions.VkAPIError:
-            self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
-            exit()
-        # build list of communities
-        self.buildlistofcommunities(communities)
-
-    def listcommunityvideos(self):
-        """
-        List user's community videos.
-        (menu action handler)
-        plugin://plugin.video.vk/communityvideos?...
-        """
-        # paging offset (default=0)
-        self.urlargs['offset'] = self.urlargs.get('offset', 0)
-        # request vk api for community videos
-        try:
-            communityvideos = self.vkapi.video.get(
-                extended=1,
-                owner_id=int(self.urlargs['ownerid']),
-                offset=int(self.urlargs['offset']),
-                count=int(self.addon.getSetting('itemsperpage')),
-            )
-        except vk.exceptions.VkAPIError:
-            self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
-            exit()
-        # build list of community videos
-        self.buildlistofvideos(communityvideos)
-
-    def listlikedcommunities(self):
-        """
-        List user's liked communities.
-        (menu action handler)
-        plugin://plugin.video.vk/likedcommunities?...
-        """
-        # paging offset (default=0)
-        self.urlargs['offset'] = self.urlargs.get('offset', 0)
-        # request vk api for liked communities data
-        try:
-            likedcommunities = self.vkapi.fave.getLinks(
-                offset=int(self.urlargs['offset']),
-                count=int(self.addon.getSetting('itemsperpage')),
-            )
-        except vk.exceptions.VkAPIError:
-            self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
-            exit()
-        # build list of liked communities
-        self.buildlistofcommunities(likedcommunities)
-
-    def listlikedvideos(self):
-        """
-        List user's liked videos.
-        (menu action handler)
-        plugin://plugin.video.vk/likedvideos?...
-        """
-        # paging offset (default=0)
-        self.urlargs['offset'] = self.urlargs.get('offset', 0)
-        # request vk api for liked videos
-        try:
-            likedvideos = self.vkapi.fave.getVideos(
-                extended=1,
-                offset=int(self.urlargs['offset']),
-                count=int(self.addon.getSetting('itemsperpage')),
-            )
-        except vk.exceptions.VkAPIError:
-            self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
-            exit()
-        # build list of liked videos
-        self.buildlistofvideos(likedvideos)
+    # ----- common -----
 
     def listmainmenu(self):
         """
         List main menu.
-        (menu action handler)
-        plugin://plugin.video.vk/
         """
         # request vk api for menu counters (stored function)
         try:
             counters = self.vkapi.execute.getMenuCounters()
         except vk.exceptions.VkAPIError:
             self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
+            self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
-        # create list items for main menu
+        # count search history
+        counters['searchhistory'] = len(self.db.table(TBL_SEARCH_HISTORY))
+        # create main menu list items
         listitems = [
-            (self.buildurl('/search'), xbmcgui.ListItem('{0}'.format(self.addon.getLocalizedString(30030))), FOLDER),
-            (self.buildurl('/searchhistory'), xbmcgui.ListItem('{0}'.format(self.addon.getLocalizedString(30031))), FOLDER),
-            (self.buildurl('/videos'), xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(self.addon.getLocalizedString(30032), counters['videos'], color=COLOR_ALT)), FOLDER),
-            (self.buildurl('/albums'), xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(self.addon.getLocalizedString(30034), counters['albums'], color=COLOR_ALT)), FOLDER),
-            (self.buildurl('/communities'), xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(self.addon.getLocalizedString(30035), counters['communities'], color=COLOR_ALT)), FOLDER),
-            (self.buildurl('/likedvideos'), xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(self.addon.getLocalizedString(30033), counters['likedvideos'], color=COLOR_ALT)), FOLDER),
-            (self.buildurl('/likedcommunities'), xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(self.addon.getLocalizedString(30036), counters['likedcommunities'], color=COLOR_ALT)), FOLDER),
-            (self.buildurl('/stats'), xbmcgui.ListItem('{0}'.format(self.addon.getLocalizedString(30037))), FOLDER),
+            (self.buildurl('/searchvideos'), xbmcgui.ListItem('{0}'.format(self.addon.getLocalizedString(30040))), FOLDER),
+            (self.buildurl('/searchhistory'), xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(self.addon.getLocalizedString(30041), counters['searchhistory'], color=ALT_COLOR)), FOLDER),
+            (self.buildurl('/videos'), xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(self.addon.getLocalizedString(30042), counters['videos'], color=ALT_COLOR)), FOLDER),
+            (self.buildurl('/likedvideos'), xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(self.addon.getLocalizedString(30043), counters['likedvideos'], color=ALT_COLOR)), FOLDER),
+            (self.buildurl('/albums'), xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(self.addon.getLocalizedString(30044), counters['albums'], color=ALT_COLOR)), FOLDER),
+            (self.buildurl('/communities'), xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(self.addon.getLocalizedString(30045), counters['communities'], color=ALT_COLOR)), FOLDER),
+            (self.buildurl('/likedcommunities'), xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(self.addon.getLocalizedString(30046), counters['likedcommunities'], color=ALT_COLOR)), FOLDER),
         ]
-        # show main menu list in kodi
+        # show list in kodi
         xbmcplugin.setContent(self.handle, 'files')
         xbmcplugin.addDirectoryItems(self.handle, listitems, len(listitems))
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_NONE)
         xbmcplugin.endOfDirectory(self.handle)
-
-    def listsearchhistory(self):
-        """
-        List search history.
-        (menu action handler)
-        plugin://plugin.video.vk/searchhistory?...
-        """
-        # load search history
-        searchhistory = self.loadsearchhistory()
-        # create list items for search history sorted by lastUsed reversed
-        listitems = []
-        for search in sorted(searchhistory['items'], key=lambda x: x['lastUsed'], reverse=True):
-            li = xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(search['query'], search['resultsCount'], color=COLOR_ALT))
-            li.addContextMenuItems(
-                [
-                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30053), color=COLOR_ALT), 'Container.Update({0})'.format(self.buildurl('/searchsimilar', {'qdef': search['query']}))),
-                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30063), color=COLOR_ALT), 'Container.Update({0})'.format(self.buildurl('/deletesearch', {'q': search['query']}))),
-                ]
-            )
-            listitems.append(
-                (self.buildurl('/search', {'q': search['query']}), li, FOLDER)
-            )
-        # show search history list in kodi, even if empty
-        xbmcplugin.setContent(self.handle, 'files')
-        xbmcplugin.addDirectoryItems(self.handle, listitems, len(listitems))
-        xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_NONE)
-        xbmcplugin.endOfDirectory(self.handle)
-
-    def liststats(self):
-        """
-        List stats.
-        (menu action handler)
-        plugin://plugin.video.vk/stats
-        Metrics:
-            firstRun [d.m.yyyy]
-            lastRun [d.m.yyyy]
-            usageTimeTotal [dd:hh:mm]
-            usageTimeSession [hh:mm:ss]
-            usageTimeSessionAvg [hh:mm:ss]
-            usageTimeSessionMax [hh:mm:ss]
-            sessionsCountTotal [int]
-            playedVideosCountTotal [int]
-            playedVideosCountSession [int]
-            playedVideosCountSessionAvg [float]
-            playedVideosCountSessionMax [float]
-            ...
-        """
-        pass  # todo: [feat] list usage stats
-
-    def listvideos(self):
-        """
-        List user's videos.
-        (menu action handler)
-        plugin://plugin.video.vk/videos?...
-        """
-        # paging offset (default=0)
-        self.urlargs['offset'] = self.urlargs.get('offset', 0)
-        # request vk api for videos
-        try:
-            videos = self.vkapi.video.get(
-                extended=1,
-                offset=int(self.urlargs['offset']),
-                count=int(self.addon.getSetting('itemsperpage')),
-            )
-        except vk.exceptions.VkAPIError:
-            self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
-            exit()
-        # build list of videos
-        self.buildlistofvideos(videos)
 
     def logout(self):
         """
         Logout user.
-        (settings action handler)
-        plugin://plugin.video.vk/logout
         """
         # reset user access token
         self.addon.setSetting('vkuseraccesstoken', '')
         # delete cookiejar data file
-        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')).decode('utf-8'), ADDON_DATA_FILE_COOKIEJAR)
+        fp = os.path.join(xbmc.translatePath(self.addon.getAddonInfo('profile')).decode('utf-8'), ADDON_DATA_FILE_COOKIES)
         if os.path.isfile(fp):
             os.remove(fp)
         self.log('User logged out by resetting access token and deleting cookiejar data file.')
-        self.notify(self.addon.getLocalizedString(30025))
+        self.notify(self.addon.getLocalizedString(30032))
 
-    def playvideo(self):
-        """
-        Play video.
-        (menu action handler)
-        plugin://plugin.video.vk/play?...
-        """
-        oidid = self.buildoidid(self.urlargs['ownerid'], self.urlargs['id'])
-        # resolve playable streams via vk videoinfo api (hack)
-        try:
-            vi = self.vksession.requests_session.get(
-                url='https://vk.com/al_video.php?act=show_inline&al=1&video={0}'.format(oidid),
-                headers={'User-Agent': VK_VIDEOINFO_UA},
-                # +logged user's cookies sent autom.
-            )
-            self.log('Resolving video url: {0}'.format(vi.url))
-            matches = re.findall(r'"url(\d+)":"([^"]+)"', vi.text.replace('\\', ''))
-            playables = {}
-            for m in matches:
-                qual = int(m[0])
-                playables[qual] = m[1]
-            if not playables:
-                raise VKAddonError()
-        except VKAddonError:
-            self.log('Resolving error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30204), icon=xbmcgui.NOTIFICATION_ERROR)
-            return
-        # create item for kodi player (using max quality stream)
-        self.log('Resolved playable stream/s: {0}'.format(playables))
-        maxqual = max(playables.keys())
-        self.log('Playing started: {0}'.format(playables[maxqual]))
-        xbmcplugin.setContent(self.handle, 'videos')
-        li = xbmcgui.ListItem(path=playables[maxqual])
-        xbmcplugin.setResolvedUrl(self.handle, True, li)
+    # ----- videos -----
 
-    def renamealbum(self):
+    def listsearchedvideos(self):
         """
-        Rename album.
-        (contextmenu action handler)
-        plugin://plugin.video.vk/renamealbum?...
-        """
-        try:
-            album = self.vkapi.video.getAlbumById(
-                album_id=int(self.urlargs['albumid'])
-            )
-            albumtitle = xbmcgui.Dialog().input(self.addon.getLocalizedString(30115), defaultt=album['title'])
-            if not albumtitle:
-                return
-            self.vkapi.video.editAlbum(
-                album_id=int(self.urlargs['albumid']),
-                title=albumtitle,
-                privacy=3  # 3=onlyme
-            )
-        except vk.exceptions.VkAPIError:
-            self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
-            exit()
-        self.log('Album renamed: {0}'.format(self.urlargs['albumid']))
-        # self.notify(self.addon.getLocalizedString(30116))
-
-    def reorderalbum(self):
-        """
-        Reorder album.
-        (contextmenu action handler)
-        plugin://plugin.video.vk/reorderalbum?...
-        """
-        try:
-            params = {'album_id': int(self.urlargs['albumid'])}
-            if 'beforeid' in self.urlargs:
-                params['before'] = int(self.urlargs['beforeid'])
-            elif 'afterid' in self.urlargs:
-                params['after'] = int(self.urlargs['afterid'])
-            self.vkapi.video.reorderAlbums(**params)
-        except vk.exceptions.VkAPIError:
-            self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
-            exit()
-        self.log('Album reordered: {0}'.format(self.urlargs['albumid']))
-
-    def searchvideos(self):
-        """
-        Search videos.
-        (menu action handler)
-        plugin://plugin.video.vk/search?
+        List searched videos.
         """
         # paging offset (default=0)
         self.urlargs['offset'] = self.urlargs.get('offset', 0)
-        if int(self.urlargs['offset']) == 0:  # only once!
-            # if not in urlargs, ask user for entering a search query (or editing one passed from /searchsimilar)
+        # only once:
+        if int(self.urlargs['offset']) == 0:
+            # if not in urlargs, ask user for entering a new search query (or editing passed one)
             if 'q' not in self.urlargs:
-                self.urlargs['q'] = xbmcgui.Dialog().input(self.addon.getLocalizedString(30090), defaultt=self.urlargs.get('qdef', ''))
-                # todo: [feat] autocompletion
-                # ac = AutoCompletion.get_autocomplete_items(self.urlargs['q'])
-                # self.log(ac)
+                self.urlargs['q'] = xbmcgui.Dialog().input(self.addon.getLocalizedString(30051), defaultt=self.urlargs.get('qdef', ''))
             if not self.urlargs['q']:
                 return
         # request vk api for searched videos
@@ -876,29 +303,248 @@ class VKAddon():
             self.log('Searched videos: {0}'.format(searchedvideos))
         except vk.exceptions.VkAPIError:
             self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
+            self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
-        if int(self.urlargs['offset']) == 0:  # only once!
-            # update search history
-            lastsearch = {'query': self.urlargs['q'], 'resultsCount': int(searchedvideos['count'])}
-            self.updatesearchhistory(lastsearch)
-            # notify user of search results count
-            # self.notify(self.addon.getLocalizedString(30091).format(searchedvideos['count']))
+        # only once:
+        if int(self.urlargs['offset']) == 0:
+            # update search history db with last search
+            lastsearch = {
+                'q': self.urlargs['q'].lower(),
+                'resultsCount': int(searchedvideos['count']),
+                'lastUsed': datetime.datetime.now().isoformat()
+            }
+            self.db.table(TBL_SEARCH_HISTORY).upsert(lastsearch, tinydb.where('q') == lastsearch['q'])
+            self.log('Search history db updated: {0}'.format(lastsearch))
+            # notify search results count
+            self.notify(self.addon.getLocalizedString(30052).format(searchedvideos['count']))
         # build list of searched videos
         self.buildlistofvideos(searchedvideos)
 
-    def setalbumsforvideo(self):
+    def listvideos(self):
         """
-        Set album/s for video.
-        (contextmenu action handler)
-        plugin://plugin.video.vk/setalbumsforvideo?...
+        List user's videos.
+        """
+        # paging offset (default=0)
+        self.urlargs['offset'] = self.urlargs.get('offset', 0)
+        # request vk api for videos
+        try:
+            videos = self.vkapi.video.get(
+                extended=1,
+                offset=int(self.urlargs['offset']),
+                count=int(self.addon.getSetting('itemsperpage')),
+            )
+            self.log('Videos: {0}'.format(videos))
+        except vk.exceptions.VkAPIError:
+            self.log('VK API error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
+            exit()
+        # build list of videos
+        self.buildlistofvideos(videos)
+
+    def listlikedvideos(self):
+        """
+        List user's liked videos.
+        """
+        # paging offset (default=0)
+        self.urlargs['offset'] = self.urlargs.get('offset', 0)
+        # request vk api for liked videos
+        try:
+            likedvideos = self.vkapi.fave.getVideos(
+                extended=1,
+                offset=int(self.urlargs['offset']),
+                count=int(self.addon.getSetting('itemsperpage')),
+            )
+            self.log('Liked videos: {0}'.format(likedvideos))
+        except vk.exceptions.VkAPIError:
+            self.log('VK API error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
+            exit()
+        # build list of liked videos
+        self.buildlistofvideos(likedvideos)
+
+    def listalbumvideos(self):
+        """
+        List user's album videos.
+        """
+        # paging offset (default=0)
+        self.urlargs['offset'] = self.urlargs.get('offset', 0)
+        # request vk api for album videos
+        try:
+            albumvideos = self.vkapi.video.get(
+                extended=1,
+                album_id=int(self.urlargs['albumid']),
+                offset=int(self.urlargs['offset']),
+                count=int(self.addon.getSetting('itemsperpage')),
+            )
+            self.log('Album videos: {0}'.format(albumvideos))
+        except vk.exceptions.VkAPIError:
+            self.log('VK API error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
+            exit()
+        # build list of album videos
+        self.buildlistofvideos(albumvideos)
+
+    def listcommunityvideos(self):
+        """
+        List user's community videos.
+        """
+        # paging offset (default=0)
+        self.urlargs['offset'] = self.urlargs.get('offset', 0)
+        # request vk api for community videos
+        try:
+            communityvideos = self.vkapi.video.get(
+                extended=1,
+                owner_id=int(self.urlargs['ownerid']),
+                offset=int(self.urlargs['offset']),
+                count=int(self.addon.getSetting('itemsperpage')),
+            )
+            self.log('Community videos: {0}'.format(communityvideos))
+        except vk.exceptions.VkAPIError:
+            self.log('VK API error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
+            exit()
+        # build list of community videos
+        self.buildlistofvideos(communityvideos)
+
+    def buildlistofvideos(self, listdata):
+        """
+        Build list of videos.
+        :param listdata: dict
+        """
+        # listtypes: /searchvideos, /videos, /likedvideos, /albumvideos, /communityvideos
+        listtype = self.urlpath
+        # create list items for videos
+        listitems = []
+        for video in listdata['items']:
+            li = xbmcgui.ListItem(video['title'])
+            li.setProperty('IsPlayable', 'true')
+            li.setInfo(
+                type='video',
+                infoLabels={
+                    'title': video['title'],
+                    'plot': video['description'],
+                    'duration': video['duration'],
+                    'date': datetime.datetime.fromtimestamp(video['date']).strftime('%d.%m.%Y'),
+                }
+            )
+            if 'width' in video and 'height' in video:
+                li.addStreamInfo(
+                    'video',
+                    {
+                        'width': int(video['width']),
+                        'height': int(video['height']),
+                    }
+                )
+            if 'photo_800' in video:
+                maxthumb = video['photo_800']
+            elif 'photo_640' in video:
+                maxthumb = video['photo_640']
+            else:
+                maxthumb = video['photo_320']
+            li.setArt({'thumb': maxthumb})
+            # create contextmenu items for each video
+            cmi = []
+            if (listtype == '/likedvideos') or ('likes' in video and video['likes']['user_likes'] == 1):  # isliked
+                cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30054), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/unlikevideo', {'ownerid': video['owner_id'], 'id': video['id']}))))
+            else:
+                cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30053), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/likevideo', {'ownerid': video['owner_id'], 'id': video['id']}))))
+            cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30055), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/addvideotoalbums', {'ownerid': video['owner_id'], 'id': video['id']}))))
+            cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30080), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/searchvideos', {'qdef': video['title']}))))
+            li.addContextMenuItems(cmi)
+            listitems.append(
+                (self.buildurl('/playvideo', {'ownerid': video['owner_id'], 'id': video['id']}), li, NOT_FOLDER)
+            )
+        # paginator item
+        if int(self.urlargs['offset']) + int(self.addon.getSetting('itemsperpage')) < listdata['count']:
+            urlargsnext = dict(self.urlargs, offset=int(self.urlargs['offset']) + int(self.addon.getSetting('itemsperpage')))
+            listitems.append(
+                (self.buildurl(self.urlpath, urlargsnext), xbmcgui.ListItem('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30050), color=ALT_COLOR)), FOLDER)
+            )
+        # if enabled, force custom view mode for videos
+        if self.addon.getSetting('forcevideoviewmode') == 'true':
+            xbmc.executebuiltin('Container.SetViewMode({0})'.format(int(self.addon.getSetting('forcevideoviewmodeid'))))
+        # show video list in kodi, even if empty
+        xbmcplugin.setContent(self.handle, 'videos')
+        xbmcplugin.addDirectoryItems(self.handle, listitems, len(listitems))
+        xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_NONE)
+        xbmcplugin.endOfDirectory(self.handle)
+
+    def playvideo(self):
+        """
+        Play video.
+        """
+        oidid = self.buildoidid(self.urlargs['ownerid'], self.urlargs['id'])
+        # resolve playable streams via vk videoinfo api (hack)
+        try:
+            vi = self.vksession.requests_session.get(
+                url='https://vk.com/al_video.php?act=show_inline&al=1&video={0}'.format(oidid),
+                headers={'User-Agent': xbmc.getUserAgent()},
+                # +logged user's cookies sent autom.
+            )
+            self.log('Resolving video url: {0}'.format(vi.url))
+            matches = re.findall(r'"url(\d+)":"([^"]+)"', vi.text.replace('\\', ''))
+            playables = {}
+            for m in matches:
+                qual = int(m[0])
+                playables[qual] = m[1]
+            if not playables:
+                raise VKAddonError()
+        except VKAddonError:
+            self.log('Video resolving error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30024), icon=xbmcgui.NOTIFICATION_ERROR)
+            return
+        # create item for kodi player (using max quality stream)
+        self.log('Resolved playable streams: {0}'.format(playables))
+        maxqual = max(playables.keys())
+        self.log('Playing started: {0}'.format(playables[maxqual]))
+        xbmcplugin.setContent(self.handle, 'videos')
+        li = xbmcgui.ListItem(path=playables[maxqual])
+        xbmcplugin.setResolvedUrl(self.handle, True, li)
+
+    def likevideo(self):
+        """
+        Like video.
+        """
+        oidid = self.buildoidid(self.urlargs['ownerid'], self.urlargs['id'])
+        try:
+            self.vkapi.likes.add(
+                type='video',
+                owner_id=int(self.urlargs['ownerid']),
+                item_id=int(self.urlargs['id']),
+            )
+            self.log('Video liked: {0}'.format(oidid))
+        except vk.exceptions.VkAPIError:
+            self.log('VK API error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
+            exit()
+
+    def unlikevideo(self):
+        """
+        Unlike video.
+        """
+        oidid = self.buildoidid(self.urlargs['ownerid'], self.urlargs['id'])
+        try:
+            self.vkapi.likes.delete(
+                type='video',
+                owner_id=int(self.urlargs['ownerid']),
+                item_id=int(self.urlargs['id']),
+            )
+            self.log('Video unliked: {0}'.format(oidid))
+        except vk.exceptions.VkAPIError:
+            self.log('VK API error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
+            exit()
+
+    def addvideotoalbums(self):
+        """
+        Add video to albums.
         """
         oidid = self.buildoidid(self.urlargs['ownerid'], self.urlargs['id'])
         try:
             # get user albums
             albums = self.vkapi.video.getAlbums(
                 need_system=0,
-                count=100  # ugly! todo: [feat] pageable multiselect dialog for /setalbumsforvideo?
+                count=100  # ugly! todo: [feat] pageable multiselect dialog for adding video to albums?
             )
             # get current album ids for video
             albumidspre = self.vkapi.video.getAlbumsByVideo(
@@ -913,7 +559,7 @@ class VKAddon():
                 if album['id'] in albumidspre:
                     optionspre.append(i)
             # show dialog, get selected opts
-            optionssel = xbmcgui.Dialog().multiselect(self.addon.getLocalizedString(30117), options, preselect=optionspre)
+            optionssel = xbmcgui.Dialog().multiselect(self.addon.getLocalizedString(30055), options, preselect=optionspre)
             if optionssel is not None and optionssel != optionspre:
                 # get selected album ids
                 albumidssel = []
@@ -933,49 +579,314 @@ class VKAddon():
                         video_id=int(self.urlargs['id']),
                         album_ids=albumidssel
                     )
+                self.log('Video added to albums: {0} {1}=>{2}'.format(oidid, albumidspre, albumidssel))
         except vk.exceptions.VkAPIError:
             self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
+            self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
-        self.log('Albums set for video: {0} {1}=>{2}'.format(oidid, albumidspre, albumidssel))
-        # self.notify(self.addon.getLocalizedString(30118))
+
+    # ----- video albums -----
+
+    def listalbums(self):
+        """
+        List user's video albums.
+        """
+        # paging offset (default=0)
+        self.urlargs['offset'] = self.urlargs.get('offset', 0)
+        # workaround due api's max=100
+        albumsperpage = int(self.addon.getSetting('itemsperpage')) if int(self.addon.getSetting('itemsperpage')) <= 100 else 100
+        # request vk api for albums
+        try:
+            albums = self.vkapi.video.getAlbums(
+                extended=1,
+                offset=int(self.urlargs['offset']),
+                count=albumsperpage,
+            )
+            self.log('Albums: {0}'.format(albums))
+        except vk.exceptions.VkAPIError:
+            self.log('VK API error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
+            exit()
+        # create list items for albums
+        listitems = []
+        for i, album in enumerate(albums['items']):
+            li = xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(album['title'], int(album['count']), color=ALT_COLOR))
+            if album['count'] > 0:
+                li.setArt({'thumb': album['photo_320']})
+            # before/after album ids for reordering
+            beforeid = albums['items'][i - 1]['id'] if i > 0 else None
+            afterid = albums['items'][i + 1]['id'] if i < len(albums['items']) - 1 else None
+            li.addContextMenuItems(
+                [
+                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30060), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/renamealbum', {'albumid': album['id']}))),
+                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30061), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/reorderalbum', {'albumid': album['id'], 'beforeid': beforeid}))),
+                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30062), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/reorderalbum', {'albumid': album['id'], 'afterid': afterid}))),
+                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30063), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/deletealbum', {'albumid': album['id']}))),
+                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30065), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/createalbum'))),
+                ]
+            )
+            listitems.append(
+                (self.buildurl('/albumvideos', {'albumid': album['id']}), li, FOLDER)
+            )
+        # paginator item (modded w albumsperpage)
+        if int(self.urlargs['offset']) + albumsperpage < albums['count']:
+            urlargsnext = dict(self.urlargs, offset=int(self.urlargs['offset']) + albumsperpage)
+            listitems.append(
+                (self.buildurl(self.urlpath, urlargsnext), xbmcgui.ListItem('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30050), color=ALT_COLOR)), FOLDER)
+            )
+        # show album list in kodi, even if empty
+        xbmcplugin.setContent(self.handle, 'files')
+        xbmcplugin.addDirectoryItems(self.handle, listitems, len(listitems))
+        xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_NONE)
+        xbmcplugin.endOfDirectory(self.handle)
+
+    def renamealbum(self):
+        """
+        Rename album.
+        """
+        try:
+            album = self.vkapi.video.getAlbumById(
+                album_id=int(self.urlargs['albumid'])
+            )
+            albumtitle = xbmcgui.Dialog().input(self.addon.getLocalizedString(30060), defaultt=album['title'])
+            if not albumtitle:
+                return
+            self.vkapi.video.editAlbum(
+                album_id=int(self.urlargs['albumid']),
+                title=albumtitle,
+                privacy=3  # 3=onlyme
+            )
+            self.log('Album renamed: {0}'.format(self.urlargs['albumid']))
+        except vk.exceptions.VkAPIError:
+            self.log('VK API error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
+            exit()
+
+    def reorderalbum(self):
+        """
+        Reorder album (move up/down).
+        """
+        try:
+            params = {'album_id': int(self.urlargs['albumid'])}
+            if 'beforeid' in self.urlargs:
+                params['before'] = int(self.urlargs['beforeid'])
+            elif 'afterid' in self.urlargs:
+                params['after'] = int(self.urlargs['afterid'])
+            self.vkapi.video.reorderAlbums(**params)
+            self.log('Album reordered: {0}'.format(self.urlargs['albumid']))
+        except vk.exceptions.VkAPIError:
+            self.log('VK API error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
+            exit()
+
+    def deletealbum(self):
+        """
+        Delete album.
+        """
+        # get urlargs
+        albumid = int(self.urlargs.get('albumid'))
+        # ask user for confirmation
+        if not xbmcgui.Dialog().yesno(self.addon.getLocalizedString(30063), self.addon.getLocalizedString(30064)):
+            return
+        # request vk api
+        try:
+            self.vkapi.video.deleteAlbum(
+                album_id=albumid,
+            )
+            self.log('Album deleted: {0}'.format(albumid))
+        except vk.exceptions.VkAPIError:
+            self.log('VK API error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
+            exit()
+
+    def createalbum(self):
+        """
+        Create album.
+        """
+        # ask user for entering a new album title
+        albumtitle = xbmcgui.Dialog().input(self.addon.getLocalizedString(30065))
+        if not albumtitle:
+            return
+        # request vk api
+        try:
+            album = self.vkapi.video.addAlbum(
+                title=albumtitle,
+                privacy=3,  # 3=onlyme
+            )
+            self.log('Album created: {0}'.format(album['album_id']))
+        except vk.exceptions.VkAPIError:
+            self.log('VK API error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
+            exit()
+
+    # ----- communities -----
+
+    def listcommunities(self):
+        """
+        List user's communities.
+        """
+        # paging offset (default=0)
+        self.urlargs['offset'] = self.urlargs.get('offset', 0)
+        # request vk api for communities data
+        try:
+            communities = self.vkapi.groups.get(
+                extended=1,
+                offset=int(self.urlargs['offset']),
+                count=int(self.addon.getSetting('itemsperpage')),
+            )
+            self.log('Communities: {0}'.format(communities))
+        except vk.exceptions.VkAPIError:
+            self.log('VK API error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
+            exit()
+        # build list of communities
+        self.buildlistofcommunities(communities)
+
+    def listlikedcommunities(self):
+        """
+        List user's liked communities.
+        """
+        # paging offset (default=0)
+        self.urlargs['offset'] = self.urlargs.get('offset', 0)
+        # request vk api for liked communities data
+        try:
+            likedcommunities = self.vkapi.fave.getLinks(
+                offset=int(self.urlargs['offset']),
+                count=int(self.addon.getSetting('itemsperpage')),
+            )
+            self.log('Liked communities: {0}'.format(likedcommunities))
+        except vk.exceptions.VkAPIError:
+            self.log('VK API error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
+            exit()
+        # build list of liked communities
+        self.buildlistofcommunities(likedcommunities)
+
+    def buildlistofcommunities(self, listdata):
+        """
+        Build list of communities.
+        :param listdata: dict
+        """
+        # listtypes: /communities, /likedcommunities
+        listtype = self.urlpath
+        # create list items
+        listitems = []
+        _namekey = 'title' if listtype == '/likedcommunities' else 'name'
+        for community in listdata['items']:
+            if listtype == '/likedcommunities':
+                community['id'] = community['id'].split('_')[2]
+            li = xbmcgui.ListItem(community[_namekey])
+            li.setArt({'thumb': community['photo_200']})
+            # cm actions
+            cmi = []
+            if listtype == '/likedcommunities':
+                cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30071), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/unlikecommunity', {'communityid': community['id']}))))
+            else:
+                cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30070), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/likecommunity', {'communityid': community['id']}))))
+            cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30072), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/unfollowcommunity', {'communityid': community['id']}))))
+            li.addContextMenuItems(cmi)
+            listitems.append(
+                (self.buildurl('/communityvideos', {'ownerid': '-{0}'.format(community['id'])}), li, FOLDER)  # negative id required
+            )
+        # paginator item
+        if int(self.urlargs['offset']) + int(self.addon.getSetting('itemsperpage')) < listdata['count']:
+            urlargsnext = dict(self.urlargs, offset=int(self.urlargs['offset']) + int(self.addon.getSetting('itemsperpage')))
+            listitems.append(
+                (self.buildurl(self.urlpath, urlargsnext), xbmcgui.ListItem('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30050), color=ALT_COLOR)), FOLDER)
+            )
+        # show community list in kodi, even if empty
+        xbmcplugin.setContent(self.handle, 'files')
+        xbmcplugin.addDirectoryItems(self.handle, listitems, len(listitems))
+        xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_NONE)
+        xbmcplugin.endOfDirectory(self.handle)
+
+    def likecommunity(self):
+        """
+        Like community.
+        """
+        try:
+            self.vkapi.fave.addGroup(
+                group_id=int(self.urlargs['communityid'])
+            )
+            self.log('Community liked: {0}'.format(self.urlargs['communityid']))
+        except vk.exceptions.VkAPIError:
+            self.log('VK API error!', level=xbmc.LOGERROR)
+            self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
+            exit()
 
     def unlikecommunity(self):
         """
         Unlike community.
-        (contextmenu action handler)
-        plugin://plugin.video.vk/unlikecommunity?...
         """
         try:
             self.vkapi.fave.removeGroup(
                 group_id=int(self.urlargs['communityid'])
             )
+            self.log('Community unliked: {0}'.format(self.urlargs['communityid']))
         except vk.exceptions.VkAPIError:
             self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
+            self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
-        self.log('Community unliked: {0}'.format(self.urlargs['communityid']))
-        # self.notify(self.addon.getLocalizedString(30133))
 
-    def unlikevideo(self):
+    def unfollowcommunity(self):
         """
-        Unlike video.
-        (contextmenu action handler)
-        plugin://plugin.video.vk/unlikevideo?...
+        Unfollow community.
         """
-        oidid = self.buildoidid(self.urlargs['ownerid'], self.urlargs['id'])
         try:
-            self.vkapi.likes.delete(
-                type='video',
-                owner_id=int(self.urlargs['ownerid']),
-                item_id=int(self.urlargs['id']),
+            self.vkapi.groups.leave(
+                group_id=int(self.urlargs['communityid'])
             )
+            self.log('Community unfollowed: {0}'.format(self.urlargs['communityid']))
         except vk.exceptions.VkAPIError:
             self.log('VK API error!', level=xbmc.LOGERROR)
-            self.notify(self.addon.getLocalizedString(30201), icon=xbmcgui.NOTIFICATION_ERROR)
+            self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
-        self.log('Video unliked: {0}'.format(oidid))
-        # self.notify(self.addon.getLocalizedString(30131))
+
+    # ----- search history -----
+
+    def listsearchhistory(self):
+        """
+        List search history.
+        """
+        # retrieve search history from db (empty list if no data)
+        searchhistory = self.db.table(TBL_SEARCH_HISTORY).all()
+        self.log('Search history: {0}'.format(searchhistory))
+        # create search history list items sorted by last used reversed
+        listitems = []
+        for search in sorted(searchhistory, key=lambda x: x['lastUsed'], reverse=True):
+            li = xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(search['q'], search['resultsCount'], color=ALT_COLOR))
+            # search item context menu
+            li.addContextMenuItems(
+                [
+                    # delete search
+                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30081), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/deletesearch', {'q': search['q']}))),
+                    # search similar
+                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30080), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/searchvideos', {'qdef': search['q']}))),
+                ]
+            )
+            listitems.append(
+                (self.buildurl('/searchvideos', {'q': search['q']}), li, FOLDER)
+            )
+        # show search history list in kodi, even if empty
+        xbmcplugin.setContent(self.handle, 'files')
+        xbmcplugin.addDirectoryItems(self.handle, listitems, len(listitems))
+        xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_NONE)
+        xbmcplugin.endOfDirectory(self.handle)
+
+    def deletesearch(self):
+        """
+        Delete search from search history.
+        """
+        # get urlargs
+        q = self.urlargs.get('q')
+        # ask user for confirmation
+        if not xbmcgui.Dialog().yesno(self.addon.getLocalizedString(30081), self.addon.getLocalizedString(30082)):
+            return
+        # query db
+        self.db.table(TBL_SEARCH_HISTORY).remove(
+            tinydb.where('q') == q
+        )
+        self.log('Search deleted: {0}'.format(q))
 
 
 class VKAddonError(Exception):

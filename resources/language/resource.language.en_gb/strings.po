@@ -17,6 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 # Addon settings
+
 msgctxt "#30000"
 msgid "GENERAL"
 msgstr ""
@@ -38,15 +39,15 @@ msgid "View mode [id]"
 msgstr ""
 
 msgctxt "#30005"
-msgid "Search also adult videos"
+msgid "Search incl. adult videos"
 msgstr ""
 
 msgctxt "#30006"
-msgid "Search also own videos"
+msgid "Search incl. own videos"
 msgstr ""
 
 msgctxt "#30007"
-msgid "Search videos with duration"
+msgid "Search by video duration"
 msgstr ""
 
 msgctxt "#30008"
@@ -81,213 +82,156 @@ msgctxt "#30015"
 msgid "By relevance"
 msgstr ""
 
-msgctxt "#30018"
+msgctxt "#30016"
 msgid "VK user access token"
 msgstr ""
 
-msgctxt "#30019"
+msgctxt "#30017"
 msgid "LOGOUT"
 msgstr ""
 
-# Addon authorization
-msgctxt "#30020"
-msgid "Enter your VK login/email"
-msgstr ""
-
-msgctxt "#30021"
-msgid "Enter your VK password"
-msgstr ""
-
-# Logout
-msgctxt "#30025"
-msgid "User logged out."
-msgstr ""
-
-# Addon main menu
-msgctxt "#30030"
-msgid "SEARCH"
-msgstr ""
-
-msgctxt "#30031"
-msgid "SEARCH HISTORY"
-msgstr ""
-
-msgctxt "#30032"
-msgid "MY VIDEOS"
-msgstr ""
-
-msgctxt "#30033"
-msgid "MY LIKED VIDEOS"
-msgstr ""
-
-msgctxt "#30034"
-msgid "MY VIDEO ALBUMS"
-msgstr ""
-
-msgctxt "#30035"
-msgid "MY COMMUNITIES"
-msgstr ""
-
-msgctxt "#30036"
-msgid "MY LIKED COMMUNITIES"
-msgstr ""
-
-msgctxt "#30037"
-msgid "STATS"
-msgstr ""
-
-# Context menu actions
-msgctxt "#30050"
-msgid "Unlike video"
-msgstr ""
-
-msgctxt "#30051"
-msgid "Like video"
-msgstr ""
-
-msgctxt "#30052"
-msgid "Set albums for video"
-msgstr ""
-
-msgctxt "#30053"
-msgid "Search similar"
-msgstr ""
-
-msgctxt "#30054"
-msgid "Unlike community"
-msgstr ""
-
-msgctxt "#30055"
-msgid "Like community"
-msgstr ""
-
-msgctxt "#30056"
-msgid "Leave community"
-msgstr ""
-
-msgctxt "#30058"
-msgid "Rename album"
-msgstr ""
-
-msgctxt "#30059"
-msgid "Move up"
-msgstr ""
-
-msgctxt "#30060"
-msgid "Move down"
-msgstr ""
-
-msgctxt "#30061"
-msgid "Delete album"
-msgstr ""
-
-msgctxt "#30062"
-msgid "Add album"
-msgstr ""
-
-msgctxt "#30063"
-msgid "Delete search"
-msgstr ""
-
-# Search
-msgctxt "#30090"
-msgid "Enter the search query:"
-msgstr ""
-
-msgctxt "#30091"
-msgid "{0} videos found."
-msgstr ""
-
-msgctxt "#30092"
-msgid "Search deleted."
-msgstr ""
-
-# Video albums
-msgctxt "#30110"
-msgid "Enter the album title:"
-msgstr ""
-
-msgctxt "#30111"
-msgid "Album added."
-msgstr ""
-
-msgctxt "#30112"
-msgid "Confirmation:"
-msgstr ""
-
-msgctxt "#30113"
-msgid "Do you want to delete the album?"
-msgstr ""
-
-msgctxt "#30114"
-msgid "Album deleted."
-msgstr ""
-
-msgctxt "#30115"
-msgid "Edit the album title:"
-msgstr ""
-
-msgctxt "#30116"
-msgid "Album renamed."
-msgstr ""
-
-msgctxt "#30117"
-msgid "Set the albums for video:"
-msgstr ""
-
-msgctxt "#30118"
-msgid "Albums set."
-msgstr ""
-
-# Likes
-msgctxt "#30130"
-msgid "Video liked."
-msgstr ""
-
-msgctxt "#30131"
-msgid "Video unliked."
-msgstr ""
-
-msgctxt "#30132"
-msgid "Community liked."
-msgstr ""
-
-msgctxt "#30133"
-msgid "Community unliked."
-msgstr ""
-
-# Communities
-msgctxt "#30140"
-msgid "Community was left."
-msgstr ""
-
-# Stats
-msgctxt "#30150"
-msgid "Lorem ipsum"
-msgstr ""
-
-# Paginator
-msgctxt "#30190"
-msgid "NEXT PAGE"
-msgstr ""
-
 # Errors
-msgctxt "#30200"
+
+msgctxt "#30020"
 msgid "VK authorization error!"
 msgstr ""
 
-msgctxt "#30201"
+msgctxt "#30021"
 msgid "VK API error!"
 msgstr ""
 
-msgctxt "#30202"
-msgid "Routing error!"
+msgctxt "#30022"
+msgid "Addon routing error!"
 msgstr ""
 
-msgctxt "#30203"
-msgid "Missing data file error!"
+msgctxt "#30023"
+msgid "Addon data file error!"
 msgstr ""
 
-msgctxt "#30204"
-msgid "Resolving error!"
+msgctxt "#30024"
+msgid "Video resolving error!"
+msgstr ""
+
+# Common
+
+msgctxt "#30030"
+msgid "VK account email"
+msgstr ""
+
+msgctxt "#30031"
+msgid "VK account password"
+msgstr ""
+
+msgctxt "#30032"
+msgid "User logged out."
+msgstr ""
+
+# Main menu
+
+msgctxt "#30040"
+msgid "SEARCH"
+msgstr ""
+
+msgctxt "#30041"
+msgid "SEARCH HISTORY"
+msgstr ""
+
+msgctxt "#30042"
+msgid "MY VIDEOS"
+msgstr ""
+
+msgctxt "#30043"
+msgid "MY LIKED VIDEOS"
+msgstr ""
+
+msgctxt "#30044"
+msgid "MY VIDEO ALBUMS"
+msgstr ""
+
+msgctxt "#30045"
+msgid "MY COMMUNITIES"
+msgstr ""
+
+msgctxt "#30046"
+msgid "MY LIKED COMMUNITIES"
+msgstr ""
+
+# Videos
+
+msgctxt "#30050"
+msgid "NEXT PAGE"
+msgstr ""
+
+msgctxt "#30051"
+msgid "Search videos"
+msgstr ""
+
+msgctxt "#30052"
+msgid "{0} videos found."
+msgstr ""
+
+msgctxt "#30053"
+msgid "Like video"
+msgstr ""
+
+msgctxt "#30054"
+msgid "Unlike video"
+msgstr ""
+
+msgctxt "#30055"
+msgid "Add video to albums"
+msgstr ""
+
+# Video albums
+
+msgctxt "#30060"
+msgid "Rename album"
+msgstr ""
+
+msgctxt "#30061"
+msgid "Move album up"
+msgstr ""
+
+msgctxt "#30062"
+msgid "Move album down"
+msgstr ""
+
+msgctxt "#30063"
+msgid "Delete album"
+msgstr ""
+
+msgctxt "#30064"
+msgid "Do you want to delete the album?"
+msgstr ""
+
+msgctxt "#30065"
+msgid "Create new album"
+msgstr ""
+
+# Communities
+
+msgctxt "#30070"
+msgid "Like community"
+msgstr ""
+
+msgctxt "#30071"
+msgid "Unlike community"
+msgstr ""
+
+msgctxt "#30072"
+msgid "Unfollow community"
+msgstr ""
+
+# Search history
+
+msgctxt "#30080"
+msgid "Search similar"
+msgstr ""
+
+msgctxt "#30081"
+msgid "Delete search"
+msgstr ""
+
+msgctxt "#30082"
+msgid "Do you want to delete the search?"
 msgstr ""
