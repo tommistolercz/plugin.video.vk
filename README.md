@@ -1,8 +1,13 @@
+![Icon](./resources/icon.png)
+
 # VK (plugin.video.vk)
 
 Kodi add-on for watching videos from VK.com social network.
 
-![Icon](./resources/icon.png)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Features (changelog)](#features-changelog)
+- [Screenshots](#screenshots)
 
 ## Requirements
 
@@ -20,7 +25,7 @@ Kodi add-on for watching videos from VK.com social network.
 
     [How to install add-ons from zip files](https://kodi.wiki/view/HOW-TO:Install_add-ons_from_zip_files)
 
-## Features / Changelog
+## Features (changelog)
 
 ### v1.0.0 <sub>(2018-11-12)</sub>
 
