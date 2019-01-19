@@ -1,32 +1,46 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.vk" name="VK" version="1.1.0" provider-name="TomMistolerCZ">
-	<requires>
-		<import addon="xbmc.python" version="2.25.0"/>
-		<import addon="script.module.requests" version="2.8.1"/>
-	</requires>
-	<extension point="xbmc.python.pluginsource" library="addon.py">
-		<provides>video</provides>
-	</extension>
-	<extension point="xbmc.addon.metadata">
-		<summary lang="en_GB">VK for Kodi</summary>
-		<description lang="en_GB">Kodi add-on for watching videos from VK.com social network.</description>
-		<disclaimer lang="en_GB">Author does not host or distribute any of the content displayed by this add-on.</disclaimer>
-		<summary lang="cs_CZ">VK pro Kodi</summary>
-		<description lang="cs_CZ">Kodi doplněk pro přehrávání videí ze sociální sítě VK.com.</description>
-		<disclaimer lang="cs_CZ">Autor doplňku se nepodílí na tvorbě či distribuci obsahu zobrazovaného tímto doplňkem.</disclaimer>
-		<platform>all</platform>
-		<license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
-		<forum></forum>
-		<website>https://www.vk.com</website>
-		<source>https://github.com/tommistolercz/plugin.video.vk</source>
-		<email></email>
-		<news>Fixes/improvements/refactorings:[CR]- Fix unicode issues[CR]- Fix content refreshing after performing context menu actions[CR]- Fix paginators[CR]- Refine add-on routing (url/internal naming scheme)[CR]- Refine debug logging[CR]- Refine language resources[CR]- Rename cookies data file to be non-hidden (cookiejar.txt)[CR]- Utilize TinyDB for persisting add-on data (db.json)[CR]- Merge search history data (db.json)[CR]- Autom. migrate user data and clean up obsolete files after add-on upgrade[CR]- Track add-on requests for enabling MY STATS feature (db.json)[CR]- Reduce using of Kodi notifications (do not confirm successful user actions)[CR]- Set correct infolabels for listed video to show its resolution (before playing it)[CR]- Show search history items counter in main menu[CR]- Do not show the LOGOUT USER action button unless the user is logged in</news>
-		<assets>
-			<icon>resources/icon.png</icon>
-			<screenshot>resources/media/screenshot1.jpg</screenshot>
-			<screenshot>resources/media/screenshot2.jpg</screenshot>
-			<screenshot>resources/media/screenshot3.jpg</screenshot>
-			<screenshot>resources/media/screenshot4.jpg</screenshot>
-		</assets>
-	</extension>
+    <requires>
+        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="script.module.requests" version="2.8.1"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB">VK for Kodi</summary>
+        <description lang="en_GB">Kodi add-on for watching videos from VK.com social network.</description>
+        <disclaimer lang="en_GB">Author does not host or distribute any of the content displayed by this add-on.</disclaimer>
+        <summary lang="cs_CZ">VK pro Kodi</summary>
+        <description lang="cs_CZ">Kodi doplněk pro přehrávání videí ze sociální sítě VK.com.</description>
+        <disclaimer lang="cs_CZ">Autor doplňku se nepodílí na tvorbě či distribuci obsahu zobrazovaného tímto doplňkem.</disclaimer>
+        <platform>all</platform>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
+        <website>https://www.vk.com</website>
+        <source>https://github.com/tommistolercz/plugin.video.vk</source>
+        <assets>
+            <icon>resources/icon.png</icon>
+            <screenshot>resources/media/screenshot1.jpg</screenshot>
+            <screenshot>resources/media/screenshot2.jpg</screenshot>
+            <screenshot>resources/media/screenshot3.jpg</screenshot>
+            <screenshot>resources/media/screenshot4.jpg</screenshot>
+        </assets>
+        <news>
+            Fixes, improvements, code refactorings:
+            - Fix unicode issues
+            - Fix content refreshing after performing context menu actions
+            - Fix pagination code
+            - Refine add-on routing
+            - Refine debug logging
+            - Refine language resources
+            - Rename cookies data file to be non-hidden
+            - Utilize TinyDB for persisting add-on data
+            - Auto migrate user data and clean up files after add-on upgrade
+            - Track add-on requests for enabling MY STATS feature
+            - Reduce using of Kodi notifications
+            - Set info-labels for listed videos to show resolution before playing
+            - Show search history items counter in main menu
+            - Hide the LOGOUT USER action button unless the user is logged in
+        </news>
+    </extension>
 </addon>

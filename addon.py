@@ -544,7 +544,7 @@ class VKAddon():
             # get user albums
             albums = self.vkapi.video.getAlbums(
                 need_system=0,
-                count=100  # ugly! todo: [feat] pageable multiselect dialog for adding video to albums?
+                count=100  # todo: pageable multiselect dialog for adding video to albums?
             )
             # get current album ids for video
             albumidspre = self.vkapi.video.getAlbumsByVideo(
