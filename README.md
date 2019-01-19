@@ -58,7 +58,7 @@ Kodi add-on for watching videos from VK.com social network.
 
 - Fixes/improvements/refactorings:
     - [x] Fix unicode issues
-    - [ ] Fix content refreshing after performing context menu actions (Kodi v18 changes?)
+    - [ ] Fix content refreshing after performing context menu actions
     - [x] Fix paginators
     - [x] Refine add-on routing (url/internal naming scheme)
     - [x] Refine debug logging

@@ -20,7 +20,7 @@
 		<website>https://www.vk.com</website>
 		<source>https://github.com/tommistolercz/plugin.video.vk</source>
 		<email></email>
-		<news></news>
+		<news>Fixes/improvements/refactorings:[CR]- Fix unicode issues[CR]- Fix content refreshing after performing context menu actions[CR]- Fix paginators[CR]- Refine add-on routing (url/internal naming scheme)[CR]- Refine debug logging[CR]- Refine language resources[CR]- Rename cookies data file to be non-hidden (cookiejar.txt)[CR]- Utilize TinyDB for persisting add-on data (db.json)[CR]- Merge search history data (db.json)[CR]- Autom. migrate user data and clean up obsolete files after add-on upgrade[CR]- Track add-on requests for enabling MY STATS feature (db.json)[CR]- Reduce using of Kodi notifications (do not confirm successful user actions)[CR]- Set correct infolabels for listed video to show its resolution (before playing it)[CR]- Show search history items counter in main menu[CR]- Do not show the LOGOUT USER action button unless the user is logged in</news>
 		<assets>
 			<icon>resources/icon.png</icon>
 			<screenshot>resources/media/screenshot1.jpg</screenshot>
