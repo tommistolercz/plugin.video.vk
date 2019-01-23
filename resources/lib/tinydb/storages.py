@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Contains the :class:`base class <tinydb.storages.Storage>` for storages and
 implementations.

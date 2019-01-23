@@ -1,3 +1,5 @@
+# coding=utf-8
+
 def delete(field):
     """
     Delete a given field from the document.

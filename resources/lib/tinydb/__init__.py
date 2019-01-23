@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 TinyDB is a tiny, document oriented database optimized for your happiness :)
 

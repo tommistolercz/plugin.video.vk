@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Contains the :class:`base class <tinydb.middlewares.Middleware>` for
 middlewares and implementations.

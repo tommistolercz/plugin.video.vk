@@ -1,3 +1,5 @@
+# coding=utf-8
+
 """
 Contains the :class:`database <tinydb.database.TinyDB>` and
 :class:`tables <tinydb.database.Table>` implementation.

@@ -65,21 +65,25 @@ Search history:
 
 ### v1.1.0 <sub>(not yet released)</sub>
 
-Fixes, improvements, code refactorings:
-- [x] Fix unicode issues
-- [ ] Fix content refreshing after performing context menu actions
-- [x] Fix pagination code
-- [x] Refine add-on routing
-- [x] Refine debug logging
-- [x] Refine language resources
-- [x] Rename cookies data file to be non-hidden
-- [x] Utilize TinyDB for persisting add-on data
-- [ ] Auto migrate user data and clean up files after add-on upgrade
-- [x] Track add-on requests for enabling MY STATS feature
-- [x] Reduce using of Kodi notifications
-- [x] Set info-labels for listed videos to show resolution before playing
-- [x] Show search history items counter in main menu
-- [x] Hide the LOGOUT USER action button unless the user is logged in
+Fixes:
+- [x] Fixed unicode issues
+- [ ] Fixed content refreshing after contextual actions
+- [x] Fixed pagination bug
+- [x] Fixed LOGOUT USER button visibility bug
+
+Code refactorings:
+- [x] Utilized TinyDB for persisting add-on data
+- [x] Renamed cookies data file to be non-hidden
+- [x] Refined add-on routing
+- [x] Refined debug logging
+- [x] Refined language resources
+
+Features:
+- [x] Reduced using of Kodi notifications
+- [x] Added info-labels showing video resolution in lists
+- [x] Added SEARCH HISTORY counter in main menu
+- [x] Added code enabling ADDICT STATS future feature
+- [ ] Added auto migration of user data after add-on upgrade
 
 ## Screenshots
 

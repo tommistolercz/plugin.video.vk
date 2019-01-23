@@ -1,3 +1,4 @@
+# coding=utf-8
 
 from vk.api import logger
 from vk.api import Session, AuthSession, InteractiveSession, InteractiveAuthSession

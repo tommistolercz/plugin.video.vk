@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.vk" name="VK" version="1.1.0" provider-name="TomMistolerCZ">
+<addon id="plugin.video.vk" name="VK" version="1.1.0-devel" provider-name="TomMistolerCZ">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.requests" version="2.8.1"/>
@@ -26,21 +26,23 @@
             <screenshot>resources/media/screenshot4.jpg</screenshot>
         </assets>
         <news>
-            Fixes, improvements, code refactorings:
-            - Fix unicode issues
-            - Fix content refreshing after performing context menu actions
-            - Fix pagination code
-            - Refine add-on routing
-            - Refine debug logging
-            - Refine language resources
-            - Rename cookies data file to be non-hidden
-            - Utilize TinyDB for persisting add-on data
-            - Auto migrate user data and clean up files after add-on upgrade
-            - Track add-on requests for enabling MY STATS feature
-            - Reduce using of Kodi notifications
-            - Set info-labels for listed videos to show resolution before playing
-            - Show search history items counter in main menu
-            - Hide the LOGOUT USER action button unless the user is logged in
+Fixes:
+- Fixed unicode issues
+- Fixed content refreshing after contextual actions
+- Fixed pagination bug
+- Fixed LOGOUT USER button visibility bug
+Code refactorings:
+- Utilized TinyDB for persisting add-on data
+- Renamed cookies data file to be non-hidden
+- Refined add-on routing
+- Refined debug logging
+- Refined language resources
+Features:
+- Reduced using of Kodi notifications
+- Added info-labels showing video resolution in lists
+- Added SEARCH HISTORY counter in main menu
+- Added code enabling ADDICT STATS future feature
+- Added auto migration of user data after add-on upgrade
         </news>
     </extension>
 </addon>
