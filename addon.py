@@ -488,17 +488,17 @@ class VKAddon(object):
             cmi = []
             if (listtype == '/likedvideos') or ('likes' in video and video['likes']['user_likes'] == 1):  # isliked
                 # unlike video
-                cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30054), color=ALT_COLOR), 'Container.Update({0})'.format(
+                cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30054), color=ALT_COLOR), 'RunPlugin({0})'.format(
                     self.buildurl('/unlikevideo', {'ownerid': video['owner_id'], 'videoid': video['id']}))))
             else:
                 # like video
-                cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30053), color=ALT_COLOR), 'Container.Update({0})'.format(
+                cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30053), color=ALT_COLOR), 'RunPlugin({0})'.format(
                     self.buildurl('/likevideo', {'ownerid': video['owner_id'], 'videoid': video['id']}))))
             # add video to albums
-            cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30055), color=ALT_COLOR), 'Container.Update({0})'.format(
+            cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30055), color=ALT_COLOR), 'RunPlugin({0})'.format(
                 self.buildurl('/addvideotoalbums', {'ownerid': video['owner_id'], 'videoid': video['id']}))))
             # search similar
-            cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30080), color=ALT_COLOR), 'Container.Update({0})'.format(
+            cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30080), color=ALT_COLOR), 'RunPlugin({0})'.format(
                 self.buildurl('/searchvideos', {'qdef': video['title']}))))
             li.addContextMenuItems(cmi)
             listitems.append(
@@ -578,6 +578,8 @@ class VKAddon(object):
             self.log('VK API error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
+        # refresh content
+        xbmc.executebuiltin("Container.Refresh")
 
     def unlikevideo(self):
         """
@@ -601,6 +603,8 @@ class VKAddon(object):
             self.log('VK API error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
+        # refresh content
+        xbmc.executebuiltin("Container.Refresh")
 
     def addvideotoalbums(self):
         """
@@ -664,6 +668,8 @@ class VKAddon(object):
             self.log('VK API error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
+        # refresh content
+        xbmc.executebuiltin("Container.Refresh")
 
     # ----- video albums -----
 
@@ -704,14 +710,14 @@ class VKAddon(object):
             li.addContextMenuItems(
                 [
                     # reorder album up/down
-                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30061), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/reorderalbum', {'albumid': album['id'], 'beforeid': beforeid}))),
-                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30062), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/reorderalbum', {'albumid': album['id'], 'afterid': afterid}))),
+                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30061), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/reorderalbum', {'albumid': album['id'], 'beforeid': beforeid}))),
+                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30062), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/reorderalbum', {'albumid': album['id'], 'afterid': afterid}))),
                     # rename album
-                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30060), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/renamealbum', {'albumid': album['id']}))),
+                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30060), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/renamealbum', {'albumid': album['id']}))),
                     # delete album
-                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30063), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/deletealbum', {'albumid': album['id']}))),
+                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30063), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/deletealbum', {'albumid': album['id']}))),
                     # create new album
-                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30065), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/createalbum'))),
+                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30065), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/createalbum'))),
                 ]
             )
             listitems.append(
@@ -753,6 +759,8 @@ class VKAddon(object):
             self.log('VK API error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
+        # refresh content
+        xbmc.executebuiltin("Container.Refresh")
 
     def renamealbum(self):
         """
@@ -783,6 +791,8 @@ class VKAddon(object):
             self.log('VK API error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
+        # refresh content
+        xbmc.executebuiltin("Container.Refresh")
 
     def deletealbum(self):
         """
@@ -803,6 +813,8 @@ class VKAddon(object):
             self.log('VK API error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
+        # refresh content
+        xbmc.executebuiltin("Container.Refresh")
 
     def createalbum(self):
         """
@@ -825,6 +837,8 @@ class VKAddon(object):
             self.log('VK API error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
+        # refresh content
+        xbmc.executebuiltin("Container.Refresh")
 
     # ----- communities -----
 
@@ -895,14 +909,14 @@ class VKAddon(object):
             cmi = []
             if listtype == '/likedcommunities':
                 # unlike community
-                cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30071), color=ALT_COLOR), 'Container.Update({0})'.format(
+                cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30071), color=ALT_COLOR), 'RunPlugin({0})'.format(
                     self.buildurl('/unlikecommunity', {'communityid': community['id']}))))
             else:
                 # like community
-                cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30070), color=ALT_COLOR), 'Container.Update({0})'.format(
+                cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30070), color=ALT_COLOR), 'RunPlugin({0})'.format(
                     self.buildurl('/likecommunity', {'communityid': community['id']}))))
             # unfollor community
-            cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30072), color=ALT_COLOR), 'Container.Update({0})'.format(
+            cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30072), color=ALT_COLOR), 'RunPlugin({0})'.format(
                 self.buildurl('/unfollowcommunity', {'communityid': community['id']}))))
             li.addContextMenuItems(cmi)
             listitems.append(
@@ -938,6 +952,8 @@ class VKAddon(object):
             self.log('VK API error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
+        # refresh content
+        xbmc.executebuiltin("Container.Refresh")
 
     def unlikecommunity(self):
         """
@@ -957,6 +973,8 @@ class VKAddon(object):
             self.log('VK API error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
+        # refresh content
+        xbmc.executebuiltin("Container.Refresh")
 
     def unfollowcommunity(self):
         """
@@ -976,6 +994,8 @@ class VKAddon(object):
             self.log('VK API error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
+        # refresh content
+        xbmc.executebuiltin("Container.Refresh")
 
     # ----- search history -----
 
@@ -997,9 +1017,9 @@ class VKAddon(object):
             li.addContextMenuItems(
                 [
                     # delete search
-                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30081), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/deletesearch', {'q': search['q']}))),
+                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30081), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/deletesearch', {'q': search['q']}))),
                     # search similar
-                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30080), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/searchvideos', {'qdef': search['q']}))),
+                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30080), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/searchvideos', {'qdef': search['q']}))),
                 ]
             )
             listitems.append(
@@ -1025,6 +1045,8 @@ class VKAddon(object):
         # query db
         self.db.table(TABLE_SEARCH_HISTORY).remove(tinydb.where('q') == q)
         self.log('Search deleted: {0}'.format(q))
+        # refresh content
+        xbmc.executebuiltin("Container.Refresh")
 
 
 class VKAddonError(Exception):

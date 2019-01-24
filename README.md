@@ -67,7 +67,7 @@ Search history:
 
 Fixes:
 - [x] Fixed unicode issues
-- [ ] Fixed content refreshing after contextual actions
+- [x] Fixed content refreshing after contextual actions
 - [x] Fixed pagination bug
 - [x] Fixed LOGOUT USER button visibility bug
 
