@@ -268,6 +268,7 @@ class VKAddon(object):
         :rtype: None
         """
         # get counters from different sources
+        counters = {}
         try:
             counters = dict(
                 # request vk api stored function
@@ -303,50 +304,53 @@ class VKAddon(object):
 
         :rtype: None
         """
-        # paging offset (default=0)
-        self.urlargs['offset'] = self.urlargs.get('offset', 0)
-        # only once:
-        if int(self.urlargs['offset']) == 0:
-            # if not in urlargs, ask user for entering a new search query (or editing passed one)
-            if 'q' not in self.urlargs:
-                self.urlargs['q'] = xbmcgui.Dialog().input(self.addon.getLocalizedString(30051), defaultt=self.urlargs.get('qdef', ''))
-            if not self.urlargs['q']:
-                return
-        # request vk api for searched videos
+        # get urlargs
+        offset = int(self.urlargs.get('offset', 0))
+        q = self.urlargs.get('q', None)
+        qdef = self.urlargs.get('qdef', '')
+        # only once
+        if offset == 0:
+            # if not passed, ask user for entering/editing a search query
+            if not q:
+                q = self.urlargs['q'] = xbmcgui.Dialog().input(self.addon.getLocalizedString(30051), defaultt=qdef)
+                if not q:
+                    return
+        # request vk api
+        searchedvideos = {}
         try:
-            params = {
+            kwargs = {
                 'extended': 1,
                 'hd': 1,
-                'q': self.urlargs['q'],
                 'adult': 1 if self.addon.getSetting('searchadult') == 'true' else 0,  # case sens.!
                 'search_own': 1 if self.addon.getSetting('searchown') == 'true' else 0,  # case sens.!
                 'sort': int(self.addon.getSetting('searchsort')),
-                'offset': int(self.urlargs['offset']),
+                'q': q,
+                'offset': offset,
                 'count': int(self.addon.getSetting('itemsperpage')),
             }
             if self.addon.getSetting('searchduration') == '1':
-                params['longer'] = int(self.addon.getSetting('searchdurationmins')) * 60
+                kwargs['longer'] = int(self.addon.getSetting('searchdurationmins')) * 60
             elif self.addon.getSetting('searchduration') == '2':
-                params['shorter'] = int(self.addon.getSetting('searchdurationmins')) * 60
-            searchedvideos = self.vkapi.video.search(**params)
+                kwargs['shorter'] = int(self.addon.getSetting('searchdurationmins')) * 60
+            searchedvideos = self.vkapi.video.search(**kwargs)
             self.log('Searched videos: {0}'.format(searchedvideos))
         except vk.exceptions.VkAPIError:
             self.log('VK API error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
-        # only once:
-        if int(self.urlargs['offset']) == 0:
-            # update search history db with last search
+        # only once
+        if offset == 0:
+            # update search history db with the last search
             lastsearch = {
-                'q': self.urlargs['q'].lower(),
+                'q': q.lower(),
                 'resultsCount': int(searchedvideos['count']),
                 'lastUsed': datetime.datetime.now().isoformat()
             }
             self.db.table(TABLE_SEARCH_HISTORY).upsert(lastsearch, tinydb.where('q') == lastsearch['q'])
             self.log('Search history db updated: {0}'.format(lastsearch))
             # notify search results count
-            self.notify(self.addon.getLocalizedString(30052).format(searchedvideos['count']))
-        # build list of searched videos
+            self.notify(self.addon.getLocalizedString(30052).format(searchedvideos['count']))  # todo: bug: sent twice due container.refresh()
+        # build list
         self.buildlistofvideos(searchedvideos)
 
     def videos(self):
@@ -355,13 +359,14 @@ class VKAddon(object):
 
         :rtype: None
         """
-        # paging offset (default=0)
-        self.urlargs['offset'] = self.urlargs.get('offset', 0)
-        # request vk api for videos
+        # get urlargs
+        offset = int(self.urlargs.get('offset', 0))
+        # request vk api
+        videos = {}
         try:
             videos = self.vkapi.video.get(
                 extended=1,
-                offset=int(self.urlargs['offset']),
+                offset=offset,
                 count=int(self.addon.getSetting('itemsperpage')),
             )
             self.log('Videos: {0}'.format(videos))
@@ -369,7 +374,7 @@ class VKAddon(object):
             self.log('VK API error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
-        # build list of videos
+        # build list
         self.buildlistofvideos(videos)
 
     def likedvideos(self):
@@ -378,13 +383,14 @@ class VKAddon(object):
 
         :rtype: None
         """
-        # paging offset (default=0)
-        self.urlargs['offset'] = self.urlargs.get('offset', 0)
-        # request vk api for liked videos
+        # get urlargs
+        offset = int(self.urlargs.get('offset', 0))
+        # request vk api
+        likedvideos = {}
         try:
             likedvideos = self.vkapi.fave.getVideos(
                 extended=1,
-                offset=int(self.urlargs['offset']),
+                offset=offset,
                 count=int(self.addon.getSetting('itemsperpage')),
             )
             self.log('Liked videos: {0}'.format(likedvideos))
@@ -392,7 +398,7 @@ class VKAddon(object):
             self.log('VK API error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
-        # build list of liked videos
+        # build list
         self.buildlistofvideos(likedvideos)
 
     def albumvideos(self):
@@ -401,14 +407,16 @@ class VKAddon(object):
 
         :rtype: None
         """
-        # paging offset (default=0)
-        self.urlargs['offset'] = self.urlargs.get('offset', 0)
+        # get urlargs
+        albumid = int(self.urlargs.get('albumid'))
+        offset = int(self.urlargs.get('offset', 0))
         # request vk api for album videos
+        albumvideos = {}
         try:
             albumvideos = self.vkapi.video.get(
                 extended=1,
-                album_id=int(self.urlargs['albumid']),
-                offset=int(self.urlargs['offset']),
+                album_id=albumid,
+                offset=offset,
                 count=int(self.addon.getSetting('itemsperpage')),
             )
             self.log('Album videos: {0}'.format(albumvideos))
@@ -416,7 +424,7 @@ class VKAddon(object):
             self.log('VK API error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
-        # build list of album videos
+        # build list
         self.buildlistofvideos(albumvideos)
 
     def communityvideos(self):
@@ -425,14 +433,16 @@ class VKAddon(object):
 
         :rtype: None
         """
-        # paging offset (default=0)
-        self.urlargs['offset'] = self.urlargs.get('offset', 0)
-        # request vk api for community videos
+        # get urlargs
+        ownerid = int(self.urlargs.get('ownerid'))
+        offset = int(self.urlargs.get('offset', 0))
+        # request vk api
+        communityvideos = {}
         try:
             communityvideos = self.vkapi.video.get(
                 extended=1,
-                owner_id=int(self.urlargs['ownerid']),
-                offset=int(self.urlargs['offset']),
+                owner_id=ownerid,
+                offset=offset,
                 count=int(self.addon.getSetting('itemsperpage')),
             )
             self.log('Community videos: {0}'.format(communityvideos))
@@ -440,7 +450,7 @@ class VKAddon(object):
             self.log('VK API error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
-        # build list of community videos
+        # build list
         self.buildlistofvideos(communityvideos)
 
     def buildlistofvideos(self, listdata):
@@ -450,8 +460,10 @@ class VKAddon(object):
         :param dict listdata: videos data
         :rtype: None
         """
-        # list types ['/searchvideos', '/videos', '/likedvideos', '/albumvideos', '/communityvideos']
-        listtype = self.urlpath
+        # get urlargs
+        offset = int(self.urlargs.get('offset', 0))
+        # create list
+        listtype = self.urlpath  # ['/searchvideos', '/videos', '/likedvideos', '/albumvideos', '/communityvideos']
         listitems = []
         for video in listdata['items']:
             # create video item
@@ -486,27 +498,21 @@ class VKAddon(object):
             li.setArt({'thumb': maxthumb})
             # context menu
             cmi = []
-            if (listtype == '/likedvideos') or ('likes' in video and video['likes']['user_likes'] == 1):  # isliked
+            if video['is_favorite']:
                 # unlike video
-                cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30054), color=ALT_COLOR), 'RunPlugin({0})'.format(
-                    self.buildurl('/unlikevideo', {'ownerid': video['owner_id'], 'videoid': video['id']}))))
+                cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30054), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/unlikevideo', {'ownerid': video['owner_id'], 'videoid': video['id']}))))
             else:
                 # like video
-                cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30053), color=ALT_COLOR), 'RunPlugin({0})'.format(
-                    self.buildurl('/likevideo', {'ownerid': video['owner_id'], 'videoid': video['id']}))))
+                cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30053), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/likevideo', {'ownerid': video['owner_id'], 'videoid': video['id']}))))
             # add video to albums
-            cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30055), color=ALT_COLOR), 'RunPlugin({0})'.format(
-                self.buildurl('/addvideotoalbums', {'ownerid': video['owner_id'], 'videoid': video['id']}))))
+            cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30055), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/addvideotoalbums', {'ownerid': video['owner_id'], 'videoid': video['id']}))))
             # search similar
-            cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30080), color=ALT_COLOR), 'RunPlugin({0})'.format(
-                self.buildurl('/searchvideos', {'qdef': video['title']}))))
+            cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30080), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/searchvideos', {'qdef': video['title']}))))
             li.addContextMenuItems(cmi)
-            listitems.append(
-                (self.buildurl('/playvideo', {'ownerid': video['owner_id'], 'videoid': video['id']}), li, NOT_FOLDER)
-            )
+            listitems.append((self.buildurl('/playvideo', {'ownerid': video['owner_id'], 'videoid': video['id']}), li, NOT_FOLDER))
         # paginator item
-        if int(self.urlargs['offset']) + int(self.addon.getSetting('itemsperpage')) < listdata['count']:
-            urlargsnext = dict(self.urlargs, offset=int(self.urlargs['offset']) + int(self.addon.getSetting('itemsperpage')))
+        if offset + int(self.addon.getSetting('itemsperpage')) < listdata['count']:
+            urlargsnext = dict(self.urlargs, offset=offset + int(self.addon.getSetting('itemsperpage')))
             listitems.append(
                 (self.buildurl(self.urlpath, urlargsnext), xbmcgui.ListItem('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30050), color=ALT_COLOR)), FOLDER)
             )
@@ -529,7 +535,9 @@ class VKAddon(object):
         ownerid = int(self.urlargs.get('ownerid'))
         videoid = int(self.urlargs.get('videoid'))
         oidid = '{0}_{1}'.format(ownerid, videoid)
-        # resolve playable streams via vk videoinfo api (hack)
+        # request vk api
+        video = {}  # todo
+        # resolve playable streams via vk videoinfo api
         try:
             vi = self.vksession.requests_session.get(
                 url='https://vk.com/al_video.php?act=show_inline&al=1&video={0}'.format(oidid),
@@ -548,7 +556,7 @@ class VKAddon(object):
             self.log('Video resolving error!', level=xbmc.LOGERROR)
             self.notify(self.addon.getLocalizedString(30024), icon=xbmcgui.NOTIFICATION_ERROR)
             return
-        # resolved, use max quality stream
+        # stream resolved, use max quality
         self.log('Resolved playable streams: {0}'.format(playables))
         maxqual = max(playables.keys())
         # create playable item for kodi player
@@ -617,13 +625,15 @@ class VKAddon(object):
         videoid = int(self.urlargs.get('videoid'))
         oidid = '{0}_{1}'.format(ownerid, videoid)
         # request vk api
+        albums = {}
+        albumids = []
         try:
             # get user albums
             albums = self.vkapi.video.getAlbums(
                 need_system=0,
                 count=100,  # todo: pageable multiselect dialog for adding video to albums?
             )
-            # get album ids for video
+            # get list of album ids for video
             albumids = self.vkapi.video.getAlbumsByVideo(
                 owner_id=ownerid,
                 video_id=videoid,
@@ -649,14 +659,14 @@ class VKAddon(object):
             albumids_new.append(albums['items'][i]['id'])
         # request vk api
         try:
-            # remove sel album ids from video (if any)
+            # remove sel album ids if any
             if len(albumids) > 0:
                 self.vkapi.video.removeFromAlbum(
                     owner_id=ownerid,
                     video_id=videoid,
                     album_ids=albumids
                 )
-            # add new sel album ids for video (if any)
+            # add new sel album ids if any
             if len(albumids_new) > 0:
                 self.vkapi.video.addToAlbum(
                     owner_id=ownerid,
@@ -679,15 +689,16 @@ class VKAddon(object):
 
         :rtype: None
         """
-        # paging offset (default=0)
-        self.urlargs['offset'] = self.urlargs.get('offset', 0)
+        # get urlargs
+        offset = int(self.urlargs.get('offset', 0))
         # workaround due api's max=100
         albumsperpage = int(self.addon.getSetting('itemsperpage')) if int(self.addon.getSetting('itemsperpage')) <= 100 else 100
-        # request vk api for albums
+        # request vk api
+        albums = {}
         try:
             albums = self.vkapi.video.getAlbums(
                 extended=1,
-                offset=int(self.urlargs['offset']),
+                offset=offset,
                 count=albumsperpage,
             )
             self.log('Albums: {0}'.format(albums))
@@ -724,8 +735,8 @@ class VKAddon(object):
                 (self.buildurl('/albumvideos', {'albumid': album['id']}), li, FOLDER)
             )
         # paginator item, modded w albumsperpage
-        if int(self.urlargs['offset']) + albumsperpage < albums['count']:
-            urlargsnext = dict(self.urlargs, offset=int(self.urlargs['offset']) + albumsperpage)
+        if offset + albumsperpage < albums['count']:
+            urlargsnext = dict(self.urlargs, offset=offset + albumsperpage)
             listitems.append(
                 (self.buildurl(self.urlpath, urlargsnext), xbmcgui.ListItem('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30050), color=ALT_COLOR)), FOLDER)
             )
@@ -848,13 +859,14 @@ class VKAddon(object):
 
         :rtype: None
         """
-        # paging offset (default=0)
-        self.urlargs['offset'] = self.urlargs.get('offset', 0)
-        # request vk api for communities data
+        # get urlargs
+        offset = int(self.urlargs.get('offset', 0))
+        # request vk api
+        communities = {}
         try:
             communities = self.vkapi.groups.get(
                 extended=1,
-                offset=int(self.urlargs['offset']),
+                offset=offset,
                 count=int(self.addon.getSetting('itemsperpage')),
             )
             self.log('Communities: {0}'.format(communities))
@@ -871,12 +883,13 @@ class VKAddon(object):
 
         :rtype: None
         """
-        # paging offset (default=0)
-        self.urlargs['offset'] = self.urlargs.get('offset', 0)
+        # get urlargs
+        offset = int(self.urlargs.get('offset', 0))
         # request vk api
+        likedcommunities = {}
         try:
             likedcommunities = self.vkapi.fave.getLinks(
-                offset=int(self.urlargs['offset']),
+                offset=offset,
                 count=int(self.addon.getSetting('itemsperpage')),
             )
             self.log('Liked communities: {0}'.format(likedcommunities))
@@ -894,8 +907,10 @@ class VKAddon(object):
         :param dict listdata: communities data
         :rtype: None
         """
-        # list types ['/communities', '/likedcommunities']
-        listtype = self.urlpath
+        # get urlargs
+        offset = int(self.urlargs.get('offset', 0))
+        # create list
+        listtype = self.urlpath  # ['/communities', '/likedcommunities']
         listitems = []
         _namekey = 'title' if listtype == '/likedcommunities' else 'name'
         for community in listdata['items']:
@@ -923,8 +938,8 @@ class VKAddon(object):
                 (self.buildurl('/communityvideos', {'ownerid': '-{0}'.format(community['id'])}), li, FOLDER)  # negative id required
             )
         # paginator item
-        if int(self.urlargs['offset']) + int(self.addon.getSetting('itemsperpage')) < listdata['count']:
-            urlargsnext = dict(self.urlargs, offset=int(self.urlargs['offset']) + int(self.addon.getSetting('itemsperpage')))
+        if offset + int(self.addon.getSetting('itemsperpage')) < listdata['count']:
+            urlargsnext = dict(self.urlargs, offset=offset + int(self.addon.getSetting('itemsperpage')))
             listitems.append(
                 (self.buildurl(self.urlpath, urlargsnext), xbmcgui.ListItem('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30050), color=ALT_COLOR)), FOLDER)
             )

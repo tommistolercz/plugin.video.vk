@@ -83,7 +83,6 @@ Features:
 - [x] Added info-labels showing video resolution in lists
 - [x] Added SEARCH HISTORY counter in main menu
 - [x] Added code enabling ADDICT STATS future feature
-- [ ] Added auto migration of user data after add-on upgrade
 
 ## Screenshots
 
