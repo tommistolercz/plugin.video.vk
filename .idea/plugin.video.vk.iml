@@ -2,8 +2,8 @@
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/resources/lib" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
     </content>
     <content url="file://$MODULE_DIR$/../../userdata/addon_data/plugin.video.vk">
       <excludeFolder url="file://$MODULE_DIR$/../../userdata/addon_data/plugin.video.vk/_Archiv_" />

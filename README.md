@@ -1,4 +1,4 @@
-![Icon](./resources/icon.png)
+![Icon](resources/icon.png)
 
 # VK (plugin.video.vk)
 
@@ -86,10 +86,10 @@ Features:
 
 ## Screenshots
 
-![Screenshot 1](./resources/media/screenshot1.jpg)
+![Screenshot 1](resources/media/screenshot1.jpg)
 
-![Screenshot 2](./resources/media/screenshot2.jpg)
+![Screenshot 2](resources/media/screenshot2.jpg)
 
-![Screenshot 3](./resources/media/screenshot3.jpg)
+![Screenshot 3](resources/media/screenshot3.jpg)
 
-![Screenshot 4](./resources/media/screenshot4.jpg)
+![Screenshot 4](resources/media/screenshot4.jpg)
