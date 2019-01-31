@@ -293,19 +293,20 @@ class VKAddon:
         """
         Search videos.
 
+        ``plugin://plugin.video.vk/searchvideos[?similarq={similarq}]``
+        ``plugin://plugin.video.vk/searchvideos?q={q}[&offset={offset}]``
+
         :rtype: None
         """
         # get urlargs
-        offset = int(self.urlargs.get('offset', 0))
+        similarq = self.urlargs.get('similarq', '')
         q = self.urlargs.get('q', None)
-        qdef = self.urlargs.get('qdef', '')
-        # only once
-        if offset == 0:
-            # if not passed, ask user for entering/editing a search query
+        offset = int(self.urlargs.get('offset', 0))
+        # if q not passed, ask user for entering a new query / editing similar one
+        if not q:
+            q = self.urlargs['q'] = xbmcgui.Dialog().input(self.addon.getLocalizedString(30051), defaultt=similarq)
             if not q:
-                q = self.urlargs['q'] = xbmcgui.Dialog().input(self.addon.getLocalizedString(30051), defaultt=qdef)
-                if not q:
-                    return
+                return
         # request vk api for searched videos
         searchedvideos = {}
         try:
@@ -330,7 +331,7 @@ class VKAddon:
             self.notify(self.addon.getLocalizedString(30021), icon=xbmcgui.NOTIFICATION_ERROR)
             exit()
         # only once
-        if offset == 0:
+        if offset == 0:  # BUG: duplicated on container refresh
             # update search history db with the last search
             lastsearch = {
                 'q': q.lower(),
@@ -339,7 +340,7 @@ class VKAddon:
             }
             self.db.table(TABLE_SEARCH_HISTORY).upsert(lastsearch, tinydb.where('q') == lastsearch['q'])
             self.log('Search history db updated: {0}'.format(lastsearch))
-            # notify search results count  # BUG: duplicated due container refresh
+            # notify search results count
             self.notify(self.addon.getLocalizedString(30052).format(searchedvideos['count']))
         # build list
         self.buildlistofvideos(searchedvideos)
@@ -347,6 +348,8 @@ class VKAddon:
     def videos(self):
         """
         List videos.
+
+        ``plugin://plugin.video.vk/videos``
 
         :rtype: None
         """
@@ -372,6 +375,8 @@ class VKAddon:
         """
         List liked videos.
 
+        ``plugin://plugin.video.vk/likedvideos``
+
         :rtype: None
         """
         # get urlargs
@@ -395,6 +400,8 @@ class VKAddon:
     def albumvideos(self):
         """
         List album videos.
+
+        ``plugin://plugin.video.vk/albumvideos``
 
         :rtype: None
         """
@@ -422,6 +429,8 @@ class VKAddon:
         """
         List community videos.
 
+        ``plugin://plugin.video.vk/communityvideos``
+
         :rtype: None
         """
         # get urlargs
@@ -448,20 +457,21 @@ class VKAddon:
         """
         Build list of videos.
 
+        ``/searchvideos, /videos, /likedvideos, /albumvideos, /communityvideos``
+
         :param dict listdata:
         :rtype: None
         """
         # get urlargs
-        listtype = self.urlpath  # ['/searchvideos', '/videos', '/likedvideos', '/albumvideos', '/communityvideos']
         offset = int(self.urlargs.get('offset', 0))
         # create list
         listitems = []
         for video in listdata['items']:
             # create video item
             li = xbmcgui.ListItem(video['title'])
-            # playable
+            # set isplayable
             li.setProperty('IsPlayable', 'true')
-            # infolabels
+            # set infolabels
             li.setInfo(
                 'video',
                 {
@@ -471,7 +481,7 @@ class VKAddon:
                     'date': datetime.datetime.fromtimestamp(video['date']).strftime('%d.%m.%Y')
                 }
             )
-            # stream infolabels
+            # set stream infolabels
             li.addStreamInfo(
                 'video',
                 {
@@ -479,7 +489,7 @@ class VKAddon:
                     'height': video.get('height', None)
                 }
             )
-            # art
+            # set art
             if 'photo_800' in video:
                 maxthumb = video['photo_800']
             elif 'photo_640' in video:
@@ -487,7 +497,7 @@ class VKAddon:
             else:
                 maxthumb = video['photo_320']
             li.setArt({'thumb': maxthumb})
-            # context menu
+            # create context menu
             cmi = []
             if video['is_favorite']:
                 # unlike video
@@ -498,19 +508,20 @@ class VKAddon:
             # add video to albums
             cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30055), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/addvideotoalbums', {'ownerid': video['owner_id'], 'videoid': video['id']}))))
             # search similar
-            cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30080), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/searchvideos', {'qdef': video['title']}))))
+            cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30080), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/searchvideos', {'similarq': video['title']}))))
             li.addContextMenuItems(cmi)
+            # add complete video item to list
             listitems.append((self.buildurl('/playvideo', {'ownerid': video['owner_id'], 'videoid': video['id']}), li, NOT_FOLDER))
         # paginator item
         if offset + int(self.addon.getSetting('itemsperpage')) < listdata['count']:
-            urlargsnext = dict(self.urlargs, offset=offset + int(self.addon.getSetting('itemsperpage')))
+            urlargsnext = dict(self.urlargs, offset=offset+int(self.addon.getSetting('itemsperpage')))
             listitems.append(
                 (self.buildurl(self.urlpath, urlargsnext), xbmcgui.ListItem('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30050), color=ALT_COLOR)), FOLDER)
             )
-        # force custom view mode for videos, if enabled
+        # force custom view mode for videos if enabled
         if self.addon.getSetting('forcevideoviewmode') == 'true':  # case sens!
             xbmc.executebuiltin('Container.SetViewMode({0})'.format(int(self.addon.getSetting('forcevideoviewmodeid'))))
-        # show video list in kodi, even if empty
+        # show list in kodi, even if empty
         xbmcplugin.setContent(self.handle, 'videos')
         xbmcplugin.addDirectoryItems(self.handle, listitems, len(listitems))
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_NONE)
@@ -519,6 +530,8 @@ class VKAddon:
     def playvideo(self):
         """
         Play video.
+
+        ``plugin://plugin.video.vk/playvideo``
 
         :rtype: None
         """
@@ -559,6 +572,8 @@ class VKAddon:
         """
         Like video.
 
+        ``plugin://plugin.video.vk/likevideo``
+
         :rtype: None
         """
         # get urlargs
@@ -584,6 +599,8 @@ class VKAddon:
         """
         Unlike video.
 
+        ``plugin://plugin.video.vk/unlikevideo``
+
         :rtype: None
         """
         # get urlargs
@@ -608,6 +625,8 @@ class VKAddon:
     def addvideotoalbums(self):
         """
         Add video to albums.
+
+        ``plugin://plugin.video.vk/addvideotoalbums``
 
         :rtype: None
         """
@@ -678,6 +697,8 @@ class VKAddon:
         """
         List video albums.
 
+        ``plugin://plugin.video.vk/albums``
+
         :rtype: None
         """
         # get urlargs
@@ -741,6 +762,8 @@ class VKAddon:
         """
         Reorder album.
 
+        ``plugin://plugin.video.vk/reorderalbum``
+
         :rtype: None
         """
         # get urlargs
@@ -767,6 +790,8 @@ class VKAddon:
     def renamealbum(self):
         """
         Rename album.
+
+        ``plugin://plugin.video.vk/renamealbum``
 
         :rtype: None
         """
@@ -800,6 +825,8 @@ class VKAddon:
         """
         Delete album.
 
+        ``plugin://plugin.video.vk/deletealbum``
+
         :rtype: None
         """
         # get urlargs
@@ -821,6 +848,8 @@ class VKAddon:
     def createalbum(self):
         """
         Create album.
+
+        ``plugin://plugin.video.vk/createalbum``
 
         :rtype: None
         """
@@ -848,6 +877,8 @@ class VKAddon:
         """
         List communities.
 
+        ``plugin://plugin.video.vk/communities``
+
         :rtype: None
         """
         # get urlargs
@@ -872,6 +903,8 @@ class VKAddon:
         """
         List liked communities.
 
+        ``plugin://plugin.video.vk/likedcommunities``
+
         :rtype: None
         """
         # get urlargs
@@ -895,13 +928,15 @@ class VKAddon:
         """
         Build list of communities.
 
+        ``/communities, /likedcommunities``
+
         :param dict listdata:
         :rtype: None
         """
         # get urlargs
-        listtype = self.urlpath  # ['/communities', '/likedcommunities']
         offset = int(self.urlargs.get('offset', 0))
         # create list
+        listtype = self.urlpath
         listitems = []
         _namekey = 'title' if listtype == '/likedcommunities' else 'name'
         for community in listdata['items']:
@@ -909,9 +944,9 @@ class VKAddon:
                 community['id'] = community['id'].split('_')[2]
             # create community item
             li = xbmcgui.ListItem(community[_namekey])
-            # art
+            # set art
             li.setArt({'thumb': community['photo_200']})
-            # context menu
+            # create context menu
             cmi = []
             if listtype == '/likedcommunities':
                 # unlike community
@@ -921,20 +956,21 @@ class VKAddon:
                 # like community
                 cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30070), color=ALT_COLOR), 'RunPlugin({0})'.format(
                     self.buildurl('/likecommunity', {'communityid': community['id']}))))
-            # unfollor community
+            # unfollow community
             cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30072), color=ALT_COLOR), 'RunPlugin({0})'.format(
                 self.buildurl('/unfollowcommunity', {'communityid': community['id']}))))
             li.addContextMenuItems(cmi)
+            # add complete community item to list
             listitems.append(
-                (self.buildurl('/communityvideos', {'ownerid': '-{0}'.format(community['id'])}), li, FOLDER)  # negative id required
+                (self.buildurl('/communityvideos', {'ownerid': '-{0}'.format(community['id'])}), li, FOLDER)  # negative id required!
             )
         # paginator item
         if offset + int(self.addon.getSetting('itemsperpage')) < listdata['count']:
-            urlargsnext = dict(self.urlargs, offset=offset + int(self.addon.getSetting('itemsperpage')))
+            urlargsnext = dict(self.urlargs, offset=offset+int(self.addon.getSetting('itemsperpage')))
             listitems.append(
                 (self.buildurl(self.urlpath, urlargsnext), xbmcgui.ListItem('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30050), color=ALT_COLOR)), FOLDER)
             )
-        # show community list in kodi, even if empty
+        # show list in kodi, even if empty
         xbmcplugin.setContent(self.handle, 'files')
         xbmcplugin.addDirectoryItems(self.handle, listitems, len(listitems))
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_NONE)
@@ -943,6 +979,8 @@ class VKAddon:
     def likecommunity(self):
         """
         Like community.
+
+        ``plugin://plugin.video.vk/likecommunity``
 
         :rtype: None
         """
@@ -965,6 +1003,8 @@ class VKAddon:
         """
         Unlike community.
 
+        ``plugin://plugin.video.vk/unlikecommunity``
+
         :rtype: None
         """
         # get urlargs
@@ -985,6 +1025,8 @@ class VKAddon:
     def unfollowcommunity(self):
         """
         Unfollow community.
+
+        ``plugin://plugin.video.vk/unfollowcommunity``
 
         :rtype: None
         """
@@ -1009,29 +1051,32 @@ class VKAddon:
         """
         List search history.
 
+        ``plugin://plugin.video.vk/searchhistory``
+
         :rtype: None
         """
-        # query db for search history data, empty list if no data
+        # query db for search history, empty list if no data
         searchhistory = self.db.table(TABLE_SEARCH_HISTORY).all()
         self.log('Search history: {0}'.format(searchhistory))
-        # create list sorted by last used item reversed
+        # create list, sort by lastUsed reversed
         listitems = []
         for search in sorted(searchhistory, key=lambda x: x['lastUsed'], reverse=True):
             # create search item
             li = xbmcgui.ListItem('{0} [COLOR {color}]({1})[/COLOR]'.format(search['q'], search['resultsCount'], color=ALT_COLOR))
-            # context menu
+            # create context menu
             li.addContextMenuItems(
                 [
                     # delete search
                     ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30081), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/deletesearch', {'q': search['q']}))),
                     # search similar
-                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30080), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/searchvideos', {'qdef': search['q']}))),
+                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30080), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/searchvideos', {'similarq': search['q']}))),
                 ]
             )
+            # add complete search item to list
             listitems.append(
                 (self.buildurl('/searchvideos', {'q': search['q']}), li, FOLDER)
             )
-        # show search history list in kodi, even if empty
+        # show list in kodi, even if empty
         xbmcplugin.setContent(self.handle, 'files')
         xbmcplugin.addDirectoryItems(self.handle, listitems, len(listitems))
         xbmcplugin.addSortMethod(self.handle, xbmcplugin.SORT_METHOD_NONE)
@@ -1040,6 +1085,8 @@ class VKAddon:
     def deletesearch(self):
         """
         Delete search from search history.
+
+        ``plugin://plugin.video.vk/deletesearch``
 
         :rtype: None
         """
