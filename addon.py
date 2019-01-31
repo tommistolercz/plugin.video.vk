@@ -508,7 +508,7 @@ class VKAddon:
             # add video to albums
             cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30055), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/addvideotoalbums', {'ownerid': video['owner_id'], 'videoid': video['id']}))))
             # search similar
-            cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30080), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/searchvideos', {'similarq': video['title']}))))
+            cmi.append(('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30080), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/searchvideos', {'similarq': video['title']}))))  # cont.upd() required!
             li.addContextMenuItems(cmi)
             # add complete video item to list
             listitems.append((self.buildurl('/playvideo', {'ownerid': video['owner_id'], 'videoid': video['id']}), li, NOT_FOLDER))
@@ -1069,7 +1069,7 @@ class VKAddon:
                     # delete search
                     ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30081), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/deletesearch', {'q': search['q']}))),
                     # search similar
-                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30080), color=ALT_COLOR), 'RunPlugin({0})'.format(self.buildurl('/searchvideos', {'similarq': search['q']}))),
+                    ('[COLOR {color}]{0}[/COLOR]'.format(self.addon.getLocalizedString(30080), color=ALT_COLOR), 'Container.Update({0})'.format(self.buildurl('/searchvideos', {'similarq': search['q']}))),  # cont.upd() required!
                 ]
             )
             # add complete search item to list
