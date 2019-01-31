@@ -69,14 +69,14 @@ Fixes:
 - [x] Fixed unicode issues
 - [x] Fixed content refreshing after contextual actions
 - [x] Fixed pagination bug
-- [x] Fixed LOGOUT USER button visibility bug
+- [x] Fixed itemsperpage value range bug
+- [x] Fixed LOGOUT USER button visibility bug 
 
 Code refactorings:
 - [x] Utilized TinyDB for persisting add-on data
-- [x] Renamed cookies data file to be non-hidden
-- [x] Refined add-on routing
-- [x] Refined debug logging
+- [x] Refined complete python code
 - [x] Refined language resources
+- [x] Renamed cookies data file to be non-hidden
 
 Features:
 - [x] Reduced using of Kodi notifications

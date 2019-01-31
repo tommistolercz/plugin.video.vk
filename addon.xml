@@ -30,13 +30,13 @@ Fixes:
 - Fixed unicode issues
 - Fixed content refreshing after contextual actions
 - Fixed pagination bug
+- Fixed itemsperpage value range bug
 - Fixed LOGOUT USER button visibility bug
 Code refactorings:
 - Utilized TinyDB for persisting add-on data
-- Renamed cookies data file to be non-hidden
-- Refined add-on routing
-- Refined debug logging
+- Refined complete python code
 - Refined language resources
+- Renamed cookies data file to be non-hidden
 Features:
 - Reduced using of Kodi notifications
 - Added info-labels showing video resolution in lists

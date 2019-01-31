@@ -355,7 +355,7 @@ class VKAddon:
         """
         # get urlargs
         offset = int(self.urlargs.get('offset', 0))
-        # request vk api for videos  # BUG: api's max 200
+        # request vk api for videos
         videos = {}
         try:
             videos = self.vkapi.video.get(
