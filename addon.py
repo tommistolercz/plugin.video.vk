@@ -22,7 +22,7 @@ import xbmcaddon
 import xbmcgui
 import xbmcplugin
 
-sys.path.append(os.path.join(sys.path[0], 'resources', 'lib'))
+sys.path.append(os.path.join(xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('path')).decode('utf-8'), 'resources', 'lib'))
 import tinydb  # noqa: E402
 import vk  # noqa: E402
 
