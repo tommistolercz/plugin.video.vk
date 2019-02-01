@@ -1,73 +1,94 @@
+![Icon](resources/icon.png)
+
 # VK (plugin.video.vk)
 
 Kodi add-on for watching videos from VK.com social network.
 
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Features (changelog)](#features-changelog)
+- [Screenshots](#screenshots)
+
 ## Requirements
 
-- [Kodi](https://kodi.tv) 17.x or newer<br>
-    (tested on: Kodi 17.6/macOS 10.13 High Sierra, Kodi 17.6/LibreELEC 8.2, Kodi 17.4/iOS 10)
-
+- [Kodi](https://kodi.tv) v17+ installed
 - [VK.com](https://vk.com) user account
 
 ## Installation
 
 1. Download the add-on zip file:<br>
-    [plugin.video.vk-1.0.0.zip](https://github.com/tommistolercz/plugin.video.vk/releases/download/v1.0.0/plugin.video.vk-1.0.0.zip)
-
-2. Install in Kodi:<br>
-    Settings > Add-ons > Install from zip file... (select downloaded file, press OK)
+    [plugin.video.vk-1.1.0.zip](https://github.com/tommistolercz/plugin.video.vk/releases/download/v1.1.0/plugin.video.vk-1.1.0.zip)
     
-(More detailed instructions available [here](https://kodi.wiki/view/HOW-TO:Install_add-ons_from_zip_files).)
+2. Install it in Kodi:<br>
+    `Kodi > Settings > Add-ons > Install from zip file...`
 
-## Features
+    [How to install add-ons from zip files](https://kodi.wiki/view/HOW-TO:Install_add-ons_from_zip_files)
 
-### v1.0.0
+## Features (changelog)
 
-- Common
-    - [x] Edit add-on settings
-    - [x] List add-on main menu
-    - [x] Authorize add-on (OAuth2 support using user access token)
-    - [x] Logout user
-    - [x] User-friendly listings (incl. pagination, HD thumbs, item counters, auto switching view modes, ...)
-    - [x] EN/CZ translations
-- Search
-    - [x] Search videos
-    - [x] List searched videos
-    - [x] Search similar videos
-    - [x] List search history
-    - [x] Delete search
-- My videos
-    - [x] List videos
-    - [x] Play video (HD support incl. 1080p)
-- My video albums
-    - [x] List albums
-    - [x] List album videos
-    - [x] Add album
-    - [x] Rename album
-    - [x] Reorder album up/down
-    - [x] Delete album
-    - [x] Set albums for video
-- My communities
-    - [x] List communities
-    - [x] List community videos
-    - [x] Leave community
-- My likes
-    - [x] List liked videos
-    - [x] List liked communities
-    - [x] Like video
-    - [x] Unlike video
-    - [x] Like community
-    - [x] Unlike community
+### v1.0.0 <sub>(2018-11-12)</sub>
 
-### v1.1.0 **[WIP]**
+Common:
+- [x] EN/CZ language version
+- [x] Manage add-on settings
+- [x] Authorize add-on (OAuth2)
+- [x] List add-on menu
+- [x] Logout user
 
-- Stats
-    - [ ] List stats
+Videos:
+- [x] Search videos
+- [x] List user's videos
+- [x] List user's liked videos
+- [x] List album videos
+- [x] List community videos
+- [x] Play video
+- [x] Like/Unlike video
+- [x] Add video to albums
 
-### Backlog
+Video albums:
+- [x] List user's albums
+- [x] Rename album
+- [x] Reorder album (Move up/down)
+- [x] Delete album
+- [x] Create new album
 
-Future features and ideas [backlog](https://github.com/tommistolercz/plugin.video.vk/milestones/backlog).
+Communities:
+- [x] List user's communities
+- [x] List user's liked communities
+- [x] Like/Unlike community
+- [x] Unfollow community
 
-## Docs
+Search history:
+- [x] List user's search history
+- [x] Delete search
 
-Some dev docs available [here](./resources/docs/DOCS.md).
+### v1.1.0 <sub>(2019-02-01)</sub>
+
+Fixes:
+- [x] Fixed unicode issues
+- [x] Fixed content refreshing after contextual actions
+- [x] Fixed pagination bug
+- [x] Fixed itemsperpage value range bug
+- [x] Fixed LOGOUT USER button visibility bug 
+
+Code refactorings:
+- [x] Utilized TinyDB for persisting add-on data
+- [x] Refined complete python code
+- [x] Refined language resources
+- [x] Renamed cookies data file to be non-hidden
+
+Features:
+- [x] Reduced using of Kodi notifications
+- [x] Added info-labels showing video resolution in lists
+- [x] Added SEARCH HISTORY counter in main menu
+- [x] Added code enabling ADDICT STATS future feature
+
+## Screenshots
+
+![Screenshot 1](resources/media/screenshot1.jpg)
+
+![Screenshot 2](resources/media/screenshot2.jpg)
+
+![Screenshot 3](resources/media/screenshot3.jpg)
+
+![Screenshot 4](resources/media/screenshot4.jpg)
