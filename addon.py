@@ -6,7 +6,7 @@ VK (plugin.video.vk)
 Kodi add-on for watching videos from VK.com social network.
 """
 
-__version__ = '1.1.0-devel'
+__version__ = '1.1.0'
 
 
 import datetime
