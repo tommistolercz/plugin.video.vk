@@ -27,7 +27,7 @@ Kodi add-on for watching videos from VK.com social network.
 ## Features and changelog
 
 ### Future
-- [ ] Fix /playvideo raising video resolving error due to unhandled cookies expiration [#57]
+- [ ] Fix /playvideo raising video resolving error due to unhandled cookies expiration (#57)
 - [ ] Fix /addvideotoalbums only showing first 100 albums
 - [ ] Add /clearhistory context action for /playedvideos, /searchhistory
 - [ ] Add /searchhistory pagination
@@ -38,12 +38,12 @@ Kodi add-on for watching videos from VK.com social network.
 - [ ] Fix unicode issues:
     - [x] Added type hints for all methods
     - [ ] Fix weak encoding error in menu (search history item)
-    - [ ] Fix reported unicode issues [#66] [#70]
+    - [ ] Fix reported unicode issues (#66) (#70)
     - [ ] ...
 - [ ] Fix content refreshing issues:
     - [ ] Fix main menu counters refreshing
     - [ ] Fix /searchvideos?offset=0 container refresh issues
-    - [ ] Fix reported various issues related to container.refresh [#69]
+    - [ ] Fix reported various issues related to container.refresh (#69)
     - [ ] ...
 - [ ] Fix /createalbum not accessible if user has any albums yet
 - [ ] Fix /playedvideos sorting (by lastPlayed)
