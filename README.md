@@ -1,4 +1,4 @@
-![Icon](resources/icon.png)
+![Add-on icon](resources/icon.png)
 
 # VK (plugin.video.vk)
 
@@ -6,7 +6,7 @@ Kodi add-on for watching videos from VK.com social network.
 
 - [Requirements](#requirements)
 - [Installation](#installation)
-- [Features (changelog)](#features-changelog)
+- [Features and changelog](#features-and-changelog)
 - [Screenshots](#screenshots)
 
 ## Requirements
@@ -17,78 +17,104 @@ Kodi add-on for watching videos from VK.com social network.
 ## Installation
 
 1. Download the add-on zip file:<br>
-    [plugin.video.vk-1.1.0.zip](https://github.com/tommistolercz/plugin.video.vk/releases/download/v1.1.0/plugin.video.vk-1.1.0.zip)
+    [plugin.video.vk-1.2.0-dev.zip](https://github.com/tommistolercz/plugin.video.vk/releases/download/v1.2.0-dev/plugin.video.vk-1.2.0-dev.zip)
     
 2. Install it in Kodi:<br>
     `Kodi > Settings > Add-ons > Install from zip file...`
 
     [How to install add-ons from zip files](https://kodi.wiki/view/HOW-TO:Install_add-ons_from_zip_files)
 
-## Features (changelog)
+## Features and changelog
 
-### v1.0.0 <sub>(2018-11-12)</sub>
+### Future
+- [ ] Fix /playvideo raising video resolving error due to unhandled cookies expiration [#57]
+- [ ] Fix /addvideotoalbums only showing first 100 albums
+- [ ] Add /clearhistory context action for /playedvideos, /searchhistory
+- [ ] Add /searchhistory pagination
+- [ ] Add /playedvideos pagination
 
-Common:
-- [x] EN/CZ language version
-- [x] Manage add-on settings
-- [x] Authorize add-on (OAuth2)
-- [x] List add-on menu
-- [x] Logout user
+### v1.2.0-dev (not yet released)
 
-Videos:
-- [x] Search videos
-- [x] List user's videos
-- [x] List user's liked videos
-- [x] List album videos
-- [x] List community videos
-- [x] Play video
-- [x] Like/Unlike video
-- [x] Add video to albums
+- [ ] Fix unicode issues:
+    - [x] Added type hints for all methods
+    - [ ] Fix weak encoding error in menu (search history item)
+    - [ ] Fix reported unicode issues [#66] [#70]
+    - [ ] ...
+- [ ] Fix content refreshing issues:
+    - [ ] Fix main menu counters refreshing
+    - [ ] Fix /searchvideos?offset=0 container refresh issues
+    - [ ] Fix reported various issues related to container.refresh [#69]
+    - [ ] ...
+- [ ] Fix /createalbum not accessible if user has any albums yet
+- [ ] Fix /playedvideos sorting (by lastPlayed)
+- [x] Added /playedvideos list
+- [x] Added /searchvideos context action into all lists types
+- [ ] Refactor add-on file structure and python code:
+    - [x] Refactored /deletesearch urlargs (q -> id)
+    - [ ] Test initvksession() after refactor (new auth)
+    - [ ] Define globals for urlpaths (URLPATH_FOO = '/foo')    
 
-Video albums:
-- [x] List user's albums
-- [x] Rename album
-- [x] Reorder album (Move up/down)
-- [x] Delete album
-- [x] Create new album
+### v1.1.0 (2019-02-01)
 
-Communities:
-- [x] List user's communities
-- [x] List user's liked communities
-- [x] Like/Unlike community
-- [x] Unfollow community
-
-Search history:
-- [x] List user's search history
-- [x] Delete search
-
-### v1.1.0 <sub>(2019-02-01)</sub>
-
-Fixes:
 - [x] Fixed unicode issues
 - [x] Fixed content refreshing after contextual actions
 - [x] Fixed pagination bug
-- [x] Fixed itemsperpage value range bug
-- [x] Fixed LOGOUT USER button visibility bug 
-
-Code refactorings:
+- [x] Fixed itemsperpage setting bug
+- [x] Fixed Logout user button visibility bug 
+- [x] Added info-labels showing video resolution in lists
+- [x] Added counter for Search history in menu
+- [x] Added code enabling Addict stats future feature
+- [x] Reduced using of Kodi notifications
 - [x] Utilized TinyDB for persisting add-on data
 - [x] Refined complete python code
 - [x] Refined language resources
 - [x] Renamed cookies data file to be non-hidden
 
-Features:
-- [x] Reduced using of Kodi notifications
-- [x] Added info-labels showing video resolution in lists
-- [x] Added SEARCH HISTORY counter in main menu
-- [x] Added code enabling ADDICT STATS future feature
+### v1.0.0 (2018-11-12)
+
+Common:
+- [x] EN/CZ language version
+- [x] Manage add-on settings
+- [x] Authorize add-on
+- [x] List menu
+- [x] Logout user
+
+Search history:
+- [x] List search history
+- [x] Delete search
+
+Videos:
+- [x] Search videos
+- [x] Search similar videos
+- [x] List videos
+- [x] List liked videos
+- [x] List album videos
+- [x] List community videos
+- [x] Play video
+- [x] Like video
+- [x] Unlike video
+- [x] Add video to albums
+
+Video albums:
+- [x] List albums
+- [x] Rename album
+- [x] Reorder album up/down
+- [x] Delete album
+- [x] Create new album
+
+Communities:
+- [x] List communities
+- [x] List liked communities
+- [x] Like community
+- [x] Unlike community
+- [x] Unfollow community
 
 ## Screenshots
 
-![Screenshot 1](resources/media/screenshot1.jpg)
+![Screenshot 1: Add-on info](resources/media/screenshot1.jpg)
 
-![Screenshot 2](resources/media/screenshot2.jpg)
+![Screenshot 2: Add-on settings](resources/media/screenshot2.jpg)
 
-![Screenshot 3](resources/media/screenshot3.jpg)
+![Screenshot 3: Add-on menu](resources/media/screenshot3.jpg)
 
-![Screenshot 4](resources/media/screenshot4.jpg)
+![Screenshot 4: Add-on content](resources/media/screenshot4.jpg)

@@ -101,22 +101,22 @@ msgid "VK API error!"
 msgstr "Chyba VK API!"
 
 msgctxt "#30022"
-msgid "Addon routing error!"
+msgid "Routing error!"
 msgstr "Chyba routingu!"
 
 msgctxt "#30023"
-msgid "Addon data file error!"
-msgstr "Chyba datového souboru!"
+msgid "Data file error!"
+msgstr "Chyba dat. souboru!"
 
 msgctxt "#30024"
 msgid "Video resolving error!"
-msgstr "Chyba video resolveru!"
+msgstr "Chyba video resolvingu!"
 
 # Common
 
 msgctxt "#30030"
-msgid "VK account email"
-msgstr "Email VK účtu"
+msgid "VK account email/phone"
+msgstr "Email/Tel VK účtu"
 
 msgctxt "#30031"
 msgid "VK account password"
@@ -129,8 +129,8 @@ msgstr "Uživatel odhlášen."
 # Main menu
 
 msgctxt "#30040"
-msgid "SEARCH"
-msgstr "HLEDAT"
+msgid "SEARCH VIDEOS"
+msgstr "HLEDAT VIDEA"
 
 msgctxt "#30041"
 msgid "SEARCH HISTORY"
@@ -155,6 +155,10 @@ msgstr "MOJE KOMUNITY"
 msgctxt "#30046"
 msgid "MY LIKED COMMUNITIES"
 msgstr "MOJE OBLÍBENÉ KOMUNITY"
+
+msgctxt "#30047"
+msgid "PLAYED VIDEOS HISTORY"
+msgstr "HISTORIE PŘEHRANÝCH VIDEÍ"
 
 # Videos
 
