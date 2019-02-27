@@ -5,8 +5,8 @@
       <sourceFolder url="file://$MODULE_DIR$/resources/lib" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/resources/lib/tinydb" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/resources/lib/vk" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/resources/lib/tests" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/_Archiv_" />
-      <excludeFolder url="file://$MODULE_DIR$/resources/lib/tests" />
     </content>
     <content url="file://$MODULE_DIR$/../../userdata/addon_data/plugin.video.vk" />
     <orderEntry type="inheritedJdk" />
