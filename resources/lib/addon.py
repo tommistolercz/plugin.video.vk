@@ -339,12 +339,12 @@ def listsearchhistory():  # type: () -> None
                 # search videos
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, _addon.getLocalizedString(30051)),
-                    'Container.Update({0})'.format(buildurl('/searchvideos'))  # cont.upd. required!
+                    'Container.Update({0})'.format(buildurl('/searchvideos'))  # upd.required!
                 ),
                 # search similar
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, _addon.getLocalizedString(30080)),
-                    'Container.Update({0})'.format(buildurl('/searchvideos', {'similarq': search['q']}))  # cont.upd. required!
+                    'Container.Update({0})'.format(buildurl('/searchvideos', {'similarq': search['q']}))  # upd.required!
                 ),
             ]
         )
@@ -388,6 +388,7 @@ def searchvideos(q='', similarq='', offset=0):  # type: (str, str, int) -> None
     Search videos.
     """
     offset = int(offset)
+    itemsperpage = int(_addon.getSetting('itemsperpage'))
     # if q not passed, ask user for entering a new query / editing similar one
     if not q:
         q = xbmcgui.Dialog().input(_addon.getLocalizedString(30051), defaultt=similarq)
@@ -402,7 +403,7 @@ def searchvideos(q='', similarq='', offset=0):  # type: (str, str, int) -> None
         'sort': int(_addon.getSetting('searchsort')),
         'q': q,
         'offset': offset,
-        'count': int(_addon.getSetting('itemsperpage')),
+        'count': itemsperpage,
     }
     if _addon.getSetting('searchduration') == '1':
         kwargs['longer'] = int(_addon.getSetting('searchdurationmins')) * 60
@@ -412,6 +413,11 @@ def searchvideos(q='', similarq='', offset=0):  # type: (str, str, int) -> None
         searchedvideos = _vkapi.video.search(**kwargs)
     except vk.VkAPIError:
         raise AddonError(ERR_VK_API)
+    # pagination data
+    if int(searchedvideos['count']) > offset + itemsperpage:
+        searchedvideos['next'] = {
+            'url': buildurl('/searchvideos', {'q': q, 'similarq': similarq, 'offset': offset + itemsperpage}),
+        }
     xbmc.log('{0}: Searched videos: {1}'.format(_addon.getAddonInfo('id'), searchedvideos))
     # only once
     if offset == 0:
@@ -450,15 +456,21 @@ def listvideos(offset=0):  # type: (int) -> None
     List videos.
     """
     offset = int(offset)
+    itemsperpage = int(_addon.getSetting('itemsperpage'))
     # request vk api
     try:
         videos = _vkapi.video.get(
             extended=1,
             offset=offset,
-            count=int(_addon.getSetting('itemsperpage'))
+            count=itemsperpage,
         )
     except vk.VkAPIError:
         raise AddonError(ERR_VK_API)
+    # pagination data
+    if int(videos['count']) > offset + itemsperpage:
+        videos['next'] = {
+            'url': buildurl('/videos', {'offset': offset + itemsperpage}),
+        }
     xbmc.log('{0}: Videos: {1}'.format(_addon.getAddonInfo('id'), videos))
     # build list
     buildvideolist(videos)
@@ -470,15 +482,21 @@ def listlikedvideos(offset=0):  # type: (int) -> None
     List liked videos.
     """
     offset = int(offset)
+    itemsperpage = int(_addon.getSetting('itemsperpage'))
     # request vk api
     try:
         likedvideos = _vkapi.fave.getVideos(
             extended=1,
             offset=offset,
-            count=int(_addon.getSetting('itemsperpage')),
+            count=itemsperpage,
         )
     except vk.VkAPIError:
         raise AddonError(ERR_VK_API)
+    # pagination data
+    if int(likedvideos['count']) > offset + itemsperpage:
+        likedvideos['next'] = {
+            'url': buildurl('/likedvideos', {'offset': offset + itemsperpage}),
+        }
     xbmc.log('{0}: Liked videos: {1}'.format(_addon.getAddonInfo('id'), likedvideos))
     # build list
     buildvideolist(likedvideos)
@@ -491,16 +509,22 @@ def listalbumvideos(albumid, offset=0):  # type: (int, int) -> None
     """
     albumid = int(albumid)
     offset = int(offset)
+    itemsperpage = int(_addon.getSetting('itemsperpage'))
     # request vk api
     try:
         albumvideos = _vkapi.video.get(
             extended=1,
             album_id=albumid,
             offset=offset,
-            count=int(_addon.getSetting('itemsperpage')),
+            count=itemsperpage,
         )
     except vk.VkAPIError:
         raise AddonError(ERR_VK_API)
+    # pagination data
+    if int(albumvideos['count']) > offset + itemsperpage:
+        albumvideos['next'] = {
+            'url': buildurl('/albumvideos', {'albumid': albumid, 'offset': offset + itemsperpage}),
+        }
     xbmc.log('{0}: Album videos: {1}'.format(_addon.getAddonInfo('id'), albumvideos))
     # build list
     buildvideolist(albumvideos)
@@ -513,16 +537,22 @@ def listcommunityvideos(communityid, offset=0):  # type: (int, int) -> None
     """
     communityid = int(communityid)
     offset = int(offset)
+    itemsperpage = int(_addon.getSetting('itemsperpage'))
     # request vk api
     try:
         communityvideos = _vkapi.video.get(
             extended=1,
             owner_id=(-1 * communityid),  # neg.id required!
             offset=offset,
-            count=int(_addon.getSetting('itemsperpage')),
+            count=itemsperpage,
         )
     except vk.VkAPIError:
         raise AddonError(ERR_VK_API)
+    # pagination data
+    if int(communityvideos['count']) > offset + itemsperpage:
+        communityvideos['next'] = {
+            'url': buildurl('/communityvideos', {'communityid': communityid, 'offset': offset + itemsperpage}),
+        }
     xbmc.log('{0}: Community videos: {1}'.format(_addon.getAddonInfo('id'), communityvideos))
     # build list
     buildvideolist(communityvideos)
@@ -604,14 +634,14 @@ def buildvideolist(listdata):  # type: (dict) -> None
         cmi.append(
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, _addon.getLocalizedString(30051)),
-                'Container.Update({0})'.format(buildurl('/searchvideos'))  # cont.upd. required!
+                'Container.Update({0})'.format(buildurl('/searchvideos'))  # upd.required!
             )
         )
         # search similar
         cmi.append(
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, _addon.getLocalizedString(30080)),
-                'Container.Update({0})'.format(buildurl('/searchvideos', {'similarq': video['title']}))  # cont.upd. required!
+                'Container.Update({0})'.format(buildurl('/searchvideos', {'similarq': video['title']}))  # upd.required!
             )
         )
         li.addContextMenuItems(cmi)
@@ -624,11 +654,10 @@ def buildvideolist(listdata):  # type: (dict) -> None
             )
         )
     # paginator item
-    offset = int(_urlargs.get('offset', 0))
-    if offset + int(_addon.getSetting('itemsperpage')) < listdata['count']:
+    if 'next' in listdata:
         listitems.append(
             (
-                buildurl(_urlpath, _urlargs.update({'offset': offset + int(_addon.getSetting('itemsperpage'))})),
+                listdata['next']['url'],
                 xbmcgui.ListItem('[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, _addon.getLocalizedString(30050))),
                 FOLDER
             )
@@ -856,7 +885,7 @@ def listalbums(offset=0):  # type: (int) -> None
                 # search videos
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, _addon.getLocalizedString(30051)),
-                    'Container.Update({0})'.format(buildurl('/searchvideos'))  # cont.upd. required!
+                    'Container.Update({0})'.format(buildurl('/searchvideos'))  # upd.required!
                 ),
             ]
         )
@@ -988,18 +1017,24 @@ def listcommunities(offset=0):  # type: (int) -> None
     List communities.
     """
     offset = int(offset)
+    itemsperpage = int(_addon.getSetting('itemsperpage'))
     # request vk api
     try:
         communities = _vkapi.groups.get(
             extended=1,
             offset=offset,
-            count=int(_addon.getSetting('itemsperpage')),
+            count=itemsperpage,
         )
     except vk.VkAPIError:
         raise AddonError(ERR_VK_API)
+    # pagination data
+    if int(communities['count']) > offset + itemsperpage:
+        communities['next'] = {
+            'url': buildurl('/communities', {'offset': offset + itemsperpage}),
+        }
     xbmc.log('{0}: Communities: {1}'.format(_addon.getAddonInfo('id'), communities))
     # build list
-    buildcommunitylist(communities)
+    buildcommunitylist('/communities', communities)
 
 
 @route('/likedcommunities')
@@ -1008,20 +1043,26 @@ def listlikedcommunities(offset=0):  # type: (int) -> None
     List liked communities.
     """
     offset = int(offset)
+    itemsperpage = int(_addon.getSetting('itemsperpage'))
     # request vk api
     try:
         likedcommunities = _vkapi.fave.getLinks(
             offset=offset,
-            count=int(_addon.getSetting('itemsperpage')),
+            count=itemsperpage,
         )
     except vk.VkAPIError:
         raise AddonError(ERR_VK_API)
+    # pagination data
+    if int(likedcommunities['count']) > offset + itemsperpage:
+        likedcommunities['next'] = {
+            'url': buildurl('/likedcommunities', {'offset': offset + itemsperpage}),
+        }
     xbmc.log('{0}: Liked communities: {1}'.format(_addon.getAddonInfo('id'), likedcommunities))
     # build list
-    buildcommunitylist(likedcommunities)
+    buildcommunitylist('/likedcommunities', likedcommunities)
 
 
-def buildcommunitylist(listdata):  # type: (dict) -> None
+def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
     """
     Build list of communities:
 
@@ -1030,9 +1071,9 @@ def buildcommunitylist(listdata):  # type: (dict) -> None
     """
     # create list
     listitems = []
-    namekey = 'title' if _urlpath == '/likedcommunities' else 'name'
+    namekey = 'title' if listtype == '/likedcommunities' else 'name'
     for community in listdata['items']:
-        if _urlpath == '/likedcommunities':
+        if listtype == '/likedcommunities':
             community['id'] = community['id'].split('_')[2]
         # create community item
         li = xbmcgui.ListItem(community[namekey])
@@ -1041,7 +1082,7 @@ def buildcommunitylist(listdata):  # type: (dict) -> None
         # create context menu
         cmi = []
         # unlike/like community
-        if _urlpath == '/likedcommunities':
+        if listtype == '/likedcommunities':
             cmi.append(
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, _addon.getLocalizedString(30071)),
@@ -1066,7 +1107,7 @@ def buildcommunitylist(listdata):  # type: (dict) -> None
         cmi.append(
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, _addon.getLocalizedString(30051)),
-                'Container.Update({0})'.format(buildurl('/searchvideos'))  # cont.upd. required!
+                'Container.Update({0})'.format(buildurl('/searchvideos'))  # upd.required!
             )
         )
         li.addContextMenuItems(cmi)
@@ -1079,11 +1120,10 @@ def buildcommunitylist(listdata):  # type: (dict) -> None
             )
         )
     # paginator item
-    offset = int(_urlargs.get('offset', 0))
-    if offset + int(_addon.getSetting('itemsperpage')) < listdata['count']:
+    if 'next' in listdata:
         listitems.append(
             (
-                buildurl(_urlpath, _urlargs.update({'offset': offset + int(_addon.getSetting('itemsperpage'))})),
+                listdata['next']['url'],
                 xbmcgui.ListItem('[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, _addon.getLocalizedString(30050))),
                 FOLDER
             )
@@ -1163,4 +1203,6 @@ if __name__ == '__main__':
         dispatch()
     except AddonError as e:
         xbmc.log('{0}: {1}'.format(_addon.getAddonInfo('id'), _addon.getLocalizedString(e.errid)), level=xbmc.LOGERROR)
-        xbmcgui.Dialog().notification(_addon.getAddonInfo('id'), _addon.getLocalizedString(e.errid), icon=xbmcgui.NOTIFICATION_ERROR)
+        xbmcgui.Dialog().notification(
+            _addon.getAddonInfo('id'), _addon.getLocalizedString(e.errid), icon=xbmcgui.NOTIFICATION_ERROR
+        )

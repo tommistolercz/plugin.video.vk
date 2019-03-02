@@ -50,7 +50,6 @@ Kodi add-on for watching videos from VK.com social network.
 - [x] Added /playedvideos list
 - [x] Added /searchvideos context action into all lists types
 - [x] Refactored add-on file structure and python code
-    - [ ] Refactor pagination in buildvideolist(), buildcommunitylist()
 
 ### v1.1.0 (2019-02-01)
 
