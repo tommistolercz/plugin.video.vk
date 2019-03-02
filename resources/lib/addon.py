@@ -3,9 +3,6 @@
 __all__ = []
 
 
-# IMPORTS ----------
-
-
 # builtins
 import datetime
 import os
@@ -26,13 +23,14 @@ import tinydb
 import vk
 
 
-# CONSTS ----------
+# addon data files
+ADDON_DATA_DB_FILE = 'db.json'
+ADDON_DATA_COOKIES_FILE = 'cookies.txt'
 
-
-# db table names
-TBL_ADDON_REQUESTS = 'addonRequests'
-TBL_SEARCH_HISTORY = 'searchHistory'
-TBL_PLAYED_VIDEOS = 'playedVideos'
+# addon db tables
+ADDON_REQUESTS_TBL = 'addonRequests'
+SEARCH_HISTORY_TBL = 'searchHistory'
+PLAYED_VIDEOS_TBL = 'playedVideos'
 
 # vk api setup
 VK_API_APP_ID = '6432748'
@@ -53,13 +51,13 @@ ERR_DATA_FILE = 30023
 ERR_RESOLVING = 30024
 
 
-# GLOBAL VARS ----------
-
-
+# global vars
+_sysargv = {}
 _routing = {}
-
-
-# CLASSES ----------
+_addon = None
+_db = None
+_vksession = None
+_vkapi = None
 
 
 class AddonError(Exception):
@@ -70,15 +68,13 @@ class AddonError(Exception):
         self.errid = errid
 
 
-# FUNCS ----------
-
-
 def inittinydb():  # type: () -> tinydb.TinyDB
     """
     Initialize TinyDB (create a new data file if doesn't exist).
     """
-    db = tinydb.TinyDB(_addondata['db'], indent=4, sort_keys=False)
-    xbmc.log('{0}: TinyDB initialized: {1}'.format(_addon.getAddonInfo('id'), _addondata['db']))
+    fp = str(os.path.join(xbmc.translatePath(_addon.getAddonInfo('profile')), ADDON_DATA_DB_FILE))
+    db = tinydb.TinyDB(fp, indent=4, sort_keys=False)
+    xbmc.log('{0}: TinyDB initialized: {1}'.format(_addon.getAddonInfo('id'), fp))
     return db
 
 
@@ -117,25 +113,39 @@ def savecookies(cookiejar):  # type: (object) -> None
     """
     Save cookiejar object to addon data file (truncate if exists).
     """
+    fp = str(os.path.join(xbmc.translatePath(_addon.getAddonInfo('profile')), ADDON_DATA_COOKIES_FILE))
     try:
-        with open(_addondata['cookies'], 'wb') as f:
+        with open(fp, 'wb') as f:
             pickle.dump(cookiejar, f)
     except OSError:
         raise AddonError(ERR_DATA_FILE)
-    xbmc.log('{0}: Cookies saved: {1}'.format(_addon.getAddonInfo('id'), _addondata['cookies']))
+    xbmc.log('{0}: Cookies saved: {1}'.format(_addon.getAddonInfo('id'), fp))
 
 
 def loadcookies():  # type: () -> object
     """
     Load cookiejar object from addon data file (must exist since auth).
     """
+    fp = str(os.path.join(xbmc.translatePath(_addon.getAddonInfo('profile')), ADDON_DATA_COOKIES_FILE))
     try:
-        with open(_addondata['cookies'], 'rb') as f:
+        with open(fp, 'rb') as f:
             cookiejar = pickle.load(f)
     except OSError:
         raise AddonError(ERR_DATA_FILE)
-    xbmc.log('{0}: Cookies loaded: {1}'.format(_addon.getAddonInfo('id'), _addondata['cookies']))
+    xbmc.log('{0}: Cookies loaded: {1}'.format(_addon.getAddonInfo('id'), fp))
     return cookiejar
+
+
+def deletecookies():  # type: () -> None
+    """
+    Delete cookies addon data file.
+    """
+    fp = str(os.path.join(xbmc.translatePath(_addon.getAddonInfo('profile')), ADDON_DATA_COOKIES_FILE))
+    try:
+        os.remove(fp)
+    except os.error:
+        raise AddonError(ERR_DATA_FILE)
+    xbmc.log('{0}: Cookies deleted: {1}'.format(_addon.getAddonInfo('id'), fp))
 
 
 def initvkapi():  # type: () -> vk.API
@@ -192,21 +202,23 @@ def dispatch():  # type: () -> None
     """
     Dispatch routing.
     """
-    # remember last request + update addon requests db
-    _lastrequest = {
+    # parse addon url
+    urlpath, urlargs = parseurl()
+    # update addon requests db with the last request
+    lastrequest = {
         'dt': datetime.datetime.now().isoformat(),
-        'urlpath': _urlpath,
-        'urlargs': _urlargs,
+        'urlpath': urlpath,
+        'urlargs': urlargs,
     }
-    _ = _db.table(TBL_ADDON_REQUESTS).insert(_lastrequest)
-    xbmc.log('{0}: Addon requests db updated: {1}'.format(_addon.getAddonInfo('id'), _lastrequest))
+    _ = _db.table(ADDON_REQUESTS_TBL).insert(lastrequest)
+    xbmc.log('{0}: Addon requests db updated: {1}'.format(_addon.getAddonInfo('id'), lastrequest))
     # call handler
     try:
-        handler = _routing[_urlpath]
+        handler = _routing[urlpath]
     except KeyError:
         raise AddonError(ERR_ROUTING)
     xbmc.log('{0}: Routing dispatched: {1}'.format(_addon.getAddonInfo('id'), handler.__name__))
-    handler(**_urlargs)
+    handler(**urlargs)
 
 
 # common
@@ -221,8 +233,8 @@ def listmenu():  # type: () -> None
     try:
         counters = dict(
             _vkapi.execute.getMenuCounters(),
-            searchhistory=len(_db.table(TBL_SEARCH_HISTORY)),
-            playedvideos=len(_db.table(TBL_PLAYED_VIDEOS)),
+            searchhistory=len(_db.table(SEARCH_HISTORY_TBL)),
+            playedvideos=len(_db.table(PLAYED_VIDEOS_TBL)),
         )
     except vk.VkAPIError:
         raise AddonError(ERR_VK_API)
@@ -291,10 +303,7 @@ def logout():  # type: () -> None
     Logout user.
     """
     # delete cookies + reset user access token
-    try:
-        os.remove(_addondata['cookies'])
-    except os.error:
-        raise AddonError(ERR_DATA_FILE)
+    deletecookies()
     _addon.setSetting('vkuseraccesstoken', '')
     xbmc.log('{0}: User logged out.'.format(_addon.getAddonInfo('id')))
     xbmcgui.Dialog().notification(_addon.getAddonInfo('id'), _addon.getLocalizedString(30032))
@@ -310,8 +319,8 @@ def listsearchhistory():  # type: () -> None
     """
     # query db for search history list, empty if no data
     searchhistory = {
-        'count': len(_db.table(TBL_SEARCH_HISTORY)),
-        'items': _db.table(TBL_SEARCH_HISTORY).all(),
+        'count': len(_db.table(SEARCH_HISTORY_TBL)),
+        'items': _db.table(SEARCH_HISTORY_TBL).all(),
     }
     xbmc.log('{0}: Search history: {1}'.format(_addon.getAddonInfo('id'), searchhistory))
     # create list, sort by lastUsed reversed
@@ -364,7 +373,7 @@ def deletesearch(searchid):  # type: (int) -> None
     if not xbmcgui.Dialog().yesno(_addon.getLocalizedString(30081), _addon.getLocalizedString(30082)):
         return
     # query db for deleting
-    _ = _db.table(TBL_SEARCH_HISTORY).remove(doc_ids=[searchid])
+    _ = _db.table(SEARCH_HISTORY_TBL).remove(doc_ids=[searchid])
     xbmc.log('{0}: Search deleted: {1}'.format(_addon.getAddonInfo('id'), searchid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh')
@@ -412,7 +421,7 @@ def searchvideos(q='', similarq='', offset=0):  # type: (str, str, int) -> None
             'resultsCount': int(searchedvideos['count']),
             'lastUsed': datetime.datetime.now().isoformat()
         }
-        _ = _db.table(TBL_SEARCH_HISTORY).upsert(lastsearch, tinydb.where('q') == lastsearch['q'])
+        _ = _db.table(SEARCH_HISTORY_TBL).upsert(lastsearch, tinydb.where('q') == lastsearch['q'])
         xbmc.log('{0}: Search history db updated: {1}'.format(_addon.getAddonInfo('id'), lastsearch))
         # notify search results count
         xbmcgui.Dialog().notification(_addon.getAddonInfo('id'), _addon.getLocalizedString(30052).format(searchedvideos['count']))
@@ -427,8 +436,8 @@ def listplayedvideos():  # type: () -> None
     """
     # query db for played videos list, empty if no data
     playedvideos = {
-        'count': len(_db.table(TBL_PLAYED_VIDEOS)),
-        'items': _db.table(TBL_PLAYED_VIDEOS).all(),
+        'count': len(_db.table(PLAYED_VIDEOS_TBL)),
+        'items': _db.table(PLAYED_VIDEOS_TBL).all(),
     }
     xbmc.log('{0}: Played videos: {1}'.format(_addon.getAddonInfo('id'), playedvideos))
     # build list
@@ -619,7 +628,7 @@ def buildvideolist(listdata):  # type: (dict) -> None
     if offset + int(_addon.getSetting('itemsperpage')) < listdata['count']:
         listitems.append(
             (
-                buildurl(_urlpath, _urlargs.update(offset=offset + int(_addon.getSetting('itemsperpage')))),
+                buildurl(_urlpath, _urlargs.update({'offset': offset + int(_addon.getSetting('itemsperpage'))})),
                 xbmcgui.ListItem('[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, _addon.getLocalizedString(30050))),
                 FOLDER
             )
@@ -671,7 +680,7 @@ def playvideo(ownerid, videoid):  # type: (int, int) -> None
             'lastPlayed': datetime.datetime.now().isoformat(),
         }
     )
-    _db.table(TBL_PLAYED_VIDEOS).upsert(video, tinydb.where('oidid') == oidid)
+    _db.table(PLAYED_VIDEOS_TBL).upsert(video, tinydb.where('oidid') == oidid)
     xbmc.log('{0}: Played videos db updated: {1}'.format(_addon.getAddonInfo('id'), video))
     # create playable item for kodi player
     li = xbmcgui.ListItem(path=playables[maxqual])
@@ -1021,12 +1030,12 @@ def buildcommunitylist(listdata):  # type: (dict) -> None
     """
     # create list
     listitems = []
-    _namekey = 'title' if _urlpath == '/likedcommunities' else 'name'
+    namekey = 'title' if _urlpath == '/likedcommunities' else 'name'
     for community in listdata['items']:
         if _urlpath == '/likedcommunities':
             community['id'] = community['id'].split('_')[2]
         # create community item
-        li = xbmcgui.ListItem(community[_namekey])
+        li = xbmcgui.ListItem(community[namekey])
         # set art
         li.setArt({'thumb': community['photo_200']})
         # create context menu
@@ -1074,7 +1083,7 @@ def buildcommunitylist(listdata):  # type: (dict) -> None
     if offset + int(_addon.getSetting('itemsperpage')) < listdata['count']:
         listitems.append(
             (
-                buildurl(_urlpath, _urlargs.update(offset=offset + int(_addon.getSetting('itemsperpage')))),
+                buildurl(_urlpath, _urlargs.update({'offset': offset + int(_addon.getSetting('itemsperpage'))})),
                 xbmcgui.ListItem('[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, _addon.getLocalizedString(30050))),
                 FOLDER
             )
@@ -1140,25 +1149,17 @@ def unfollowcommunity(communityid):  # type: (int) -> None
     xbmc.executebuiltin('Container.Refresh')
 
 
-# RUN ----------
-
-
 if __name__ == '__main__':
     _sysargv = {
         'path': str(sys.argv[0]),
         'handle': int(sys.argv[1]),
         'qs': str(sys.argv[2]),
     }
-    _addon = xbmcaddon.Addon()
-    _addondata = {
-        'db': str(os.path.join(xbmc.translatePath(_addon.getAddonInfo('profile')), 'db.json')),
-        'cookies': str(os.path.join(xbmc.translatePath(_addon.getAddonInfo('profile')), 'cookiejar.txt')),
-    }
     try:
+        _addon = xbmcaddon.Addon()
         _db = inittinydb()
         _vksession = initvksession()
         _vkapi = initvkapi()
-        _urlpath, _urlargs = parseurl()
         dispatch()
     except AddonError as e:
         xbmc.log('{0}: {1}'.format(_addon.getAddonInfo('id'), _addon.getLocalizedString(e.errid)), level=xbmc.LOGERROR)

@@ -49,10 +49,8 @@ Kodi add-on for watching videos from VK.com social network.
 - [ ] Fix /playedvideos sorting (by lastPlayed)
 - [x] Added /playedvideos list
 - [x] Added /searchvideos context action into all lists types
-- [ ] Refactor add-on file structure and python code:
-    - [x] Refactored /deletesearch urlargs (q -> id)
-    - [ ] Test initvksession() after refactor (new auth)
-    - [ ] Define globals for urlpaths (URLPATH_FOO = '/foo')    
+- [x] Refactored add-on file structure and python code
+    - [ ] Refactor pagination in buildvideolist(), buildcommunitylist()
 
 ### v1.1.0 (2019-02-01)
 
