@@ -32,7 +32,7 @@ ERR_RESOLVING = 30024
 
 # addon data filenames
 FILENAME_DB = 'db.json'
-FILENAME_COOKIES = 'cookies.txt'
+FILENAME_COOKIES = 'cookiejar.txt'
 
 # addon db tables
 TBL_ADDON_REQUESTS = 'addonRequests'
@@ -83,14 +83,16 @@ def initvksession():  # type: () -> vk.AuthSession
     """
     if ADDON.getSetting('vkuseraccesstoken') == '':
         # ask user for entering vk credentials for authorizing addon
-        login = xbmcgui.Dialog().input(ADDON.getLocalizedString(30030))
-        pswd = xbmcgui.Dialog().input(ADDON.getLocalizedString(30031), option=xbmcgui.ALPHANUM_HIDE_INPUT)
+        login = xbmcgui.Dialog().input(ADDON.getLocalizedString(30030).encode('utf-8'))
+        pswd = xbmcgui.Dialog().input(ADDON.getLocalizedString(30031).encode('utf-8'), option=xbmcgui.ALPHANUM_HIDE_INPUT)
         if not login or not pswd:
+            xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK authorization error!'), level=xbmc.LOGERROR)
             raise AddonError(ERR_VK_AUTH)
         # create a new vk session
         try:
             vksession = vk.AuthSession(VK_API_APP_ID, login, pswd, VK_API_SCOPE)
         except vk.VkAuthError:
+            xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK authorization error!'), level=xbmc.LOGERROR)
             raise AddonError(ERR_VK_AUTH)
         xbmc.log('{0}: VK session created.'.format(ADDON.getAddonInfo('id')))
         # save obtained token + save cookies
@@ -101,6 +103,7 @@ def initvksession():  # type: () -> vk.AuthSession
         try:
             vksession = vk.Session(ADDON.getSetting('vkuseraccesstoken'))
         except vk.VkAuthError:
+            xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK authorization error!'), level=xbmc.LOGERROR)
             raise AddonError(ERR_VK_AUTH)
         xbmc.log('{0}: VK session restored using token.'.format(ADDON.getAddonInfo('id')))
         # load cookies
@@ -116,7 +119,8 @@ def savecookies(cookiejar):  # type: (object) -> None
     try:
         with open(fp, 'wb') as f:
             pickle.dump(cookiejar, f)
-    except OSError:
+    except IOError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'Data file error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_DATA_FILE)
     xbmc.log('{0}: Cookies saved: {1}'.format(ADDON.getAddonInfo('id'), fp))
 
@@ -129,7 +133,8 @@ def loadcookies():  # type: () -> object
     try:
         with open(fp, 'rb') as f:
             cookiejar = pickle.load(f)
-    except OSError:
+    except IOError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'Data file error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_DATA_FILE)
     xbmc.log('{0}: Cookies loaded: {1}'.format(ADDON.getAddonInfo('id'), fp))
     return cookiejar
@@ -143,6 +148,7 @@ def deletecookies():  # type: () -> None
     try:
         os.remove(fp)
     except os.error:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'Data file error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_DATA_FILE)
     xbmc.log('{0}: Cookies deleted: {1}'.format(ADDON.getAddonInfo('id'), fp))
 
@@ -156,6 +162,7 @@ def initvkapi():  # type: () -> vk.API
         vkapi = vk.API(VKSESSION, v=VK_API_VERSION, lang=VK_API_LANG)
         _ = vkapi.stats.trackVisitor()
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: VK API initialized.'.format(ADDON.getAddonInfo('id')))
     return vkapi
@@ -168,7 +175,6 @@ def buildurl(urlpath, urlargs=None):  # type: (str, dict) -> str
     url = 'plugin://{0}{1}'.format(ADDON.getAddonInfo('id'), urlpath)
     if urlargs:
         url += '?{0}'.format(urllib.urlencode(urlargs))
-    xbmc.log('{0}: Addon url built: {1}'.format(ADDON.getAddonInfo('id'), url))
     return url
 
 
@@ -182,9 +188,7 @@ def parseurl():  # type: () -> tuple
         urlargs = urlparse.parse_qs(SYSARGV['qs'].lstrip('?'))
         for k, v in list(urlargs.items()):
             urlargs[k] = v.pop()
-    parsedurl = (urlpath, urlargs)
-    xbmc.log('{0}: Addon url parsed: {1}'.format(ADDON.getAddonInfo('id'), parsedurl))
-    return parsedurl
+    return urlpath, urlargs
 
 
 def route(urlpath):  # type: (str) -> callable(object)
@@ -215,6 +219,7 @@ def dispatch():  # type: () -> None
     try:
         handler = ROUTING[urlpath]
     except KeyError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'Routing error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_ROUTING)
     xbmc.log('{0}: Routing dispatched: {1}'.format(ADDON.getAddonInfo('id'), handler.__name__))
     handler(**urlargs)
@@ -236,6 +241,7 @@ def listmenu():  # type: () -> None
             playedvideos=len(DB.table(TBL_PLAYED_VIDEOS)),
         )
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Counters: {1}'.format(ADDON.getAddonInfo('id'), counters))
     # create list items
@@ -243,49 +249,49 @@ def listmenu():  # type: () -> None
         # search videos
         (
             buildurl('/searchvideos'),
-            xbmcgui.ListItem('{0}'.format(ADDON.getLocalizedString(30040))),
+            xbmcgui.ListItem('{0}'.format(ADDON.getLocalizedString(30040).encode('utf-8'))),
             ITEM_TYPE_FOLDER
         ),
         # search history
         (
             buildurl('/searchhistory'),
-            xbmcgui.ListItem('{0} [COLOR {1}]({2})[/COLOR]'.format(ADDON.getLocalizedString(30041), ALT_COLOR, counters['searchhistory'])),
+            xbmcgui.ListItem('{0} [COLOR {1}]({2})[/COLOR]'.format(ADDON.getLocalizedString(30041).encode('utf-8'), ALT_COLOR, counters['searchhistory'])),
             ITEM_TYPE_FOLDER
         ),
         # played videos
         (
             buildurl('/playedvideos'),
-            xbmcgui.ListItem('{0} [COLOR {1}]({2})[/COLOR]'.format(ADDON.getLocalizedString(30047), ALT_COLOR, counters['playedvideos'])),
+            xbmcgui.ListItem('{0} [COLOR {1}]({2})[/COLOR]'.format(ADDON.getLocalizedString(30047).encode('utf-8'), ALT_COLOR, counters['playedvideos'])),
             ITEM_TYPE_FOLDER
         ),
         # videos
         (
             buildurl('/videos'),
-            xbmcgui.ListItem('{0} [COLOR {1}]({2})[/COLOR]'.format(ADDON.getLocalizedString(30042), ALT_COLOR, counters['videos'])),
+            xbmcgui.ListItem('{0} [COLOR {1}]({2})[/COLOR]'.format(ADDON.getLocalizedString(30042).encode('utf-8'), ALT_COLOR, counters['videos'])),
             ITEM_TYPE_FOLDER
         ),
         # liked videos
         (
             buildurl('/likedvideos'),
-            xbmcgui.ListItem('{0} [COLOR {1}]({2})[/COLOR]'.format(ADDON.getLocalizedString(30043), ALT_COLOR, counters['likedvideos'])),
+            xbmcgui.ListItem('{0} [COLOR {1}]({2})[/COLOR]'.format(ADDON.getLocalizedString(30043).encode('utf-8'), ALT_COLOR, counters['likedvideos'])),
             ITEM_TYPE_FOLDER
         ),
         # albums
         (
             buildurl('/albums'),
-            xbmcgui.ListItem('{0} [COLOR {1}]({2})[/COLOR]'.format(ADDON.getLocalizedString(30044), ALT_COLOR, counters['albums'])),
+            xbmcgui.ListItem('{0} [COLOR {1}]({2})[/COLOR]'.format(ADDON.getLocalizedString(30044).encode('utf-8'), ALT_COLOR, counters['albums'])),
             ITEM_TYPE_FOLDER
         ),
         # communities
         (
             buildurl('/communities'),
-            xbmcgui.ListItem('{0} [COLOR {1}]({2})[/COLOR]'.format(ADDON.getLocalizedString(30045), ALT_COLOR, counters['communities'])),
+            xbmcgui.ListItem('{0} [COLOR {1}]({2})[/COLOR]'.format(ADDON.getLocalizedString(30045).encode('utf-8'), ALT_COLOR, counters['communities'])),
             ITEM_TYPE_FOLDER
         ),
         # liked communities
         (
             buildurl('/likedcommunities'),
-            xbmcgui.ListItem('{0} [COLOR {1}]({2})[/COLOR]'.format(ADDON.getLocalizedString(30046), ALT_COLOR, counters['likedcommunities'])),
+            xbmcgui.ListItem('{0} [COLOR {1}]({2})[/COLOR]'.format(ADDON.getLocalizedString(30046).encode('utf-8'), ALT_COLOR, counters['likedcommunities'])),
             ITEM_TYPE_FOLDER
         ),
     ]
@@ -305,7 +311,7 @@ def logout():  # type: () -> None
     deletecookies()
     ADDON.setSetting('vkuseraccesstoken', '')
     xbmc.log('{0}: User logged out.'.format(ADDON.getAddonInfo('id')))
-    xbmcgui.Dialog().notification(ADDON.getAddonInfo('id'), ADDON.getLocalizedString(30032))
+    xbmcgui.Dialog().notification(ADDON.getAddonInfo('id'), ADDON.getLocalizedString(30032).encode('utf-8'))
 
 
 # search history
@@ -332,17 +338,17 @@ def listsearchhistory():  # type: () -> None
             [
                 # delete search
                 (
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30081)),
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30081).encode('utf-8')),
                     'RunPlugin({0})'.format(buildurl('/deletesearch', {'searchid': search.doc_id}))
                 ),
                 # search videos
                 (
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30051)),
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30051).encode('utf-8')),
                     'Container.Update({0})'.format(buildurl('/searchvideos'))  # upd.required!
                 ),
                 # search similar
                 (
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30080)),
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30080).encode('utf-8')),
                     'Container.Update({0})'.format(buildurl('/searchvideos', {'similarq': search['q']}))  # upd.required!
                 ),
             ]
@@ -369,7 +375,10 @@ def deletesearch(searchid):  # type: (int) -> None
     """
     searchid = int(searchid)
     # ask user for confirmation
-    if not xbmcgui.Dialog().yesno(ADDON.getLocalizedString(30081), ADDON.getLocalizedString(30082)):
+    if not xbmcgui.Dialog().yesno(
+        ADDON.getLocalizedString(30081).encode('utf-8'),
+        ADDON.getLocalizedString(30082).encode('utf-8')
+    ):
         return
     # query db for deleting
     _ = DB.table(TBL_SEARCH_HISTORY).remove(doc_ids=[searchid])
@@ -390,7 +399,7 @@ def searchvideos(q='', similarq='', offset=0):  # type: (str, str, int) -> None
     itemsperpage = int(ADDON.getSetting('itemsperpage'))
     # if q not passed, ask user for entering a new query / editing similar one
     if not q:
-        q = xbmcgui.Dialog().input(ADDON.getLocalizedString(30051), defaultt=similarq)
+        q = xbmcgui.Dialog().input(ADDON.getLocalizedString(30051).encode('utf-8'), defaultt=similarq)
         if not q:
             return
     # request vk api for searched videos
@@ -411,6 +420,7 @@ def searchvideos(q='', similarq='', offset=0):  # type: (str, str, int) -> None
     try:
         searchedvideos = VKAPI.video.search(**kwargs)
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     # pagination data
     if int(searchedvideos['count']) > offset + itemsperpage:
@@ -429,7 +439,10 @@ def searchvideos(q='', similarq='', offset=0):  # type: (str, str, int) -> None
         _ = DB.table(TBL_SEARCH_HISTORY).upsert(lastsearch, tinydb.where('q') == lastsearch['q'])
         xbmc.log('{0}: Search history db updated: {1}'.format(ADDON.getAddonInfo('id'), lastsearch))
         # notify search results count
-        xbmcgui.Dialog().notification(ADDON.getAddonInfo('id'), ADDON.getLocalizedString(30052).format(searchedvideos['count']))
+        xbmcgui.Dialog().notification(
+            ADDON.getAddonInfo('id'),
+            ADDON.getLocalizedString(30052).encode('utf-8').format(searchedvideos['count'])
+        )
     # build list
     buildvideolist(searchedvideos)
 
@@ -464,6 +477,7 @@ def listvideos(offset=0):  # type: (int) -> None
             count=itemsperpage,
         )
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     # pagination data
     if int(videos['count']) > offset + itemsperpage:
@@ -490,6 +504,7 @@ def listlikedvideos(offset=0):  # type: (int) -> None
             count=itemsperpage,
         )
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     # pagination data
     if int(likedvideos['count']) > offset + itemsperpage:
@@ -518,6 +533,7 @@ def listalbumvideos(albumid, offset=0):  # type: (int, int) -> None
             count=itemsperpage,
         )
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     # pagination data
     if int(albumvideos['count']) > offset + itemsperpage:
@@ -546,6 +562,7 @@ def listcommunityvideos(communityid, offset=0):  # type: (int, int) -> None
             count=itemsperpage,
         )
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     # pagination data
     if int(communityvideos['count']) > offset + itemsperpage:
@@ -607,7 +624,7 @@ def buildvideolist(listdata):  # type: (dict) -> None
             # unlike video
             cmi.append(
                 (
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30054)),
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30054).encode('utf-8')),
                     'RunPlugin({0})'.format(buildurl('/unlikevideo',
                                                      {'ownerid': video['owner_id'], 'videoid': video['id']}))
                 )
@@ -616,7 +633,7 @@ def buildvideolist(listdata):  # type: (dict) -> None
             # like video
             cmi.append(
                 (
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30053)),
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30053).encode('utf-8')),
                     'RunPlugin({0})'.format(buildurl('/likevideo',
                                                      {'ownerid': video['owner_id'], 'videoid': video['id']}))
                 )
@@ -624,7 +641,7 @@ def buildvideolist(listdata):  # type: (dict) -> None
         # add video to albums
         cmi.append(
             (
-                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30055)),
+                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30055).encode('utf-8')),
                 'RunPlugin({0})'.format(buildurl('/addvideotoalbums',
                                                  {'ownerid': video['owner_id'], 'videoid': video['id']}))
             )
@@ -632,14 +649,14 @@ def buildvideolist(listdata):  # type: (dict) -> None
         # search videos
         cmi.append(
             (
-                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30051)),
+                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30051).encode('utf-8')),
                 'Container.Update({0})'.format(buildurl('/searchvideos'))  # upd.required!
             )
         )
         # search similar
         cmi.append(
             (
-                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30080)),
+                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30080).encode('utf-8')),
                 'Container.Update({0})'.format(buildurl('/searchvideos', {'similarq': video['title']}))  # upd.required!
             )
         )
@@ -657,7 +674,7 @@ def buildvideolist(listdata):  # type: (dict) -> None
         listitems.append(
             (
                 listdata['next']['url'],
-                xbmcgui.ListItem('[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30050))),
+                xbmcgui.ListItem('[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30050).encode('utf-8'))),
                 ITEM_TYPE_FOLDER
             )
         )
@@ -683,6 +700,7 @@ def playvideo(ownerid, videoid):  # type: (int, int) -> None
     try:
         video = VKAPI.video.get(extended=1, videos=oidid)['items'].pop()
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     # resolve playable streams via vk videoinfo url
     vi = VKSESSION.requests_session.get(
@@ -700,6 +718,7 @@ def playvideo(ownerid, videoid):  # type: (int, int) -> None
         maxqual = max(playables.keys())
         xbmc.log('{0}: Playable stream resolved: {1}'.format(ADDON.getAddonInfo('id'), playables[maxqual]))
     else:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'Video resolving error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_RESOLVING)
     # update played videos db
     video.update(
@@ -732,6 +751,7 @@ def likevideo(ownerid, videoid):  # type: (int, int) -> None
             item_id=videoid,
         )
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Video liked: {1}'.format(ADDON.getAddonInfo('id'), oidid))
     # refresh content
@@ -754,6 +774,7 @@ def unlikevideo(ownerid, videoid):  # type: (int, int) -> None
             item_id=videoid,
         )
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Video unliked: {1}'.format(ADDON.getAddonInfo('id'), oidid))
     # refresh content
@@ -782,6 +803,7 @@ def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
             video_id=videoid,
         )
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     # create dialog w current sel
     opts = []
@@ -791,7 +813,7 @@ def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
         if album['id'] in albumids:
             sel.append(i)
     # show dialog, get new sel
-    newsel = xbmcgui.Dialog().multiselect(ADDON.getLocalizedString(30055), opts, preselect=sel)
+    newsel = xbmcgui.Dialog().multiselect(ADDON.getLocalizedString(30055).encode('utf-8'), opts, preselect=sel)
     if newsel is None or newsel == sel:
         return
     # sel changed
@@ -815,6 +837,7 @@ def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
                 album_ids=newalbumids
             )
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Video added to albums: {1}'.format(ADDON.getAddonInfo('id'), oidid))
     # refresh content
@@ -840,6 +863,7 @@ def listalbums(offset=0):  # type: (int) -> None
             count=albumsperpage,
         )
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Albums: {1}'.format(ADDON.getAddonInfo('id'), albums))
     # create list
@@ -858,32 +882,32 @@ def listalbums(offset=0):  # type: (int) -> None
             [
                 # reorder album up
                 (
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30061)),
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30061).encode('utf-8')),
                     'RunPlugin({0})'.format(buildurl('/reorderalbum', {'albumid': album['id'], 'beforeid': beforeid}))
                 ),
                 # reorder album down
                 (
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30062)),
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30062).encode('utf-8')),
                     'RunPlugin({0})'.format(buildurl('/reorderalbum', {'albumid': album['id'], 'afterid': afterid}))
                 ),
                 # rename album
                 (
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30060)),
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30060).encode('utf-8')),
                     'RunPlugin({0})'.format(buildurl('/renamealbum', {'albumid': album['id']}))
                 ),
                 # delete album
                 (
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30063)),
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30063).encode('utf-8')),
                     'RunPlugin({0})'.format(buildurl('/deletealbum', {'albumid': album['id']}))
                 ),
                 # create new album
                 (
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30065)),
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30065).encode('utf-8')),
                     'RunPlugin({0})'.format(buildurl('/createalbum'))
                 ),
                 # search videos
                 (
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30051)),
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30051).encode('utf-8')),
                     'Container.Update({0})'.format(buildurl('/searchvideos'))  # upd.required!
                 ),
             ]
@@ -900,7 +924,7 @@ def listalbums(offset=0):  # type: (int) -> None
         listitems.append(
             (
                 buildurl('/albums', {'offset': offset + albumsperpage}),
-                xbmcgui.ListItem('[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30050))),
+                xbmcgui.ListItem('[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30050).encode('utf-8'))),
                 ITEM_TYPE_FOLDER
             )
         )
@@ -929,6 +953,7 @@ def reorderalbum(albumid, beforeid=None, afterid=None):  # type: (int, int, int)
             **reorder
         )
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Album reordered: {1}'.format(ADDON.getAddonInfo('id'), albumid))
     # refresh content
@@ -947,9 +972,10 @@ def renamealbum(albumid):  # type: (int) -> None
             album_id=albumid
         )
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     # ask user for editing current album title
-    newtitle = xbmcgui.Dialog().input(ADDON.getLocalizedString(30060), defaultt=album['title'])
+    newtitle = xbmcgui.Dialog().input(ADDON.getLocalizedString(30060).encode('utf-8'), defaultt=album['title'])
     if not newtitle or newtitle == album['title']:
         return
     # request vk api for renaming album
@@ -960,6 +986,7 @@ def renamealbum(albumid):  # type: (int) -> None
             privacy=3  # 3=onlyme
         )
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Album renamed: {1}'.format(ADDON.getAddonInfo('id'), albumid))
     # refresh content
@@ -973,12 +1000,16 @@ def deletealbum(albumid):  # type: (int) -> None
     """
     albumid = int(albumid)
     # ask user for confirmation
-    if not xbmcgui.Dialog().yesno(ADDON.getLocalizedString(30063), ADDON.getLocalizedString(30064)):
+    if not xbmcgui.Dialog().yesno(
+        ADDON.getLocalizedString(30063).encode('utf-8'),
+        ADDON.getLocalizedString(30064).encode('utf-8')
+    ):
         return
     # request vk api
     try:
         _ = VKAPI.video.deletealbum()
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Album deleted: {1}'.format(ADDON.getAddonInfo('id'), albumid))
     # refresh content
@@ -991,7 +1022,7 @@ def createalbum():  # type: () -> None
     Create album.
     """
     # ask user for entering new album title
-    albumtitle = xbmcgui.Dialog().input(ADDON.getLocalizedString(30065))
+    albumtitle = xbmcgui.Dialog().input(ADDON.getLocalizedString(30065).encode('utf-8'))
     if not albumtitle:
         return
     # request vk api
@@ -1001,6 +1032,7 @@ def createalbum():  # type: () -> None
             privacy=3,  # 3=onlyme
         )
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Album created: {1}'.format(ADDON.getAddonInfo('id'), album['album_id']))
     # refresh content
@@ -1025,6 +1057,7 @@ def listcommunities(offset=0):  # type: (int) -> None
             count=itemsperpage,
         )
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     # pagination data
     if int(communities['count']) > offset + itemsperpage:
@@ -1050,6 +1083,7 @@ def listlikedcommunities(offset=0):  # type: (int) -> None
             count=itemsperpage,
         )
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     # pagination data
     if int(likedcommunities['count']) > offset + itemsperpage:
@@ -1084,28 +1118,28 @@ def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
         if listtype == '/likedcommunities':
             cmi.append(
                 (
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30071)),
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30071).encode('utf-8')),
                     'RunPlugin({0})'.format(buildurl('/unlikecommunity', {'communityid': community['id']}))
                 )
             )
         else:
             cmi.append(
                 (
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30070)),
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30070).encode('utf-8')),
                     'RunPlugin({0})'.format(buildurl('/likecommunity', {'communityid': community['id']}))
                 )
             )
         # unfollow community
         cmi.append(
             (
-                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30072)),
+                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30072).encode('utf-8')),
                 'RunPlugin({0})'.format(buildurl('/unfollowcommunity', {'communityid': community['id']}))
             )
         )
         # search videos
         cmi.append(
             (
-                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30051)),
+                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30051).encode('utf-8')),
                 'Container.Update({0})'.format(buildurl('/searchvideos'))  # upd.required!
             )
         )
@@ -1123,7 +1157,7 @@ def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
         listitems.append(
             (
                 listdata['next']['url'],
-                xbmcgui.ListItem('[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30050))),
+                xbmcgui.ListItem('[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30050).encode('utf-8'))),
                 ITEM_TYPE_FOLDER
             )
         )
@@ -1146,6 +1180,7 @@ def likecommunity(communityid):  # type: (int) -> None
             group_id=communityid
         )
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Community liked: {1}'.format(ADDON.getAddonInfo('id'), communityid))
     # refresh content
@@ -1164,6 +1199,7 @@ def unlikecommunity(communityid):  # type: (int) -> None
             group_id=communityid
         )
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Community unliked: {1}'.format(ADDON.getAddonInfo('id'), communityid))
     # refresh content
@@ -1182,6 +1218,7 @@ def unfollowcommunity(communityid):  # type: (int) -> None
             group_id=communityid
         )
     except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Community unfollowed: {1}'.format(ADDON.getAddonInfo('id'), communityid))
     # refresh content
@@ -1201,7 +1238,7 @@ if __name__ == '__main__':
         VKAPI = initvkapi()
         dispatch()
     except AddonError as e:
-        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), ADDON.getLocalizedString(e.errid)), level=xbmc.LOGERROR)
         xbmcgui.Dialog().notification(
-            ADDON.getAddonInfo('id'), ADDON.getLocalizedString(e.errid), icon=xbmcgui.NOTIFICATION_ERROR
+            ADDON.getAddonInfo('id'), ADDON.getLocalizedString(e.errid).encode('utf-8'),
+            icon=xbmcgui.NOTIFICATION_ERROR
         )

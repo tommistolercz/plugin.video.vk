@@ -37,8 +37,8 @@ Kodi add-on for watching videos from VK.com social network.
 
 - [ ] Fix unicode issues:
     - [x] Added type hints for all methods
-    - [ ] Fix weak encoding error in menu (search history item)
-    - [ ] Fix reported unicode issues (#66) (#70)
+    - [x] Fixed weak encoding error in menu (search history item)
+    - [x] Fixed reported unicode issues (#66) (#70)
     - [ ] ...
 - [ ] Fix content refreshing issues:
     - [ ] Fix main menu counters refreshing
