@@ -332,7 +332,7 @@ def listsearchhistory():  # type: () -> None
     listitems = []
     for search in sorted(searchhistory['items'], key=lambda x: x['lastUsed'], reverse=True):
         # create search item
-        li = xbmcgui.ListItem('{0} [COLOR {1}]({2})[/COLOR]'.format(search['q'], ALT_COLOR, search['resultsCount']))
+        li = xbmcgui.ListItem('{0} [COLOR {1}]({2})[/COLOR]'.format(search['q'].encode('utf-8'), ALT_COLOR, search['resultsCount']))
         # create context menu
         li.addContextMenuItems(
             [
@@ -349,7 +349,7 @@ def listsearchhistory():  # type: () -> None
                 # search similar
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30080).encode('utf-8')),
-                    'Container.Update({0})'.format(buildurl('/searchvideos', {'similarq': search['q']}))  # upd.required!
+                    'Container.Update({0})'.format(buildurl('/searchvideos', {'similarq': search['q'].encode('utf-8')}))  # upd.required!
                 ),
             ]
         )
@@ -589,15 +589,15 @@ def buildvideolist(listdata):  # type: (dict) -> None
     listitems = []
     for video in listdata['items']:
         # create video item
-        li = xbmcgui.ListItem(video['title'])
+        li = xbmcgui.ListItem(video['title'].encode('utf-8'))
         # set isplayable
         li.setProperty('IsPlayable', 'true')
         # set infolabels
         li.setInfo(
             'video',
             {
-                'title': video['title'],
-                'plot': video['description'],
+                'title': video['title'].encode('utf-8'),
+                'plot': video['description'].encode('utf-8'),
                 'duration': video['duration'],
                 'date': datetime.datetime.fromtimestamp(video['date']).strftime('%d.%m.%Y')
             }
@@ -657,7 +657,7 @@ def buildvideolist(listdata):  # type: (dict) -> None
         cmi.append(
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30080).encode('utf-8')),
-                'Container.Update({0})'.format(buildurl('/searchvideos', {'similarq': video['title']}))  # upd.required!
+                'Container.Update({0})'.format(buildurl('/searchvideos', {'similarq': video['title'].encode('utf-8')}))  # upd.required!
             )
         )
         li.addContextMenuItems(cmi)
@@ -870,8 +870,8 @@ def listalbums(offset=0):  # type: (int) -> None
     listitems = []
     for i, album in enumerate(albums['items']):
         # create album item
-        li = xbmcgui.ListItem('{0} [COLOR {1}]({2})[/COLOR]'.format(album['title'], ALT_COLOR, int(album['count'])))
-        # art
+        li = xbmcgui.ListItem('{0} [COLOR {1}]({2})[/COLOR]'.format(album['title'].encode('utf-8'), ALT_COLOR, int(album['count'])))
+        # art, if any
         if album['count'] > 0:
             li.setArt({'thumb': album['photo_320']})
         # before/after album ids for reordering
@@ -1109,7 +1109,7 @@ def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
         if listtype == '/likedcommunities':
             community['id'] = community['id'].split('_')[2]
         # create community item
-        li = xbmcgui.ListItem(community[namekey])
+        li = xbmcgui.ListItem(community[namekey].encode('utf-8'))
         # set art
         li.setArt({'thumb': community['photo_200']})
         # create context menu
