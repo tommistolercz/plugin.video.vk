@@ -67,6 +67,13 @@ class AddonError(Exception):
         self.errid = errid
 
 
+def initaddon():  # type: () -> xbmcaddon.Addon
+    """
+    Initialize addon.
+    """
+    return xbmcaddon.Addon()
+
+
 def inittinydb():  # type: () -> tinydb.TinyDB
     """
     Initialize TinyDB (create a new data file if doesn't exist).
@@ -384,7 +391,7 @@ def deletesearch(searchid):  # type: (int) -> None
     _ = DB.table(TBL_SEARCH_HISTORY).remove(doc_ids=[searchid])
     xbmc.log('{0}: Search deleted: {1}'.format(ADDON.getAddonInfo('id'), searchid))
     # refresh content
-    xbmc.executebuiltin('Container.Refresh')
+    xbmc.executebuiltin('Container.Refresh()')
 
 
 # videos
@@ -425,7 +432,7 @@ def searchvideos(q='', similarq='', offset=0):  # type: (str, str, int) -> None
     # pagination data
     if int(searchedvideos['count']) > offset + itemsperpage:
         searchedvideos['next'] = {
-            'url': buildurl('/searchvideos', {'q': q, 'similarq': similarq, 'offset': offset + itemsperpage}),
+            'url': buildurl('/searchvideos', {'q': q, 'offset': offset + itemsperpage}),
         }
     xbmc.log('{0}: Searched videos: {1}'.format(ADDON.getAddonInfo('id'), searchedvideos))
     # only once
@@ -755,7 +762,7 @@ def likevideo(ownerid, videoid):  # type: (int, int) -> None
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Video liked: {1}'.format(ADDON.getAddonInfo('id'), oidid))
     # refresh content
-    xbmc.executebuiltin('Container.Refresh')
+    xbmc.executebuiltin('Container.Refresh()')
 
 
 @route('/unlikevideo')
@@ -778,7 +785,7 @@ def unlikevideo(ownerid, videoid):  # type: (int, int) -> None
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Video unliked: {1}'.format(ADDON.getAddonInfo('id'), oidid))
     # refresh content
-    xbmc.executebuiltin('Container.Refresh')
+    xbmc.executebuiltin('Container.Refresh()')
 
 
 @route('/addvideotoalbums')
@@ -841,7 +848,7 @@ def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Video added to albums: {1}'.format(ADDON.getAddonInfo('id'), oidid))
     # refresh content
-    xbmc.executebuiltin('Container.Refresh')
+    xbmc.executebuiltin('Container.Refresh()')
 
 
 # video albums
@@ -957,7 +964,7 @@ def reorderalbum(albumid, beforeid=None, afterid=None):  # type: (int, int, int)
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Album reordered: {1}'.format(ADDON.getAddonInfo('id'), albumid))
     # refresh content
-    xbmc.executebuiltin('Container.Refresh')
+    xbmc.executebuiltin('Container.Refresh()')
 
 
 @route('/renamealbum')
@@ -990,7 +997,7 @@ def renamealbum(albumid):  # type: (int) -> None
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Album renamed: {1}'.format(ADDON.getAddonInfo('id'), albumid))
     # refresh content
-    xbmc.executebuiltin('Container.Refresh')
+    xbmc.executebuiltin('Container.Refresh()')
 
 
 @route('/deletealbum')
@@ -1013,7 +1020,7 @@ def deletealbum(albumid):  # type: (int) -> None
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Album deleted: {1}'.format(ADDON.getAddonInfo('id'), albumid))
     # refresh content
-    xbmc.executebuiltin('Container.Refresh')
+    xbmc.executebuiltin('Container.Refresh()')
 
 
 @route('/createalbum')
@@ -1036,7 +1043,7 @@ def createalbum():  # type: () -> None
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Album created: {1}'.format(ADDON.getAddonInfo('id'), album['album_id']))
     # refresh content
-    xbmc.executebuiltin('Container.Refresh')
+    xbmc.executebuiltin('Container.Refresh()')
 
 
 # communities
@@ -1184,7 +1191,7 @@ def likecommunity(communityid):  # type: (int) -> None
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Community liked: {1}'.format(ADDON.getAddonInfo('id'), communityid))
     # refresh content
-    xbmc.executebuiltin('Container.Refresh')
+    xbmc.executebuiltin('Container.Refresh()')
 
 
 @route('/unlikecommunity')
@@ -1203,7 +1210,7 @@ def unlikecommunity(communityid):  # type: (int) -> None
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Community unliked: {1}'.format(ADDON.getAddonInfo('id'), communityid))
     # refresh content
-    xbmc.executebuiltin('Container.Refresh')
+    xbmc.executebuiltin('Container.Refresh()')
 
 
 @route('/unfollowcommunity')
@@ -1222,7 +1229,7 @@ def unfollowcommunity(communityid):  # type: (int) -> None
         raise AddonError(ERR_VK_API)
     xbmc.log('{0}: Community unfollowed: {1}'.format(ADDON.getAddonInfo('id'), communityid))
     # refresh content
-    xbmc.executebuiltin('Container.Refresh')
+    xbmc.executebuiltin('Container.Refresh()')
 
 
 if __name__ == '__main__':
@@ -1232,7 +1239,7 @@ if __name__ == '__main__':
         'qs': str(sys.argv[2]),
     }
     try:
-        ADDON = xbmcaddon.Addon()
+        ADDON = initaddon()
         DB = inittinydb()
         VKSESSION = initvksession()
         VKAPI = initvkapi()

@@ -17,7 +17,7 @@ Kodi add-on for watching videos from VK.com social network.
 ## Installation
 
 1. Download the add-on zip file:<br>
-    [plugin.video.vk-1.2.0-dev.zip](https://github.com/tommistolercz/plugin.video.vk/releases/download/v1.2.0-dev/plugin.video.vk-1.2.0-dev.zip)
+    [plugin.video.vk-1.2.0.zip](https://github.com/tommistolercz/plugin.video.vk/releases/download/v1.2.0/plugin.video.vk-1.2.0.zip)
     
 2. Install it in Kodi:<br>
     `Kodi > Settings > Add-ons > Install from zip file...`
@@ -27,6 +27,10 @@ Kodi add-on for watching videos from VK.com social network.
 ## Features and changelog
 
 ### Future
+
+- [ ] Fix content refreshing issues:
+    - [ ] Fix counters refreshing in main menu
+    - [ ] Fix reported issues related to container.refresh (#69)
 - [ ] Fix /playvideo raising video resolving error due to unhandled cookies expiration (#57)
 - [ ] Fix /playedvideos sorting (by lastPlayed)
 - [ ] Fix /addvideotoalbums only showing first 100 albums
@@ -35,15 +39,11 @@ Kodi add-on for watching videos from VK.com social network.
 - [ ] Add /searchhistory pagination
 - [ ] Add /playedvideos pagination
 
-### v1.2.0-dev (not yet released)
+### v1.2.0 (2019-03-04)
 
 - [x] Fixed unicode issues:
-    - [x] Fixed weak encoding error in menu (search history item)
     - [x] Fixed reported unicode issues (#66) (#70)
-- [ ] Fix content refreshing issues:
-    - [ ] Fix main menu counters refreshing
-    - [ ] Fix /searchvideos?offset=0 container refresh issues
-    - [ ] Fix reported various issues related to container.refresh (#69)
+    - [x] Fixed weak encoding error in main menu (search history item)
 - [x] Added /playedvideos list
 - [x] Added /searchvideos context action into all lists types
 - [x] Refactored add-on file structure and python code
