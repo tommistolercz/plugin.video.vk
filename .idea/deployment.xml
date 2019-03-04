@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" serverName="TMi-Raspberry.local" exclude="*.pyc;*.pyo;.idea;*.sublime-project;.git;.svn;.cvs;.hg;*.hprof;.DS_Store">
+  <component name="PublishConfigData" serverName="TMi-Raspberry.local" exclude="*.pyc;*.pyo;*.sublime-project;.idea;.git;.gtm;.svn;.cvs;.hg;*.hprof;.DS_Store">
     <serverData>
       <paths name="TMi-Raspberry.local">
         <serverdata>
           <mappings>
             <mapping deploy=".kodi/addons/plugin.video.vk" local="$PROJECT_DIR$" web="/" />
-            <mapping deploy="/.kodi/userdata/addon_data/plugin.video.vk" local="$PROJECT_DIR$/../../userdata/addon_data/plugin.video.vk" web="/" />
+            <mapping deploy=".kodi/userdata/addon_data/plugin.video.vk" local="$PROJECT_DIR$/../../userdata/addon_data/plugin.video.vk" web="/" />
           </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/_Archiv_" />
+            <excludedPath local="true" path="$PROJECT_DIR$/resources/lib/tests" />
+          </excludedPaths>
         </serverdata>
       </paths>
     </serverData>

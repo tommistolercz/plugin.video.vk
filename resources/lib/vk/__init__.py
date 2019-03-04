@@ -1,11 +1,6 @@
 # coding=utf-8
 
-from vk.api import logger
-from vk.api import Session, AuthSession, InteractiveSession, InteractiveAuthSession
-from vk.api import VERSION
-from vk.api import API
-from vk.exceptions import VkAuthError, VkAPIError  # mod tmi
+from vk.api import API, Session, AuthSession
+from vk.exceptions import VkAuthError, VkAPIError
 
-__version__ = version = VERSION
-
-# API = OAuthAPI
+__all__ = ['API', 'Session', 'AuthSession', 'VkAuthError', 'VkAPIError']

@@ -101,11 +101,11 @@ msgid "VK API error!"
 msgstr ""
 
 msgctxt "#30022"
-msgid "Addon routing error!"
+msgid "Routing error!"
 msgstr ""
 
 msgctxt "#30023"
-msgid "Addon data file error!"
+msgid "Data file error!"
 msgstr ""
 
 msgctxt "#30024"
@@ -115,7 +115,7 @@ msgstr ""
 # Common
 
 msgctxt "#30030"
-msgid "VK account email"
+msgid "VK account email/phone"
 msgstr ""
 
 msgctxt "#30031"
@@ -129,7 +129,7 @@ msgstr ""
 # Main menu
 
 msgctxt "#30040"
-msgid "SEARCH"
+msgid "SEARCH VIDEOS"
 msgstr ""
 
 msgctxt "#30041"
@@ -154,6 +154,10 @@ msgstr ""
 
 msgctxt "#30046"
 msgid "MY LIKED COMMUNITIES"
+msgstr ""
+
+msgctxt "#30047"
+msgid "PLAYED VIDEOS HISTORY"
 msgstr ""
 
 # Videos
