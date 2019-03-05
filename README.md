@@ -26,19 +26,6 @@ Kodi add-on for watching videos from VK.com social network.
 
 ## Features and changelog
 
-### Future
-
-- [ ] Fix content refreshing issues:
-    - [ ] Fix counters refreshing in main menu
-    - [ ] Fix reported issues related to container.refresh (#69)
-- [ ] Fix /playvideo raising video resolving error due to unhandled cookies expiration (#57)
-- [ ] Fix /playedvideos sorting (by lastPlayed)
-- [ ] Fix /addvideotoalbums only showing first 100 albums
-- [ ] Fix /createalbum not accessible if user has any albums yet
-- [ ] Add /clearhistory context action for /playedvideos, /searchhistory
-- [ ] Add /searchhistory pagination
-- [ ] Add /playedvideos pagination
-
 ### v1.2.0 (2019-03-04)
 
 - [x] Fixed unicode issues:
