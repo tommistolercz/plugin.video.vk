@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.vk" name="VK" version="1.2.0" provider-name="TomMistolerCZ">
+<addon id="plugin.video.vk" name="VK" version="1.3.0-dev" provider-name="TomMistolerCZ">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.requests" version="2.8.1"/>
-        <import addon="script.module.web-pdb" version="1.4.3" optional="true"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="resources/lib/addon.py">
         <provides>video</provides>
@@ -28,6 +27,9 @@
             <screenshot>resources/media/screenshot4.jpg</screenshot>
         </assets>
         <news>
+### v1.3.0 (not released)
+TBD
+
 ### v1.2.0 (2019-03-04)
 
 - [x] Fixed unicode issues:
