@@ -37,9 +37,9 @@ Kodi add-on for watching videos from VK.com social network.
     - [x] `/watchlist` video list
     - [x] `/addvideotowatchlist` action
     - [x] `/deletevideofromwatchlist` action
-    - [ ] `/clearwatchlist` action
-    - [ ] `/clearplayedvideos` action (#75)
-    - [ ] `/clearsearchhistory` action (#75)
+    - [x] `/clearwatchlist` action
+    - [x] `/clearsearchhistory` action (#75)
+    - [x] `/clearplayedvideos` action (#75)
 - [x] Added new settings:
     - [x] `keepaddonrequesthistory` (default false, not visible)
     - [x] `keepplayedvideohistory` (default false)

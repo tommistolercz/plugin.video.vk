@@ -226,6 +226,18 @@ def dispatch():  # type: () -> None
 # common
 
 
+@route('/logout')
+def logout():  # type: () -> None
+    """
+    Logout user.
+    """
+    # delete cookies + reset user access token
+    deletecookies()
+    ADDON.setSetting('vkuseraccesstoken', '')
+    xbmc.log('{0}: User logged out.'.format(ADDON.getAddonInfo('id')))
+    xbmcgui.Dialog().notification(ADDON.getAddonInfo('id'), ADDON.getLocalizedString(30032).encode('utf-8'))
+
+
 @route('/')
 def listaddonmenu():  # type: () -> None
     """
@@ -340,18 +352,6 @@ def listaddonmenu():  # type: () -> None
     xbmcplugin.endOfDirectory(SYSARGV['handle'])
 
 
-@route('/logout')
-def logout():  # type: () -> None
-    """
-    Logout user.
-    """
-    # delete cookies + reset user access token
-    deletecookies()
-    ADDON.setSetting('vkuseraccesstoken', '')
-    xbmc.log('{0}: User logged out.'.format(ADDON.getAddonInfo('id')))
-    xbmcgui.Dialog().notification(ADDON.getAddonInfo('id'), ADDON.getLocalizedString(30032).encode('utf-8'))
-
-
 # search history
 
 
@@ -389,6 +389,13 @@ def listsearchhistory(offset=0):  # type: (int) -> None
                         buildurl('/deletesearch', {'searchid': search.doc_id})
                     )
                 ),
+                # clear search history
+                (
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30082).encode('utf-8')),
+                    'RunPlugin({0})'.format(
+                        buildurl('/clearsearchhistory')
+                    )
+                ),
                 # search videos
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30051).encode('utf-8')),
@@ -418,7 +425,7 @@ def listsearchhistory(offset=0):  # type: (int) -> None
             (
                 buildurl('/searchhistory', {'offset': offset + itemsperpage}),
                 xbmcgui.ListItem(
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30050).encode('utf-8'))
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30034).encode('utf-8'))
                 ),
                 True
             )
@@ -439,7 +446,7 @@ def deletesearch(searchid):  # type: (int) -> None
     # ask user for confirmation
     if not xbmcgui.Dialog().yesno(
         ADDON.getLocalizedString(30081).encode('utf-8'),
-        ADDON.getLocalizedString(30082).encode('utf-8')
+        ADDON.getLocalizedString(30033).encode('utf-8')
     ):
         return
     # query db for deleting
@@ -456,13 +463,24 @@ def clearsearchhistory():  # type: () -> None
     """
     Clear search history.
     """
-    pass
+    # ask user for confirmation
+    if not xbmcgui.Dialog().yesno(
+            ADDON.getLocalizedString(30082).encode('utf-8'),
+            ADDON.getLocalizedString(30033).encode('utf-8')
+    ):
+        return
+    # purge db table
+    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
+    tinydb.TinyDB(fp).purge_table(DB_TABLE_SEARCHHISTORY)
+    xbmc.log('{0}: Search history cleared.'.format(ADDON.getAddonInfo('id')))
+    # refresh content
+    xbmc.executebuiltin('Container.Refresh()')
 
 
 # videos
 
 
-def buildvideolist(listdata):  # type: (dict) -> None
+def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
     """
     Build video list.
     """
@@ -522,6 +540,15 @@ def buildvideolist(listdata):  # type: (dict) -> None
                     )
                 )
             )
+        # add video to albums
+        cmi.append(
+            (
+                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30055).encode('utf-8')),
+                'RunPlugin({0})'.format(
+                    buildurl('/addvideotoalbums', {'ownerid': video['owner_id'], 'videoid': video['id']})
+                )
+            )
+        )
         # add video to watchlist / delete video from watchlist
         if 'added_to_watchlist' not in video:
             cmi.append(
@@ -541,15 +568,26 @@ def buildvideolist(listdata):  # type: (dict) -> None
                     )
                 )
             )
-        # add video to albums
-        cmi.append(
-            (
-                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30055).encode('utf-8')),
-                'RunPlugin({0})'.format(
-                    buildurl('/addvideotoalbums', {'ownerid': video['owner_id'], 'videoid': video['id']})
+        # clear watchlist
+        if listtype == '/watchlist':
+            cmi.append(
+                (
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30058).encode('utf-8')),
+                    'RunPlugin({0})'.format(
+                        buildurl('/clearwatchlist')
+                    )
                 )
             )
-        )
+        # clear played videos
+        elif listtype == '/playedvideos':
+            cmi.append(
+                (
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30059).encode('utf-8')),
+                    'RunPlugin({0})'.format(
+                        buildurl('/clearplayedvideos')
+                    )
+                )
+            )
         # search videos
         cmi.append(
             (
@@ -583,7 +621,7 @@ def buildvideolist(listdata):  # type: (dict) -> None
             (
                 listdata['next']['url'],
                 xbmcgui.ListItem(
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30050).encode('utf-8'))),
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30034).encode('utf-8'))),
                 True
             )
         )
@@ -656,7 +694,7 @@ def listsearchedvideos(q='', similarq='', offset=0):  # type: (str, str, int) ->
             ADDON.getLocalizedString(30052).encode('utf-8').format(searchedvideos['count'])
         )
     # build list
-    buildvideolist(searchedvideos)
+    buildvideolist('/searchvideos', searchedvideos)
 
 
 @route('/playedvideos')
@@ -680,7 +718,7 @@ def listplayedvideos(offset=0):  # type: (int) -> None
         }
     xbmc.log('{0}: Played videos: {1}'.format(ADDON.getAddonInfo('id'), playedvideos))
     # build list
-    buildvideolist(playedvideos)
+    buildvideolist('/playedvideos', playedvideos)
 
 
 @route('/watchlist')
@@ -704,7 +742,7 @@ def listwatchlist(offset=0):  # type: (int) -> None
         }
     xbmc.log('{0}: Watchlist: {1}'.format(ADDON.getAddonInfo('id'), watchlist))
     # build list
-    buildvideolist(watchlist)
+    buildvideolist('/watchlist', watchlist)
 
 
 @route('/videos')
@@ -731,7 +769,7 @@ def listvideos(offset=0):  # type: (int) -> None
         }
     xbmc.log('{0}: Videos: {1}'.format(ADDON.getAddonInfo('id'), videos))
     # build list
-    buildvideolist(videos)
+    buildvideolist('/videos', videos)
 
 
 @route('/likedvideos')
@@ -758,7 +796,7 @@ def listlikedvideos(offset=0):  # type: (int) -> None
         }
     xbmc.log('{0}: Liked videos: {1}'.format(ADDON.getAddonInfo('id'), likedvideos))
     # build list
-    buildvideolist(likedvideos)
+    buildvideolist('/likedvideos', likedvideos)
 
 
 @route('/albumvideos')
@@ -787,7 +825,7 @@ def listalbumvideos(albumid, offset=0):  # type: (int, int) -> None
         }
     xbmc.log('{0}: Album videos: {1}'.format(ADDON.getAddonInfo('id'), albumvideos))
     # build list
-    buildvideolist(albumvideos)
+    buildvideolist('/albumvideos', albumvideos)
 
 
 @route('/communityvideos')
@@ -816,7 +854,7 @@ def listcommunityvideos(communityid, offset=0):  # type: (int, int) -> None
         }
     xbmc.log('{0}: Community videos: {1}'.format(ADDON.getAddonInfo('id'), communityvideos))
     # build list
-    buildvideolist(communityvideos)
+    buildvideolist('/communityvideos', communityvideos)
 
 
 @route('/playvideo')
@@ -1021,7 +1059,7 @@ def deletevideofromwatchlist(ownerid, videoid):  # type: (int, int) -> None
     # ask user for confirmation
     if not xbmcgui.Dialog().yesno(
             ADDON.getLocalizedString(30057).encode('utf-8'),
-            ADDON.getLocalizedString(30058).encode('utf-8')
+            ADDON.getLocalizedString(30033).encode('utf-8')
     ):
         return
     # query db for deleting
@@ -1035,20 +1073,42 @@ def deletevideofromwatchlist(ownerid, videoid):  # type: (int, int) -> None
     xbmc.executebuiltin('Container.Refresh()')
 
 
-@route('/clearplayedvideos')
-def clearplayedvideos():  # type: () -> None
-    """
-    Clear played videos.
-    """
-    pass
-
-
 @route('/clearwatchlist')
 def clearwatchlist():  # type: () -> None
     """
     Clear watchlist.
     """
-    pass
+    # ask user for confirmation
+    if not xbmcgui.Dialog().yesno(
+            ADDON.getLocalizedString(30058).encode('utf-8'),
+            ADDON.getLocalizedString(30033).encode('utf-8')
+    ):
+        return
+    # purge db table
+    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
+    tinydb.TinyDB(fp).purge_table(DB_TABLE_WATCHLIST)
+    xbmc.log('{0}: Watchlist cleared.'.format(ADDON.getAddonInfo('id')))
+    # refresh content
+    xbmc.executebuiltin('Container.Refresh()')
+
+
+@route('/clearplayedvideos')
+def clearplayedvideos():  # type: () -> None
+    """
+    Clear played videos.
+    """
+    # ask user for confirmation
+    if not xbmcgui.Dialog().yesno(
+            ADDON.getLocalizedString(30059).encode('utf-8'),
+            ADDON.getLocalizedString(30033).encode('utf-8')
+    ):
+        return
+    # purge db table
+    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
+    tinydb.TinyDB(fp).purge_table(DB_TABLE_PLAYEDVIDEOS)
+    xbmc.log('{0}: Played videos cleared.'.format(ADDON.getAddonInfo('id')))
+    # refresh content
+    xbmc.executebuiltin('Container.Refresh()')
 
 
 # video albums
@@ -1111,7 +1171,7 @@ def listalbums(offset=0):  # type: (int) -> None
                 ),
                 # create new album
                 (
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30065).encode('utf-8')),
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30064).encode('utf-8')),
                     'RunPlugin({0})'.format(buildurl('/createalbum'))
                 ),
                 # search videos
@@ -1134,7 +1194,7 @@ def listalbums(offset=0):  # type: (int) -> None
             (
                 buildurl('/albums', {'offset': offset + albumsperpage}),
                 xbmcgui.ListItem(
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30050).encode('utf-8'))),
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30034).encode('utf-8'))),
                 True
             )
         )
@@ -1212,7 +1272,7 @@ def deletealbum(albumid):  # type: (int) -> None
     # ask user for confirmation
     if not xbmcgui.Dialog().yesno(
             ADDON.getLocalizedString(30063).encode('utf-8'),
-            ADDON.getLocalizedString(30064).encode('utf-8')
+            ADDON.getLocalizedString(30033).encode('utf-8')
     ):
         return
     # request vk api
@@ -1234,7 +1294,7 @@ def createalbum():  # type: () -> None
     Create album.
     """
     # ask user for new album title
-    albumtitle = xbmcgui.Dialog().input(ADDON.getLocalizedString(30065).encode('utf-8'))
+    albumtitle = xbmcgui.Dialog().input(ADDON.getLocalizedString(30064).encode('utf-8'))
     if not albumtitle:
         return
     # request vk api
@@ -1315,7 +1375,7 @@ def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
             (
                 listdata['next']['url'],
                 xbmcgui.ListItem(
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30050).encode('utf-8'))),
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30034).encode('utf-8'))),
                 True
             )
         )
