@@ -88,6 +88,7 @@ def initvksession():  # type: () -> vk.AuthSession
         except vk.VkAuthError:
             xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK authorization error!'), level=xbmc.LOGERROR)
             raise AddonError(ERR_VK_AUTH)
+        xbmc.log('{0}: VK session created.'.format(ADDON.getAddonInfo('id')))
         # save obtained token + cookies
         ADDON.setSetting('vkuseraccesstoken', vksession.access_token)
         savecookies(vksession.auth_session.cookies)
@@ -98,6 +99,7 @@ def initvksession():  # type: () -> vk.AuthSession
         except vk.VkAuthError:
             xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK authorization error!'), level=xbmc.LOGERROR)
             raise AddonError(ERR_VK_AUTH)
+        xbmc.log('{0}: VK session restored using token.'.format(ADDON.getAddonInfo('id')))
         # load cookies
         vksession.requests_session.cookies = loadcookies()
     return vksession
@@ -113,6 +115,7 @@ def initvkapi():  # type: () -> vk.API
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
+    xbmc.log('{0}: VK API initialized.'.format(ADDON.getAddonInfo('id')))
     return vkapi
 
 
@@ -127,6 +130,7 @@ def savecookies(cookiejar):  # type: (object) -> None
     except IOError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'Data file error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_DATA_FILE)
+    xbmc.log('{0}: Cookies saved: {1}'.format(ADDON.getAddonInfo('id'), fp))
 
 
 def loadcookies():  # type: () -> object
@@ -140,6 +144,7 @@ def loadcookies():  # type: () -> object
     except IOError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'Data file error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_DATA_FILE)
+    xbmc.log('{0}: Cookies loaded: {1}'.format(ADDON.getAddonInfo('id'), fp))
     return cookiejar
 
 
@@ -153,6 +158,7 @@ def deletecookies():  # type: () -> None
     except os.error:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'Data file error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_DATA_FILE)
+    xbmc.log('{0}: Cookies deleted: {1}'.format(ADDON.getAddonInfo('id'), fp))
 
 
 def buildurl(urlpath, urlargs=None):  # type: (str, dict) -> str
@@ -206,22 +212,15 @@ def dispatch():  # type: () -> None
         fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
         db = tinydb.TinyDB(fp)
         db.table(DB_TABLE_ADDONREQUESTS).insert(lastrequest)
+        xbmc.log('{0}: Addon requests db updated: {1}'.format(ADDON.getAddonInfo('id'), lastrequest))
     # call handler
     try:
         handler = ROUTING[urlpath]
     except KeyError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'Routing error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_ROUTING)
+    xbmc.log('{0}: Routing dispatched: {1}'.format(ADDON.getAddonInfo('id'), handler.__name__))
     handler(**urlargs)
-
-
-def beautify(text):  # type: (str) -> str
-    """
-    Beautify text for output.
-    """
-    # make it wrapable
-    text = text.replace('.', ' ').replace('_', ' ')
-    return text
 
 
 # common
@@ -245,6 +244,7 @@ def listaddonmenu():  # type: () -> None
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
+    xbmc.log('{0}: Counters: {1}'.format(ADDON.getAddonInfo('id'), counters))
     # create kodi list
     isfolder = True
     kodilist = [
@@ -264,15 +264,20 @@ def listaddonmenu():  # type: () -> None
             ),
             isfolder
         ),
-        (
-            buildurl('/playedvideos'),
-            xbmcgui.ListItem(
-                '{0} [COLOR {1}]({2})[/COLOR]'.format(
-                    ADDON.getLocalizedString(30047).encode('utf-8'), ALT_COLOR, counters['playedvideos']
-                )
-            ),
-            isfolder
-        ),
+    ]
+    if ADDON.getSetting('keepplayedvideohistory') == 'true':
+        kodilist += [
+            (
+                buildurl('/playedvideos'),
+                xbmcgui.ListItem(
+                    '{0} [COLOR {1}]({2})[/COLOR]'.format(
+                        ADDON.getLocalizedString(30047).encode('utf-8'), ALT_COLOR, counters['playedvideos']
+                    )
+                ),
+                isfolder
+            )
+        ]
+    kodilist += [
         (
             buildurl('/watchlist'),
             xbmcgui.ListItem(
@@ -343,6 +348,7 @@ def logout():  # type: () -> None
     # delete cookies + reset user access token
     deletecookies()
     ADDON.setSetting('vkuseraccesstoken', '')
+    xbmc.log('{0}: User logged out.'.format(ADDON.getAddonInfo('id')))
     xbmcgui.Dialog().notification(ADDON.getAddonInfo('id'), ADDON.getLocalizedString(30032).encode('utf-8'))
 
 
@@ -363,6 +369,7 @@ def listsearchhistory(offset=0):  # type: (int) -> None
         'count': len(db.table(DB_TABLE_SEARCHHISTORY)),
         'items': db.table(DB_TABLE_SEARCHHISTORY).all()[offset:offset + itemsperpage]
     }
+    xbmc.log('{0}: Search history: {1}'.format(ADDON.getAddonInfo('id'), searchhistory))
     # create kodi list
     isfolder = True
     kodilist = []
@@ -439,6 +446,7 @@ def deletesearch(searchid):  # type: (int) -> None
     fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
     db = tinydb.TinyDB(fp)
     db.table(DB_TABLE_SEARCHHISTORY).remove(doc_ids=[searchid])
+    xbmc.log('{0}: Search deleted: {1}'.format(ADDON.getAddonInfo('id'), searchid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -456,31 +464,22 @@ def clearsearchhistory():  # type: () -> None
 
 def buildvideolist(listdata):  # type: (dict) -> None
     """
-    Build video list:
-
-    - ``/searchvideos``
-    - ``/videos``
-    - ``/likedvideos``
-    - ``/albumvideos``
-    - ``/communityvideos``
-    - ``/playedvideos``
-    - ``/watchlist``
+    Build video list.
     """
     # create list
     listitems = []
-    beautified = {}
     isfolder = False
     for video in listdata['items']:
         # create video item
-        beautified['title'] = beautify(video['title'].encode('utf-8'))
-        li = xbmcgui.ListItem(beautified['title'])
+        videotitle_wrapable = video['title'].encode('utf-8').replace('.', ' ').replace('_', ' ')
+        li = xbmcgui.ListItem(videotitle_wrapable)
         # set isplayable
         li.setProperty('IsPlayable', 'true')
         # set infolabels
         li.setInfo(
             'video',
             {
-                'title': beautified['title'],
+                'title': videotitle_wrapable,
                 'plot': video['description'].encode('utf-8'),
                 'duration': video['duration'],
                 'date': datetime.datetime.fromtimestamp(video['date']).strftime('%d.%m.%Y')
@@ -565,7 +564,7 @@ def buildvideolist(listdata):  # type: (dict) -> None
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30080).encode('utf-8')),
                 'Container.Update({0})'.format(
-                    buildurl('/searchvideos', {'similarq': beautified['title']})
+                    buildurl('/searchvideos', {'similarq': videotitle_wrapable})
                 )  # cnt.upd!
             )
         )
@@ -635,6 +634,7 @@ def listsearchedvideos(q='', similarq='', offset=0):  # type: (str, str, int) ->
         searchedvideos['next'] = {
             'url': buildurl('/searchvideos', {'q': q, 'offset': offset + itemsperpage}),
         }
+    xbmc.log('{0}: Searched videos: {1}'.format(ADDON.getAddonInfo('id'), searchedvideos))
     # only once
     if offset == 0:
         # update search history db with the last search
@@ -649,6 +649,7 @@ def listsearchedvideos(q='', similarq='', offset=0):  # type: (str, str, int) ->
             lastsearch,
             tinydb.where('q') == lastsearch['q']
         )
+        xbmc.log('{0}: Search history db updated: {1}'.format(ADDON.getAddonInfo('id'), lastsearch))
         # notify search results count
         xbmcgui.Dialog().notification(
             ADDON.getAddonInfo('id'),
@@ -677,6 +678,7 @@ def listplayedvideos(offset=0):  # type: (int) -> None
         playedvideos['next'] = {
             'url': buildurl('/playedvideos', {'offset': offset + itemsperpage}),
         }
+    xbmc.log('{0}: Played videos: {1}'.format(ADDON.getAddonInfo('id'), playedvideos))
     # build list
     buildvideolist(playedvideos)
 
@@ -700,6 +702,7 @@ def listwatchlist(offset=0):  # type: (int) -> None
         watchlist['next'] = {
             'url': buildurl('/watchlist', {'offset': offset + itemsperpage}),
         }
+    xbmc.log('{0}: Watchlist: {1}'.format(ADDON.getAddonInfo('id'), watchlist))
     # build list
     buildvideolist(watchlist)
 
@@ -726,6 +729,7 @@ def listvideos(offset=0):  # type: (int) -> None
         videos['next'] = {
             'url': buildurl('/videos', {'offset': offset + itemsperpage}),
         }
+    xbmc.log('{0}: Videos: {1}'.format(ADDON.getAddonInfo('id'), videos))
     # build list
     buildvideolist(videos)
 
@@ -752,6 +756,7 @@ def listlikedvideos(offset=0):  # type: (int) -> None
         likedvideos['next'] = {
             'url': buildurl('/likedvideos', {'offset': offset + itemsperpage}),
         }
+    xbmc.log('{0}: Liked videos: {1}'.format(ADDON.getAddonInfo('id'), likedvideos))
     # build list
     buildvideolist(likedvideos)
 
@@ -780,6 +785,7 @@ def listalbumvideos(albumid, offset=0):  # type: (int, int) -> None
         albumvideos['next'] = {
             'url': buildurl('/albumvideos', {'albumid': albumid, 'offset': offset + itemsperpage}),
         }
+    xbmc.log('{0}: Album videos: {1}'.format(ADDON.getAddonInfo('id'), albumvideos))
     # build list
     buildvideolist(albumvideos)
 
@@ -808,6 +814,7 @@ def listcommunityvideos(communityid, offset=0):  # type: (int, int) -> None
         communityvideos['next'] = {
             'url': buildurl('/communityvideos', {'communityid': communityid, 'offset': offset + itemsperpage}),
         }
+    xbmc.log('{0}: Community videos: {1}'.format(ADDON.getAddonInfo('id'), communityvideos))
     # build list
     buildvideolist(communityvideos)
 
@@ -839,6 +846,7 @@ def playvideo(ownerid, videoid):  # type: (int, int) -> None
     if playables:
         # streams resolved, use one of best quality
         maxqual = max(playables.keys())
+        xbmc.log('{0}: Playable stream resolved: {1}'.format(ADDON.getAddonInfo('id'), playables[maxqual]))
     else:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'Video resolving error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_RESOLVING)
@@ -853,6 +861,7 @@ def playvideo(ownerid, videoid):  # type: (int, int) -> None
         fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
         db = tinydb.TinyDB(fp)
         db.table(DB_TABLE_PLAYEDVIDEOS).upsert(video, tinydb.where('oidid') == oidid)
+        xbmc.log('{0}: Played videos db updated: {1}'.format(ADDON.getAddonInfo('id'), video))
     # create playable item for kodi player
     li = xbmcgui.ListItem(path=playables[maxqual])
     xbmcplugin.setContent(SYSARGV['handle'], 'videos')
@@ -866,6 +875,7 @@ def likevideo(ownerid, videoid):  # type: (int, int) -> None
     """
     ownerid = int(ownerid)
     videoid = int(videoid)
+    oidid = str('{0}_{1}'.format(ownerid, videoid))
     # request vk api
     try:
         VKAPI.likes.add(
@@ -876,6 +886,7 @@ def likevideo(ownerid, videoid):  # type: (int, int) -> None
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
+    xbmc.log('{0}: Video liked: {1}'.format(ADDON.getAddonInfo('id'), oidid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -887,6 +898,7 @@ def unlikevideo(ownerid, videoid):  # type: (int, int) -> None
     """
     ownerid = int(ownerid)
     videoid = int(videoid)
+    oidid = str('{0}_{1}'.format(ownerid, videoid))
     # request vk api
     try:
         VKAPI.likes.delete(
@@ -897,6 +909,7 @@ def unlikevideo(ownerid, videoid):  # type: (int, int) -> None
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
+    xbmc.log('{0}: Video unliked: {1}'.format(ADDON.getAddonInfo('id'), oidid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -908,6 +921,7 @@ def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
     """
     ownerid = int(ownerid)
     videoid = int(videoid)
+    oidid = str('{0}_{1}'.format(ownerid, videoid))
     # request vk api
     try:
         # get user albums
@@ -957,6 +971,7 @@ def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
+    xbmc.log('{0}: Video added to albums: {1}'.format(ADDON.getAddonInfo('id'), oidid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -991,6 +1006,8 @@ def addvideotowatchlist(ownerid, videoid):  # type: (int, int) -> None
         video,
         tinydb.where('oidid') == oidid
     )
+    xbmc.log('{0}: Video added to watchlist: {1}'.format(ADDON.getAddonInfo('id'), oidid))
+    # refresh content - not needed
 
 
 @route('/deletevideofromwatchlist')
@@ -1013,6 +1030,7 @@ def deletevideofromwatchlist(ownerid, videoid):  # type: (int, int) -> None
     db.table(DB_TABLE_WATCHLIST).remove(
         tinydb.where('oidid') == oidid
     )
+    xbmc.log('{0}: Video deleted from watchlist: {1}'.format(ADDON.getAddonInfo('id'), oidid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -1054,6 +1072,7 @@ def listalbums(offset=0):  # type: (int) -> None
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
+    xbmc.log('{0}: Albums: {1}'.format(ADDON.getAddonInfo('id'), albums))
     # create list
     listitems = []
     isfolder = True
@@ -1146,6 +1165,7 @@ def reorderalbum(albumid, beforeid=None, afterid=None):  # type: (int, int, int)
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
+    xbmc.log('{0}: Album reordered: {1}'.format(ADDON.getAddonInfo('id'), albumid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -1178,6 +1198,7 @@ def renamealbum(albumid):  # type: (int) -> None
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
+    xbmc.log('{0}: Album renamed: {1}'.format(ADDON.getAddonInfo('id'), albumid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -1202,6 +1223,7 @@ def deletealbum(albumid):  # type: (int) -> None
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
+    xbmc.log('{0}: Album deleted: {1}'.format(ADDON.getAddonInfo('id'), albumid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -1217,13 +1239,14 @@ def createalbum():  # type: () -> None
         return
     # request vk api
     try:
-        VKAPI.video.addAlbum(
+        album = VKAPI.video.addAlbum(
             title=albumtitle,
             privacy=3,  # 3=onlyme
         )
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
+    xbmc.log('{0}: Album created: {1}'.format(ADDON.getAddonInfo('id'), album))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -1233,10 +1256,7 @@ def createalbum():  # type: () -> None
 
 def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
     """
-    Build community list:
-
-    - ``/communities``
-    - ``/likedcommunities``
+    Build community list.``
     """
     # create list
     listitems = []
@@ -1328,6 +1348,7 @@ def listcommunities(offset=0):  # type: (int) -> None
         communities['next'] = {
             'url': buildurl('/communities', {'offset': offset + itemsperpage}),
         }
+    xbmc.log('{0}: Communities: {1}'.format(ADDON.getAddonInfo('id'), communities))
     # build list
     buildcommunitylist('/communities', communities)
 
@@ -1353,6 +1374,7 @@ def listlikedcommunities(offset=0):  # type: (int) -> None
         likedcommunities['next'] = {
             'url': buildurl('/likedcommunities', {'offset': offset + itemsperpage}),
         }
+    xbmc.log('{0}: Liked communities: {1}'.format(ADDON.getAddonInfo('id'), likedcommunities))
     # build list
     buildcommunitylist('/likedcommunities', likedcommunities)
 
@@ -1371,6 +1393,7 @@ def likecommunity(communityid):  # type: (int) -> None
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
+    xbmc.log('{0}: Community liked: {1}'.format(ADDON.getAddonInfo('id'), communityid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -1389,6 +1412,7 @@ def unlikecommunity(communityid):  # type: (int) -> None
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
+    xbmc.log('{0}: Community unliked: {1}'.format(ADDON.getAddonInfo('id'), communityid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -1407,6 +1431,7 @@ def unfollowcommunity(communityid):  # type: (int) -> None
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
+    xbmc.log('{0}: Community unfollowed: {1}'.format(ADDON.getAddonInfo('id'), communityid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 

@@ -91,11 +91,11 @@ msgid "LOGOUT"
 msgstr ""
 
 msgctxt "#30018"
-msgid "Addon request history"
+msgid "Keep history of addon requests"
 msgstr ""
 
 msgctxt "#30019"
-msgid "Played video history"
+msgid "Keep history of played videos"
 msgstr ""
 
 # Errors

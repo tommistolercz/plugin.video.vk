@@ -91,12 +91,12 @@ msgid "LOGOUT"
 msgstr "ODHLÁSIT"
 
 msgctxt "#30018"
-msgid "Addon request history"
-msgstr "Historie volání doplňku"
+msgid "Keep history of addon requests"
+msgstr "Ukládat historii volání doplňku"
 
 msgctxt "#30019"
-msgid "Played video history"
-msgstr "Historie přehraných videí"
+msgid "Keep history of played videos"
+msgstr "Ukládat historii přehraných videí"
 
 # Errors
 

@@ -27,16 +27,34 @@
             <screenshot>resources/media/screenshot4.jpg</screenshot>
         </assets>
         <news>
-### v1.3.0 (not released)
-TBD
+### v1.3.0-dev (not released)
+
+- [ ] Fix resolving error in `/playvideo` due unhandled cookies exp. (#57)
+- [ ] Fix `/playedvideos` not sorted by last played (#78)
+- [x] Fixed pagination for `/searchhistory`, `/playedvideos` (#74)
+- [x] Fixed bug in `/deletealbum`
+- [x] Fixed displaying of long video titles in lists
+- [x] Added new features:
+    - [x] `/watchlist` video list
+    - [x] `/addvideotowatchlist` action
+    - [x] `/deletevideofromwatchlist` action
+    - [ ] `/clearwatchlist` action
+    - [ ] `/clearplayedvideos` action (#75)
+    - [ ] `/clearsearchhistory` action (#75)
+- [x] Added new settings:
+    - [x] `keepaddonrequesthistory` (default false, not visible)
+    - [x] `keepplayedvideohistory` (default false)
+- [x] Optimized performance
+- [x] Refined python code
 
 ### v1.2.0 (2019-03-04)
 
 - [x] Fixed unicode issues:
     - [x] Fixed reported unicode issues (#66) (#70)
     - [x] Fixed weak encoding error in main menu (search history item)
-- [x] Added /playedvideos list
-- [x] Added /searchvideos context action into all lists types
+- [x] Added new features:
+    - [x] `/playedvideos` video list
+    - [x] `/searchvideos` action (available in all lists)
 - [x] Refactored add-on file structure and python code
 
 ### v1.1.0 (2019-02-01)
