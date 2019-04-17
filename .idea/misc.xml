@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="CurrentPullRequests">
+    <option name="data" value="[]" />
+  </component>
+  <component name="CurrentRepository">
+    <option name="owner" value="tommistolercz" />
+    <option name="repositoryName" value="plugin.video.vk" />
+  </component>
   <component name="JavaScriptSettings">
     <option name="languageLevel" value="ES6" />
   </component>

@@ -90,6 +90,14 @@ msgctxt "#30017"
 msgid "LOGOUT"
 msgstr "ODHLÁSIT"
 
+msgctxt "#30018"
+msgid "Keep history of addon requests"
+msgstr "Ukládat historii volání doplňku"
+
+msgctxt "#30019"
+msgid "Keep history of played videos"
+msgstr "Ukládat historii přehraných videí"
+
 # Errors
 
 msgctxt "#30020"
@@ -126,6 +134,14 @@ msgctxt "#30032"
 msgid "User logged out."
 msgstr "Uživatel odhlášen."
 
+msgctxt "#30033"
+msgid "Are you sure?"
+msgstr "Jste si jisti?"
+
+msgctxt "#30034"
+msgid "NEXT PAGE"
+msgstr "DALŠÍ STRANA"
+
 # Main menu
 
 msgctxt "#30040"
@@ -157,14 +173,14 @@ msgid "MY LIKED COMMUNITIES"
 msgstr "MOJE OBLÍBENÉ KOMUNITY"
 
 msgctxt "#30047"
-msgid "PLAYED VIDEOS HISTORY"
-msgstr "HISTORIE PŘEHRANÝCH VIDEÍ"
+msgid "PLAYED VIDEOS"
+msgstr "PŘEHRANÁ VIDEA"
+
+msgctxt "#30048"
+msgid "WATCHLIST"
+msgstr "WATCHLIST"
 
 # Videos
-
-msgctxt "#30050"
-msgid "NEXT PAGE"
-msgstr "DALŠÍ STRANA"
 
 msgctxt "#30051"
 msgid "Search videos"
@@ -186,6 +202,22 @@ msgctxt "#30055"
 msgid "Add video to albums"
 msgstr "Zařadit video do alb"
 
+msgctxt "#30056"
+msgid "Add video to watchlist"
+msgstr "Přidat video na watchlist"
+
+msgctxt "#30057"
+msgid "Delete video from watchlist"
+msgstr "Smazat video z watchlistu"
+
+msgctxt "#30058"
+msgid "Clear watchlist"
+msgstr "Vymazat watchlist"
+
+msgctxt "#30059"
+msgid "Clear played videos"
+msgstr "Vymazat přehraná videa"
+
 # Video albums
 
 msgctxt "#30060"
@@ -205,10 +237,6 @@ msgid "Delete album"
 msgstr "Smazat album"
 
 msgctxt "#30064"
-msgid "Do you want to delete this album?"
-msgstr "Opravdu chcete smazat toto album?"
-
-msgctxt "#30065"
 msgid "Create new album"
 msgstr "Vytvořit nové album"
 
@@ -237,5 +265,5 @@ msgid "Delete search"
 msgstr "Smazat hledání"
 
 msgctxt "#30082"
-msgid "Do you want to delete this search?"
-msgstr "Opravdu chcete smazat toho hledání?"
+msgid "Clear search history"
+msgstr "Vymazat historii"

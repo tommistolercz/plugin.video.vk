@@ -17,7 +17,7 @@ Kodi add-on for watching videos from VK.com social network.
 ## Installation
 
 1. Download the add-on zip file:<br>
-    [plugin.video.vk-1.2.0.zip](https://github.com/tommistolercz/plugin.video.vk/releases/download/v1.2.0/plugin.video.vk-1.2.0.zip)
+    [plugin.video.vk-1.3.0.zip](https://github.com/tommistolercz/plugin.video.vk/releases/download/v1.3.0/plugin.video.vk-1.3.0.zip)
     
 2. Install it in Kodi:<br>
     `Kodi > Settings > Add-ons > Install from zip file...`
@@ -26,13 +26,32 @@ Kodi add-on for watching videos from VK.com social network.
 
 ## Features and changelog
 
+### v1.3.0 (2019-04-17)
+
+- [x] Fixed pagination for `/searchhistory`, `/playedvideos` (#74)
+- [x] Fixed bug in `/deletealbum`
+- [x] Fixed displaying of long video titles in lists
+- [x] Added new features:
+    - [x] `/watchlist` video list
+    - [x] `/addvideotowatchlist` action
+    - [x] `/deletevideofromwatchlist` action
+    - [x] `/clearwatchlist` action
+    - [x] `/clearsearchhistory` action (#75)
+    - [x] `/clearplayedvideos` action (#75)
+- [x] Added new settings:
+    - [x] `keepaddonrequesthistory` (default false, not visible)
+    - [x] `keepplayedvideohistory` (default false)
+- [x] Optimized performance
+- [x] Refined python code
+
 ### v1.2.0 (2019-03-04)
 
 - [x] Fixed unicode issues:
     - [x] Fixed reported unicode issues (#66) (#70)
     - [x] Fixed weak encoding error in main menu (search history item)
-- [x] Added /playedvideos list
-- [x] Added /searchvideos context action into all lists types
+- [x] Added new features:
+    - [x] `/playedvideos` video list
+    - [x] `/searchvideos` action (available in all lists)
 - [x] Refactored add-on file structure and python code
 
 ### v1.1.0 (2019-02-01)
