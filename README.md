@@ -26,6 +26,9 @@ Kodi add-on for watching videos from VK.com social network.
 
 ## Features and changelog
 
+### v1.4.0-dev (not released)
+TBD
+
 ### v1.3.0 (2019-04-17)
 
 - [x] Fixed pagination for `/searchhistory`, `/playedvideos` (#74)
