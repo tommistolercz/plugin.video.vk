@@ -29,7 +29,7 @@ Kodi add-on for watching videos from VK.com social network.
 ### v1.3.0-dev (not released)
 
 - [ ] Fix resolving error in `/playvideo` due unhandled cookies exp. (#57)
-- [ ] Fix `/playedvideos` not sorted by last played (#78)
+- [ ] Fix sorting of `/playedvideos` (by last played) (#78)
 - [x] Fixed pagination for `/searchhistory`, `/playedvideos` (#74)
 - [x] Fixed bug in `/deletealbum`
 - [x] Fixed displaying of long video titles in lists

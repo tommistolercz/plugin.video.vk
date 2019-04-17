@@ -874,17 +874,17 @@ def playvideo(ownerid, videoid):  # type: (int, int) -> None
     # resolve playable streams via vk videoinfo url
     vi = VKSESSION.requests_session.get(
         url='https://vk.com/al_video.php?act=show_inline&al=1&video={0}'.format(oidid),
-        headers={'User-Agent': xbmc.getUserAgent()},  # +cookies required (sent autom.)
+        headers={'User-Agent': xbmc.getUserAgent()}
     )
-    matches = re.findall(r'"url(\d+)":"([^"]+)"', vi.text.replace('\\', ''))
+    matches = re.findall(r'"url(\d+)":"([^"]+)"', vi.content.replace('\\', ''))
     playables = {}
     for m in matches:
-        qual = int(m[0])
-        playables[qual] = m[1]
+        quality = int(m[0])
+        playables[quality] = m[1]
     if playables:
-        # streams resolved, use one of best quality
-        maxqual = max(playables.keys())
-        xbmc.log('{0}: Playable stream resolved: {1}'.format(ADDON.getAddonInfo('id'), playables[maxqual]))
+        # playable streams resolved, use one of best quality
+        maxquality = max(playables.keys())
+        xbmc.log('{0}: Playable stream resolved: {1}'.format(ADDON.getAddonInfo('id'), playables[maxquality]))
     else:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'Video resolving error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_RESOLVING)
@@ -898,10 +898,13 @@ def playvideo(ownerid, videoid):  # type: (int, int) -> None
         )
         fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
         db = tinydb.TinyDB(fp)
-        db.table(DB_TABLE_PLAYEDVIDEOS).upsert(video, tinydb.where('oidid') == oidid)
+        db.table(DB_TABLE_PLAYEDVIDEOS).upsert(
+            video,
+            tinydb.where('oidid') == oidid
+        )
         xbmc.log('{0}: Played videos db updated: {1}'.format(ADDON.getAddonInfo('id'), video))
     # create playable item for kodi player
-    li = xbmcgui.ListItem(path=playables[maxqual])
+    li = xbmcgui.ListItem(path=playables[maxquality])
     xbmcplugin.setContent(SYSARGV['handle'], 'videos')
     xbmcplugin.setResolvedUrl(SYSARGV['handle'], True, li)
 
