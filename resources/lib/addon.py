@@ -47,11 +47,9 @@ VK_API_VERSION = '5.92'
 ALT_COLOR = 'blue'
 
 # global vars
+ADDON = None
 ROUTING = {}
 SYSARGV = {}
-ADDON = None
-VKSESSION = None
-VKAPI = None
 
 
 class AddonError(Exception):
@@ -70,7 +68,7 @@ def initaddon():  # type: () -> xbmcaddon.Addon
     return xbmcaddon.Addon()
 
 
-def initvksession():  # type: () -> vk.AuthSession
+def initvksession():  # type: () -> vk.Session
     """
     Initialize VK session.
     """
@@ -105,12 +103,14 @@ def initvksession():  # type: () -> vk.AuthSession
     return vksession
 
 
-def initvkapi():  # type: () -> vk.API
+def initvkapi(vksession=None):  # type: (vk.Session) -> vk.API
     """
     Initialize VK API.
     """
+    if not vksession:
+        vksession = initvksession()
     try:
-        vkapi = vk.API(VKSESSION, v=VK_API_VERSION, lang=VK_API_LANG)
+        vkapi = vk.API(vksession, v=VK_API_VERSION, lang=VK_API_LANG)
         vkapi.stats.trackVisitor()
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
@@ -243,7 +243,7 @@ def listaddonmenu():  # type: () -> None
     """
     List add-on menu.
     """
-    # collect menu counters from db and vkapi
+    # collect menu counters from db...
     fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
     db = tinydb.TinyDB(fp)
     counters = {
@@ -251,8 +251,10 @@ def listaddonmenu():  # type: () -> None
         'playedvideos': len(db.table(DB_TABLE_PLAYEDVIDEOS)),
         'watchlist': len(db.table(DB_TABLE_WATCHLIST)),
     }
+    # ...and from vkapi
+    vkapi = initvkapi()
     try:
-        counters.update(VKAPI.execute.getMenuCounters())
+        counters.update(vkapi.execute.getMenuCounters())
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
@@ -419,7 +421,7 @@ def listsearchhistory(offset=0):  # type: (int) -> None
                 isfolder
             )
         )
-    # paginator item
+    # pagination
     if int(searchhistory['count']) > offset + itemsperpage:
         kodilist.append(
             (
@@ -615,7 +617,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                 isfolder
             )
         )
-    # paginator item
+    # pagination
     if 'next' in listdata:
         listitems.append(
             (
@@ -647,7 +649,8 @@ def listsearchedvideos(q='', similarq='', offset=0):  # type: (str, str, int) ->
         q = xbmcgui.Dialog().input(ADDON.getLocalizedString(30051).encode('utf-8'), defaultt=similarq)
         if not q:
             return
-    # request vk api for searched videos
+    # request vk api
+    vkapi = initvkapi()
     kwargs = {
         'extended': 1,
         'hd': 1,
@@ -663,11 +666,11 @@ def listsearchedvideos(q='', similarq='', offset=0):  # type: (str, str, int) ->
     elif ADDON.getSetting('searchduration') == '2':
         kwargs['shorter'] = int(ADDON.getSetting('searchdurationmins')) * 60
     try:
-        searchedvideos = VKAPI.video.search(**kwargs)
+        searchedvideos = vkapi.video.search(**kwargs)
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
-    # pagination data
+    # pagination
     if int(searchedvideos['count']) > offset + itemsperpage:
         searchedvideos['next'] = {
             'url': buildurl('/searchvideos', {'q': q, 'offset': offset + itemsperpage}),
@@ -711,7 +714,7 @@ def listplayedvideos(offset=0):  # type: (int) -> None
         'count': len(db.table(DB_TABLE_PLAYEDVIDEOS)),
         'items': db.table(DB_TABLE_PLAYEDVIDEOS).all()[offset:offset + itemsperpage]
     }
-    # pagination data
+    # pagination
     if int(playedvideos['count']) > offset + itemsperpage:
         playedvideos['next'] = {
             'url': buildurl('/playedvideos', {'offset': offset + itemsperpage}),
@@ -735,7 +738,7 @@ def listwatchlist(offset=0):  # type: (int) -> None
         'count': len(db.table(DB_TABLE_WATCHLIST)),
         'items': db.table(DB_TABLE_WATCHLIST).all()[offset:offset + itemsperpage]
     }
-    # pagination data
+    # pagination
     if int(watchlist['count']) > offset + itemsperpage:
         watchlist['next'] = {
             'url': buildurl('/watchlist', {'offset': offset + itemsperpage}),
@@ -753,8 +756,9 @@ def listvideos(offset=0):  # type: (int) -> None
     offset = int(offset)
     itemsperpage = int(ADDON.getSetting('itemsperpage'))
     # request vk api
+    vkapi = initvkapi()
     try:
-        videos = VKAPI.video.get(
+        videos = vkapi.video.get(
             extended=1,
             offset=offset,
             count=itemsperpage,
@@ -762,7 +766,7 @@ def listvideos(offset=0):  # type: (int) -> None
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
-    # pagination data
+    # pagination
     if int(videos['count']) > offset + itemsperpage:
         videos['next'] = {
             'url': buildurl('/videos', {'offset': offset + itemsperpage}),
@@ -780,8 +784,9 @@ def listlikedvideos(offset=0):  # type: (int) -> None
     offset = int(offset)
     itemsperpage = int(ADDON.getSetting('itemsperpage'))
     # request vk api
+    vkapi = initvkapi()
     try:
-        likedvideos = VKAPI.fave.getVideos(
+        likedvideos = vkapi.fave.getVideos(
             extended=1,
             offset=offset,
             count=itemsperpage,
@@ -789,7 +794,7 @@ def listlikedvideos(offset=0):  # type: (int) -> None
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
-    # pagination data
+    # pagination
     if int(likedvideos['count']) > offset + itemsperpage:
         likedvideos['next'] = {
             'url': buildurl('/likedvideos', {'offset': offset + itemsperpage}),
@@ -808,8 +813,9 @@ def listalbumvideos(albumid, offset=0):  # type: (int, int) -> None
     offset = int(offset)
     itemsperpage = int(ADDON.getSetting('itemsperpage'))
     # request vk api
+    vkapi = initvkapi()
     try:
-        albumvideos = VKAPI.video.get(
+        albumvideos = vkapi.video.get(
             extended=1,
             album_id=albumid,
             offset=offset,
@@ -818,7 +824,7 @@ def listalbumvideos(albumid, offset=0):  # type: (int, int) -> None
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
-    # pagination data
+    # pagination
     if int(albumvideos['count']) > offset + itemsperpage:
         albumvideos['next'] = {
             'url': buildurl('/albumvideos', {'albumid': albumid, 'offset': offset + itemsperpage}),
@@ -837,8 +843,9 @@ def listcommunityvideos(communityid, offset=0):  # type: (int, int) -> None
     offset = int(offset)
     itemsperpage = int(ADDON.getSetting('itemsperpage'))
     # request vk api
+    vkapi = initvkapi()
     try:
-        communityvideos = VKAPI.video.get(
+        communityvideos = vkapi.video.get(
             extended=1,
             owner_id=(-1 * communityid),  # neg.id required!
             offset=offset,
@@ -847,7 +854,7 @@ def listcommunityvideos(communityid, offset=0):  # type: (int, int) -> None
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
-    # pagination data
+    # pagination
     if int(communityvideos['count']) > offset + itemsperpage:
         communityvideos['next'] = {
             'url': buildurl('/communityvideos', {'communityid': communityid, 'offset': offset + itemsperpage}),
@@ -865,14 +872,16 @@ def playvideo(ownerid, videoid):  # type: (int, int) -> None
     ownerid = int(ownerid)
     videoid = int(videoid)
     oidid = str('{0}_{1}'.format(ownerid, videoid))
-    # request vk api for video
+    # request vk api
+    vksession = initvksession()
+    vkapi = initvkapi(vksession)
     try:
-        video = VKAPI.video.get(extended=1, videos=oidid)['items'].pop()
+        video = vkapi.video.get(extended=1, videos=oidid)['items'].pop()
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     # resolve playable streams via vk videoinfo url
-    vi = VKSESSION.requests_session.get(
+    vi = vksession.requests_session.get(
         url='https://vk.com/al_video.php?act=show_inline&al=1&video={0}'.format(oidid),
         headers={'User-Agent': xbmc.getUserAgent()}
     )
@@ -918,8 +927,9 @@ def likevideo(ownerid, videoid):  # type: (int, int) -> None
     videoid = int(videoid)
     oidid = str('{0}_{1}'.format(ownerid, videoid))
     # request vk api
+    vkapi = initvkapi()
     try:
-        VKAPI.likes.add(
+        vkapi.likes.add(
             type='video',
             owner_id=ownerid,
             item_id=videoid,
@@ -941,8 +951,9 @@ def unlikevideo(ownerid, videoid):  # type: (int, int) -> None
     videoid = int(videoid)
     oidid = str('{0}_{1}'.format(ownerid, videoid))
     # request vk api
+    vkapi = initvkapi()
     try:
-        VKAPI.likes.delete(
+        vkapi.likes.delete(
             type='video',
             owner_id=ownerid,
             item_id=videoid,
@@ -964,15 +975,16 @@ def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
     videoid = int(videoid)
     oidid = str('{0}_{1}'.format(ownerid, videoid))
     # request vk api
+    vkapi = initvkapi()
     try:
         # get user albums
-        albums = VKAPI.video.getAlbums(
+        albums = vkapi.video.getAlbums(
             need_system=0,
             offset=0,
             count=100,
         )
         # get list of album ids for video
-        albumids = VKAPI.video.getAlbumsByVideo(
+        albumids = vkapi.video.getAlbumsByVideo(
             owner_id=ownerid,
             video_id=videoid,
         )
@@ -997,14 +1009,14 @@ def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
     try:
         # remove sel album ids if any
         if len(albumids) > 0:
-            VKAPI.video.removeFromAlbum(
+            vkapi.video.removeFromAlbum(
                 owner_id=ownerid,
                 video_id=videoid,
                 album_ids=albumids
             )
         # add new sel album ids if any
         if len(newalbumids) > 0:
-            VKAPI.video.addToAlbum(
+            vkapi.video.addToAlbum(
                 owner_id=ownerid,
                 video_id=videoid,
                 album_ids=newalbumids
@@ -1026,8 +1038,9 @@ def addvideotowatchlist(ownerid, videoid):  # type: (int, int) -> None
     videoid = int(videoid)
     oidid = str('{0}_{1}'.format(ownerid, videoid))
     # request vk api for video
+    vkapi = initvkapi()
     try:
-        video = VKAPI.video.get(
+        video = vkapi.video.get(
             extended=1,
             videos=oidid,
         )['items'].pop()
@@ -1126,8 +1139,9 @@ def listalbums(offset=0):  # type: (int) -> None
     # workaround due api's maxperpage=100
     albumsperpage = int(ADDON.getSetting('itemsperpage')) if int(ADDON.getSetting('itemsperpage')) <= 100 else 100
     # request vk api for albums
+    vkapi = initvkapi()
     try:
-        albums = VKAPI.video.getAlbums(
+        albums = vkapi.video.getAlbums(
             extended=1,
             offset=offset,
             count=albumsperpage,
@@ -1191,7 +1205,7 @@ def listalbums(offset=0):  # type: (int) -> None
                 isfolder
             )
         )
-    # paginator item
+    # pagination
     if offset + albumsperpage < albums['count']:
         listitems.append(
             (
@@ -1221,7 +1235,8 @@ def reorderalbum(albumid, beforeid=None, afterid=None):  # type: (int, int, int)
         reorder['after'] = int(afterid)
     # request vk api
     try:
-        VKAPI.video.reorderAlbums(
+        vkapi = initvkapi()
+        vkapi.video.reorderAlbums(
             album_id=albumid,
             **reorder
         )
@@ -1240,8 +1255,9 @@ def renamealbum(albumid):  # type: (int) -> None
     """
     albumid = int(albumid)
     # request vk api for album data
+    vkapi = initvkapi()
     try:
-        album = VKAPI.video.getAlbumById(
+        album = vkapi.video.getAlbumById(
             album_id=albumid
         )
     except vk.VkAPIError:
@@ -1253,7 +1269,7 @@ def renamealbum(albumid):  # type: (int) -> None
         return
     # request vk api for renaming album
     try:
-        VKAPI.video.editAlbum(
+        vkapi.video.editAlbum(
             album_id=albumid,
             title=newtitle,
             privacy=3  # 3=onlyme
@@ -1279,8 +1295,9 @@ def deletealbum(albumid):  # type: (int) -> None
     ):
         return
     # request vk api
+    vkapi = initvkapi()
     try:
-        VKAPI.video.deleteAlbum(
+        vkapi.video.deleteAlbum(
             album_id=albumid,
         )
     except vk.VkAPIError:
@@ -1301,8 +1318,9 @@ def createalbum():  # type: () -> None
     if not albumtitle:
         return
     # request vk api
+    vkapi = initvkapi()
     try:
-        album = VKAPI.video.addAlbum(
+        album = vkapi.video.addAlbum(
             title=albumtitle,
             privacy=3,  # 3=onlyme
         )
@@ -1372,7 +1390,7 @@ def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
                 isfolder
             )
         )
-    # paginator item
+    # pagination
     if 'next' in listdata:
         listitems.append(
             (
@@ -1397,8 +1415,9 @@ def listcommunities(offset=0):  # type: (int) -> None
     offset = int(offset)
     itemsperpage = int(ADDON.getSetting('itemsperpage'))
     # request vk api
+    vkapi = initvkapi()
     try:
-        communities = VKAPI.groups.get(
+        communities = vkapi.groups.get(
             extended=1,
             offset=offset,
             count=itemsperpage,
@@ -1406,7 +1425,7 @@ def listcommunities(offset=0):  # type: (int) -> None
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
-    # pagination data
+    # pagination
     if int(communities['count']) > offset + itemsperpage:
         communities['next'] = {
             'url': buildurl('/communities', {'offset': offset + itemsperpage}),
@@ -1424,15 +1443,16 @@ def listlikedcommunities(offset=0):  # type: (int) -> None
     offset = int(offset)
     itemsperpage = int(ADDON.getSetting('itemsperpage'))
     # request vk api
+    vkapi = initvkapi()
     try:
-        likedcommunities = VKAPI.fave.getLinks(
+        likedcommunities = vkapi.fave.getLinks(
             offset=offset,
             count=itemsperpage,
         )
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
-    # pagination data
+    # pagination
     if int(likedcommunities['count']) > offset + itemsperpage:
         likedcommunities['next'] = {
             'url': buildurl('/likedcommunities', {'offset': offset + itemsperpage}),
@@ -1449,8 +1469,9 @@ def likecommunity(communityid):  # type: (int) -> None
     """
     communityid = int(communityid)
     # request vk api
+    vkapi = initvkapi()
     try:
-        VKAPI.fave.addGroup(
+        vkapi.fave.addGroup(
             group_id=communityid
         )
     except vk.VkAPIError:
@@ -1468,8 +1489,9 @@ def unlikecommunity(communityid):  # type: (int) -> None
     """
     communityid = int(communityid)
     # request vk api
+    vkapi = initvkapi()
     try:
-        VKAPI.fave.removeGroup(
+        vkapi.fave.removeGroup(
             group_id=communityid
         )
     except vk.VkAPIError:
@@ -1487,8 +1509,9 @@ def unfollowcommunity(communityid):  # type: (int) -> None
     """
     communityid = int(communityid)
     # request vk api
+    vkapi = initvkapi()
     try:
-        VKAPI.groups.leave(
+        vkapi.groups.leave(
             group_id=communityid
         )
     except vk.VkAPIError:
@@ -1510,8 +1533,6 @@ if __name__ == '__main__':
     }
     try:
         ADDON = initaddon()
-        VKSESSION = initvksession()
-        VKAPI = initvkapi()
         dispatch()
     except AddonError as e:
         xbmcgui.Dialog().notification(

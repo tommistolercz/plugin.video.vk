@@ -28,7 +28,22 @@
         </assets>
         <news>
 ### v1.3.0-dev (not released)
-TBD
+
+- [x] Fixed pagination for `/searchhistory`, `/playedvideos` (#74)
+- [x] Fixed bug in `/deletealbum`
+- [x] Fixed displaying of long video titles in lists
+- [x] Added new features:
+    - [x] `/watchlist` video list
+    - [x] `/addvideotowatchlist` action
+    - [x] `/deletevideofromwatchlist` action
+    - [x] `/clearwatchlist` action
+    - [x] `/clearsearchhistory` action (#75)
+    - [x] `/clearplayedvideos` action (#75)
+- [x] Added new settings:
+    - [x] `keepaddonrequesthistory` (default false, not visible)
+    - [x] `keepplayedvideohistory` (default false)
+- [x] Optimized performance
+- [x] Refined python code
 
 ### v1.2.0 (2019-03-04)
 
