@@ -142,6 +142,10 @@ msgctxt "#30034"
 msgid "NEXT PAGE"
 msgstr ""
 
+msgctxt "#30035"
+msgid "Skip to offset"
+msgstr ""
+
 # Main menu
 
 msgctxt "#30040"

@@ -8,6 +8,7 @@ import os
 import pickle
 import re
 import sys
+import time  # debug
 import urllib  # py2
 import urlparse  # py2
 
@@ -45,6 +46,40 @@ VK_API_VERSION = '5.92'
 
 # etc
 ALT_COLOR = 'blue'
+
+# url paths
+URLPATH_LISTADDONMENU = '/'
+URLPATH_LOGOUT = '/logout'
+URLPATH_SKIPTOOFFSET = '/skiptooffset'
+URLPATH_LISTSEARCHHISTORY = '/searchhistory'
+URLPATH_CLEARSEARCHHISTORY = '/clearsearchhistory'
+URLPATH_DELETESEARCH = '/deletesearch'
+URLPATH_LISTSEARCHEDVIDEOS = '/searchvideos'
+URLPATH_LISTPLAYEDVIDEOS = '/playedvideos'
+URLPATH_LISTWATCHLIST = '/watchlist'
+URLPATH_LISTVIDEOS = '/videos'
+URLPATH_LISTLIKEDVIDEOS = '/likedvideos'
+URLPATH_LISTALBUMVIDEOS = '/albumvideos'
+URLPATH_LISTCOMMUNITYVIDEOS = '/communityvideos'
+URLPATH_CLEARPLAYEDVIDEOS = '/clearplayedvideos'
+URLPATH_CLEARWATCHLIST = '/clearwatchlist'
+URLPATH_PLAYVIDEO = '/playvideo'
+URLPATH_LIKEVIDEO = '/likevideo'
+URLPATH_UNLIKEVIDEO = '/unlikevideo'
+URLPATH_ADDVIDEOTOWATCHLIST = '/addvideotowatchlist'
+URLPATH_DELETEVIDEOFROMWATCHLIST = '/deletevideofromwatchlist'
+URLPATH_ADDVIDEOTOALBUMS = '/addvideotoalbums'
+URLPATH_LISTALBUMS = '/albums'
+URLPATH_REORDERALBUM = '/reorderalbum'
+URLPATH_RENAMEALBUM = '/renamealbum'
+URLPATH_CREATEALBUM = '/createalbum'
+URLPATH_DELETEALBUM = '/deletealbum'
+URLPATH_LISTCOMMUNITIES = '/communities'
+URLPATH_LISTLIKEDCOMMUNITIES = '/likedcommunities'
+URLPATH_LIKECOMMUNITY = '/likecommunity'
+URLPATH_UNLIKECOMMUNITY = '/unlikecommunity'
+URLPATH_UNFOLLOWCOMMUNITY = '/unfollowcommunity'
+
 
 # global vars
 ADDON = None
@@ -220,13 +255,16 @@ def dispatch():  # type: () -> None
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'Routing error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_ROUTING)
     xbmc.log('{0}: Routing dispatched: {1}'.format(ADDON.getAddonInfo('id'), handler.__name__))
+    t1 = time.clock()
     handler(**urlargs)
+    t2 = time.clock()
+    xbmc.log('{0}: Handler runtime: {1} sec.'.format(ADDON.getAddonInfo('id'), t2 - t1))
 
 
 # common
 
 
-@route('/logout')
+@route(URLPATH_LOGOUT)
 def logout():  # type: () -> None
     """
     Logout user.
@@ -238,7 +276,7 @@ def logout():  # type: () -> None
     xbmcgui.Dialog().notification(ADDON.getAddonInfo('id'), ADDON.getLocalizedString(30032).encode('utf-8'))
 
 
-@route('/')
+@route(URLPATH_LISTADDONMENU)
 def listaddonmenu():  # type: () -> None
     """
     List add-on menu.
@@ -262,15 +300,17 @@ def listaddonmenu():  # type: () -> None
     # create kodi list
     isfolder = True
     kodilist = [
+        # search videos
         (
-            buildurl('/searchvideos'),
+            buildurl(URLPATH_LISTSEARCHEDVIDEOS),
             xbmcgui.ListItem(
                 ADDON.getLocalizedString(30040).encode('utf-8')
             ),
             isfolder
         ),
+        # search history
         (
-            buildurl('/searchhistory'),
+            buildurl(URLPATH_LISTSEARCHHISTORY),
             xbmcgui.ListItem(
                 '{0} [COLOR {1}]({2})[/COLOR]'.format(
                     ADDON.getLocalizedString(30041).encode('utf-8'), ALT_COLOR, counters['searchhistory']
@@ -281,8 +321,9 @@ def listaddonmenu():  # type: () -> None
     ]
     if ADDON.getSetting('keepplayedvideohistory') == 'true':
         kodilist += [
+            # played videos
             (
-                buildurl('/playedvideos'),
+                buildurl(URLPATH_LISTPLAYEDVIDEOS),
                 xbmcgui.ListItem(
                     '{0} [COLOR {1}]({2})[/COLOR]'.format(
                         ADDON.getLocalizedString(30047).encode('utf-8'), ALT_COLOR, counters['playedvideos']
@@ -292,8 +333,9 @@ def listaddonmenu():  # type: () -> None
             )
         ]
     kodilist += [
+        # watchlist
         (
-            buildurl('/watchlist'),
+            buildurl(URLPATH_LISTWATCHLIST),
             xbmcgui.ListItem(
                 '{0} [COLOR {1}]({2})[/COLOR]'.format(
                     ADDON.getLocalizedString(30048).encode('utf-8'), ALT_COLOR, counters['watchlist']
@@ -301,8 +343,9 @@ def listaddonmenu():  # type: () -> None
             ),
             isfolder
         ),
+        # videos
         (
-            buildurl('/videos'),
+            buildurl(URLPATH_LISTVIDEOS),
             xbmcgui.ListItem(
                 '{0} [COLOR {1}]({2})[/COLOR]'.format(
                     ADDON.getLocalizedString(30042).encode('utf-8'), ALT_COLOR, counters['videos']
@@ -310,8 +353,9 @@ def listaddonmenu():  # type: () -> None
             ),
             isfolder
         ),
+        # liked videos
         (
-            buildurl('/likedvideos'),
+            buildurl(URLPATH_LISTLIKEDVIDEOS),
             xbmcgui.ListItem(
                 '{0} [COLOR {1}]({2})[/COLOR]'.format(
                     ADDON.getLocalizedString(30043).encode('utf-8'), ALT_COLOR, counters['likedvideos']
@@ -319,8 +363,9 @@ def listaddonmenu():  # type: () -> None
             ),
             isfolder
         ),
+        # albums
         (
-            buildurl('/albums'),
+            buildurl(URLPATH_LISTALBUMS),
             xbmcgui.ListItem(
                 '{0} [COLOR {1}]({2})[/COLOR]'.format(
                     ADDON.getLocalizedString(30044).encode('utf-8'), ALT_COLOR, counters['albums']
@@ -328,8 +373,9 @@ def listaddonmenu():  # type: () -> None
             ),
             isfolder
         ),
+        # communities
         (
-            buildurl('/communities'),
+            buildurl(URLPATH_LISTCOMMUNITIES),
             xbmcgui.ListItem(
                 '{0} [COLOR {1}]({2})[/COLOR]'.format(
                     ADDON.getLocalizedString(30045).encode('utf-8'), ALT_COLOR, counters['communities']
@@ -337,8 +383,9 @@ def listaddonmenu():  # type: () -> None
             ),
             isfolder
         ),
+        # liked communities
         (
-            buildurl('/likedcommunities'),
+            buildurl(URLPATH_LISTLIKEDCOMMUNITIES),
             xbmcgui.ListItem(
                 '{0} [COLOR {1}]({2})[/COLOR]'.format(
                     ADDON.getLocalizedString(30046).encode('utf-8'), ALT_COLOR, counters['likedcommunities']
@@ -354,10 +401,33 @@ def listaddonmenu():  # type: () -> None
     xbmcplugin.endOfDirectory(SYSARGV['handle'])
 
 
+@route(URLPATH_SKIPTOOFFSET)
+def skiptooffset(listtype):  # type: (str) -> None
+    """
+    Skip to offset.
+    """
+    # ask user for entering offset to skip to.
+    offset = int(
+        xbmcgui.Dialog().input(
+            ADDON.getLocalizedString(30035).encode('utf-8'),
+            type=xbmcgui.INPUT_ALPHANUM,
+            defaultt='',
+        )
+    )
+    if not offset:
+        return
+    # refresh content
+    xbmc.executebuiltin(
+        'Container.Update({0})'.format(
+            buildurl(listtype, {'offset': offset})
+        )
+    )
+
+
 # search history
 
 
-@route('/searchhistory')
+@route(URLPATH_LISTSEARCHHISTORY)
 def listsearchhistory(offset=0):  # type: (int) -> None
     """
     List search history.
@@ -388,35 +458,35 @@ def listsearchhistory(offset=0):  # type: (int) -> None
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30081).encode('utf-8')),
                     'RunPlugin({0})'.format(
-                        buildurl('/deletesearch', {'searchid': search.doc_id})
+                        buildurl(URLPATH_DELETESEARCH, {'searchid': search.doc_id})
                     )
                 ),
                 # clear search history
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30082).encode('utf-8')),
                     'RunPlugin({0})'.format(
-                        buildurl('/clearsearchhistory')
+                        buildurl(URLPATH_CLEARSEARCHHISTORY)
                     )
                 ),
                 # search videos
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30051).encode('utf-8')),
                     'Container.Update({0})'.format(
-                        buildurl('/searchvideos')
+                        buildurl(URLPATH_LISTSEARCHEDVIDEOS)
                     )
                 ),
                 # search similar
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30080).encode('utf-8')),
                     'Container.Update({0})'.format(
-                        buildurl('/searchvideos', {'similarq': search['q'].encode('utf-8')})
+                        buildurl(URLPATH_LISTSEARCHEDVIDEOS, {'similarq': search['q'].encode('utf-8')})
                     )
                 ),
             ]
         )
         kodilist.append(
             (
-                buildurl('/searchvideos', {'q': search['q'].encode('utf-8')}),
+                buildurl(URLPATH_LISTSEARCHEDVIDEOS, {'q': search['q'].encode('utf-8')}),
                 li,
                 isfolder
             )
@@ -425,7 +495,7 @@ def listsearchhistory(offset=0):  # type: (int) -> None
     if int(searchhistory['count']) > offset + itemsperpage:
         kodilist.append(
             (
-                buildurl('/searchhistory', {'offset': offset + itemsperpage}),
+                buildurl(URLPATH_LISTSEARCHHISTORY, {'offset': offset + itemsperpage}),
                 xbmcgui.ListItem(
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30034).encode('utf-8'))
                 ),
@@ -439,7 +509,7 @@ def listsearchhistory(offset=0):  # type: (int) -> None
     xbmcplugin.endOfDirectory(SYSARGV['handle'])
 
 
-@route('/deletesearch')
+@route(URLPATH_DELETESEARCH)
 def deletesearch(searchid):  # type: (int) -> None
     """
     Delete search from search history.
@@ -460,7 +530,7 @@ def deletesearch(searchid):  # type: (int) -> None
     xbmc.executebuiltin('Container.Refresh()')
 
 
-@route('/clearsearchhistory')
+@route(URLPATH_CLEARSEARCHHISTORY)
 def clearsearchhistory():  # type: () -> None
     """
     Clear search history.
@@ -489,20 +559,21 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
     # create list
     listitems = []
     isfolder = False
+    thumbsizes = ['photo_1280', 'photo_800', 'photo_640', 'photo_320']
     for video in listdata['items']:
         # create video item
-        videotitle_wrapable = video['title'].encode('utf-8').replace('.', ' ').replace('_', ' ')
-        li = xbmcgui.ListItem(videotitle_wrapable)
+        videotitle = video['title'].encode('utf-8').replace('.', ' ').replace('_', ' ')  # wrapable
+        li = xbmcgui.ListItem(videotitle)
         # set isplayable
         li.setProperty('IsPlayable', 'true')
         # set infolabels
         li.setInfo(
             'video',
             {
-                'title': videotitle_wrapable,
+                'title': videotitle,
                 'plot': video['description'].encode('utf-8'),
                 'duration': video['duration'],
-                'date': datetime.datetime.fromtimestamp(video['date']).strftime('%d.%m.%Y')
+                'date': datetime.datetime.fromtimestamp(video['date']).strftime('%d.%m.%Y'),
             }
         )
         # set stream infolabels
@@ -514,105 +585,111 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
             }
         )
         # set art
-        if 'photo_800' in video:
-            maxthumb = video['photo_800']
-        elif 'photo_640' in video:
-            maxthumb = video['photo_640']
-        else:
-            maxthumb = video['photo_320']
-        li.setArt({'thumb': maxthumb})
+        maxthumb = [video[thumbsize] for thumbsize in thumbsizes if thumbsize in video][0]
+        li.setArt(
+            {
+                'thumb': maxthumb
+            }
+        )
         # create context menu
         cmi = []
-        # like video / unlike video
+        # like video
         if not video['is_favorite']:
-            cmi.append(
+            cmi += [
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30053).encode('utf-8')),
                     'RunPlugin({0})'.format(
-                        buildurl('/likevideo', {'ownerid': video['owner_id'], 'videoid': video['id']})
+                        buildurl(URLPATH_LIKEVIDEO, {'ownerid': video['owner_id'], 'videoid': video['id']})
                     )
                 )
-            )
+            ]
+        # unlike video
         else:
-            cmi.append(
+            cmi += [
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30054).encode('utf-8')),
                     'RunPlugin({0})'.format(
-                        buildurl('/unlikevideo', {'ownerid': video['owner_id'], 'videoid': video['id']})
+                        buildurl(URLPATH_UNLIKEVIDEO, {'ownerid': video['owner_id'], 'videoid': video['id']})
                     )
                 )
-            )
+            ]
         # add video to albums
-        cmi.append(
+        cmi += [
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30055).encode('utf-8')),
                 'RunPlugin({0})'.format(
-                    buildurl('/addvideotoalbums', {'ownerid': video['owner_id'], 'videoid': video['id']})
+                    buildurl(URLPATH_ADDVIDEOTOALBUMS, {'ownerid': video['owner_id'], 'videoid': video['id']})
                 )
             )
-        )
-        # add video to watchlist / delete video from watchlist
+        ]
+        # add video to watchlist
         if 'added_to_watchlist' not in video:
-            cmi.append(
+            cmi += [
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30056).encode('utf-8')),
                     'RunPlugin({0})'.format(
-                        buildurl('/addvideotowatchlist', {'ownerid': video['owner_id'], 'videoid': video['id']})
+                        buildurl(URLPATH_ADDVIDEOTOWATCHLIST, {'ownerid': video['owner_id'], 'videoid': video['id']})
                     )
                 )
-            )
+            ]
+        # delete video from watchlist
         else:
-            cmi.append(
+            cmi += [
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30057).encode('utf-8')),
                     'RunPlugin({0})'.format(
-                        buildurl('/deletevideofromwatchlist', {'ownerid': video['owner_id'], 'videoid': video['id']})
+                        buildurl(URLPATH_DELETEVIDEOFROMWATCHLIST, {'ownerid': video['owner_id'], 'videoid': video['id']})
                     )
                 )
-            )
+            ]
         # clear watchlist
-        if listtype == '/watchlist':
-            cmi.append(
+        if listtype == URLPATH_LISTWATCHLIST:
+            cmi += [
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30058).encode('utf-8')),
                     'RunPlugin({0})'.format(
-                        buildurl('/clearwatchlist')
+                        buildurl(URLPATH_CLEARWATCHLIST)
                     )
                 )
-            )
+            ]
         # clear played videos
-        elif listtype == '/playedvideos':
-            cmi.append(
+        elif listtype == URLPATH_LISTPLAYEDVIDEOS:
+            cmi += [
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30059).encode('utf-8')),
                     'RunPlugin({0})'.format(
-                        buildurl('/clearplayedvideos')
+                        buildurl(URLPATH_CLEARPLAYEDVIDEOS)
                     )
                 )
-            )
-        # search videos
-        cmi.append(
+            ]
+        cmi += [
+            # search videos
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30051).encode('utf-8')),
                 'Container.Update({0})'.format(
-                    buildurl('/searchvideos')
-                )  # cnt.upd!
-            )
-        )
-        # search similar
-        cmi.append(
+                    buildurl(URLPATH_LISTSEARCHEDVIDEOS)
+                )
+            ),
+            # search similar
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30080).encode('utf-8')),
                 'Container.Update({0})'.format(
-                    buildurl('/searchvideos', {'similarq': videotitle_wrapable})
-                )  # cnt.upd!
-            )
-        )
+                    buildurl(URLPATH_LISTSEARCHEDVIDEOS, {'similarq': videotitle})
+                )
+            ),
+            # skip to offset
+            (
+                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30035).encode('utf-8')),
+                'RunPlugin({0})'.format(
+                    buildurl(URLPATH_SKIPTOOFFSET, {'listtype': listtype})
+                )
+            ),
+        ]
         li.addContextMenuItems(cmi)
         # add video item to list
         listitems.append(
             (
-                buildurl('/playvideo', {'ownerid': video['owner_id'], 'videoid': video['id']}),
+                buildurl(URLPATH_PLAYVIDEO, {'ownerid': video['owner_id'], 'videoid': video['id']}),
                 li,
                 isfolder
             )
@@ -637,7 +714,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
     xbmcplugin.endOfDirectory(SYSARGV['handle'])
 
 
-@route('/searchvideos')
+@route(URLPATH_LISTSEARCHEDVIDEOS)
 def listsearchedvideos(q='', similarq='', offset=0):  # type: (str, str, int) -> None
     """
     List searched videos.
@@ -673,7 +750,7 @@ def listsearchedvideos(q='', similarq='', offset=0):  # type: (str, str, int) ->
     # pagination
     if int(searchedvideos['count']) > offset + itemsperpage:
         searchedvideos['next'] = {
-            'url': buildurl('/searchvideos', {'q': q, 'offset': offset + itemsperpage}),
+            'url': buildurl(URLPATH_LISTSEARCHEDVIDEOS, {'q': q, 'offset': offset + itemsperpage}),
         }
     xbmc.log('{0}: Searched videos: {1}'.format(ADDON.getAddonInfo('id'), searchedvideos))
     # only once
@@ -697,10 +774,10 @@ def listsearchedvideos(q='', similarq='', offset=0):  # type: (str, str, int) ->
             ADDON.getLocalizedString(30052).encode('utf-8').format(searchedvideos['count'])
         )
     # build list
-    buildvideolist('/searchvideos', searchedvideos)
+    buildvideolist(URLPATH_LISTSEARCHEDVIDEOS, searchedvideos)
 
 
-@route('/playedvideos')
+@route(URLPATH_LISTPLAYEDVIDEOS)
 def listplayedvideos(offset=0):  # type: (int) -> None
     """
     List played videos.
@@ -717,14 +794,14 @@ def listplayedvideos(offset=0):  # type: (int) -> None
     # pagination
     if int(playedvideos['count']) > offset + itemsperpage:
         playedvideos['next'] = {
-            'url': buildurl('/playedvideos', {'offset': offset + itemsperpage}),
+            'url': buildurl(URLPATH_LISTPLAYEDVIDEOS, {'offset': offset + itemsperpage}),
         }
     xbmc.log('{0}: Played videos: {1}'.format(ADDON.getAddonInfo('id'), playedvideos))
     # build list
-    buildvideolist('/playedvideos', playedvideos)
+    buildvideolist(URLPATH_LISTPLAYEDVIDEOS, playedvideos)
 
 
-@route('/watchlist')
+@route(URLPATH_LISTWATCHLIST)
 def listwatchlist(offset=0):  # type: (int) -> None
     """
     List watchlist.
@@ -741,14 +818,14 @@ def listwatchlist(offset=0):  # type: (int) -> None
     # pagination
     if int(watchlist['count']) > offset + itemsperpage:
         watchlist['next'] = {
-            'url': buildurl('/watchlist', {'offset': offset + itemsperpage}),
+            'url': buildurl(URLPATH_LISTWATCHLIST, {'offset': offset + itemsperpage}),
         }
     xbmc.log('{0}: Watchlist: {1}'.format(ADDON.getAddonInfo('id'), watchlist))
     # build list
-    buildvideolist('/watchlist', watchlist)
+    buildvideolist(URLPATH_LISTWATCHLIST, watchlist)
 
 
-@route('/videos')
+@route(URLPATH_LISTVIDEOS)
 def listvideos(offset=0):  # type: (int) -> None
     """
     List videos.
@@ -769,14 +846,14 @@ def listvideos(offset=0):  # type: (int) -> None
     # pagination
     if int(videos['count']) > offset + itemsperpage:
         videos['next'] = {
-            'url': buildurl('/videos', {'offset': offset + itemsperpage}),
+            'url': buildurl(URLPATH_LISTVIDEOS, {'offset': offset + itemsperpage}),
         }
     xbmc.log('{0}: Videos: {1}'.format(ADDON.getAddonInfo('id'), videos))
     # build list
-    buildvideolist('/videos', videos)
+    buildvideolist(URLPATH_LISTVIDEOS, videos)
 
 
-@route('/likedvideos')
+@route(URLPATH_LISTLIKEDVIDEOS)
 def listlikedvideos(offset=0):  # type: (int) -> None
     """
     List liked videos.
@@ -797,14 +874,14 @@ def listlikedvideos(offset=0):  # type: (int) -> None
     # pagination
     if int(likedvideos['count']) > offset + itemsperpage:
         likedvideos['next'] = {
-            'url': buildurl('/likedvideos', {'offset': offset + itemsperpage}),
+            'url': buildurl(URLPATH_LISTLIKEDVIDEOS, {'offset': offset + itemsperpage}),
         }
     xbmc.log('{0}: Liked videos: {1}'.format(ADDON.getAddonInfo('id'), likedvideos))
     # build list
-    buildvideolist('/likedvideos', likedvideos)
+    buildvideolist(URLPATH_LISTLIKEDVIDEOS, likedvideos)
 
 
-@route('/albumvideos')
+@route(URLPATH_LISTALBUMVIDEOS)
 def listalbumvideos(albumid, offset=0):  # type: (int, int) -> None
     """
     List album videos.
@@ -827,14 +904,14 @@ def listalbumvideos(albumid, offset=0):  # type: (int, int) -> None
     # pagination
     if int(albumvideos['count']) > offset + itemsperpage:
         albumvideos['next'] = {
-            'url': buildurl('/albumvideos', {'albumid': albumid, 'offset': offset + itemsperpage}),
+            'url': buildurl(URLPATH_LISTALBUMVIDEOS, {'albumid': albumid, 'offset': offset + itemsperpage}),
         }
     xbmc.log('{0}: Album videos: {1}'.format(ADDON.getAddonInfo('id'), albumvideos))
     # build list
-    buildvideolist('/albumvideos', albumvideos)
+    buildvideolist(URLPATH_LISTALBUMVIDEOS, albumvideos)
 
 
-@route('/communityvideos')
+@route(URLPATH_LISTCOMMUNITYVIDEOS)
 def listcommunityvideos(communityid, offset=0):  # type: (int, int) -> None
     """
     List community videos.
@@ -857,14 +934,14 @@ def listcommunityvideos(communityid, offset=0):  # type: (int, int) -> None
     # pagination
     if int(communityvideos['count']) > offset + itemsperpage:
         communityvideos['next'] = {
-            'url': buildurl('/communityvideos', {'communityid': communityid, 'offset': offset + itemsperpage}),
+            'url': buildurl(URLPATH_LISTCOMMUNITYVIDEOS, {'communityid': communityid, 'offset': offset + itemsperpage}),
         }
     xbmc.log('{0}: Community videos: {1}'.format(ADDON.getAddonInfo('id'), communityvideos))
     # build list
-    buildvideolist('/communityvideos', communityvideos)
+    buildvideolist(URLPATH_LISTCOMMUNITYVIDEOS, communityvideos)
 
 
-@route('/playvideo')
+@route(URLPATH_PLAYVIDEO)
 def playvideo(ownerid, videoid):  # type: (int, int) -> None
     """
     Play video.
@@ -918,7 +995,7 @@ def playvideo(ownerid, videoid):  # type: (int, int) -> None
     xbmcplugin.setResolvedUrl(SYSARGV['handle'], True, li)
 
 
-@route('/likevideo')
+@route(URLPATH_LIKEVIDEO)
 def likevideo(ownerid, videoid):  # type: (int, int) -> None
     """
     Like video.
@@ -942,7 +1019,7 @@ def likevideo(ownerid, videoid):  # type: (int, int) -> None
     xbmc.executebuiltin('Container.Refresh()')
 
 
-@route('/unlikevideo')
+@route(URLPATH_UNLIKEVIDEO)
 def unlikevideo(ownerid, videoid):  # type: (int, int) -> None
     """
     Unlike video.
@@ -966,7 +1043,7 @@ def unlikevideo(ownerid, videoid):  # type: (int, int) -> None
     xbmc.executebuiltin('Container.Refresh()')
 
 
-@route('/addvideotoalbums')
+@route(URLPATH_ADDVIDEOTOALBUMS)
 def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
     """
     Add video to albums.
@@ -1029,7 +1106,7 @@ def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
     xbmc.executebuiltin('Container.Refresh()')
 
 
-@route('/addvideotowatchlist')
+@route(URLPATH_ADDVIDEOTOWATCHLIST)
 def addvideotowatchlist(ownerid, videoid):  # type: (int, int) -> None
     """
     Add video to watchlist.
@@ -1064,7 +1141,7 @@ def addvideotowatchlist(ownerid, videoid):  # type: (int, int) -> None
     # refresh content - not needed
 
 
-@route('/deletevideofromwatchlist')
+@route(URLPATH_DELETEVIDEOFROMWATCHLIST)
 def deletevideofromwatchlist(ownerid, videoid):  # type: (int, int) -> None
     """
     Delete video from watchlist.
@@ -1089,7 +1166,7 @@ def deletevideofromwatchlist(ownerid, videoid):  # type: (int, int) -> None
     xbmc.executebuiltin('Container.Refresh()')
 
 
-@route('/clearwatchlist')
+@route(URLPATH_CLEARWATCHLIST)
 def clearwatchlist():  # type: () -> None
     """
     Clear watchlist.
@@ -1108,7 +1185,7 @@ def clearwatchlist():  # type: () -> None
     xbmc.executebuiltin('Container.Refresh()')
 
 
-@route('/clearplayedvideos')
+@route(URLPATH_CLEARPLAYEDVIDEOS)
 def clearplayedvideos():  # type: () -> None
     """
     Clear played videos.
@@ -1130,21 +1207,22 @@ def clearplayedvideos():  # type: () -> None
 # video albums
 
 
-@route('/albums')
+@route(URLPATH_LISTALBUMS)
 def listalbums(offset=0):  # type: (int) -> None
     """
     List albums.
     """
     offset = int(offset)
-    # workaround due api's maxperpage=100
-    albumsperpage = int(ADDON.getSetting('itemsperpage')) if int(ADDON.getSetting('itemsperpage')) <= 100 else 100
-    # request vk api for albums
+    itemsperpage = int(ADDON.getSetting('itemsperpage'))
+    if itemsperpage > 100:
+        itemsperpage = 100  # api's max for albums
+    # request vk api
     vkapi = initvkapi()
     try:
         albums = vkapi.video.getAlbums(
             extended=1,
             offset=offset,
-            count=albumsperpage,
+            count=itemsperpage,
         )
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
@@ -1169,49 +1247,52 @@ def listalbums(offset=0):  # type: (int) -> None
                 # reorder album up
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30061).encode('utf-8')),
-                    'RunPlugin({0})'.format(buildurl('/reorderalbum', {'albumid': album['id'], 'beforeid': beforeid}))
+                    'RunPlugin({0})'.format(buildurl(URLPATH_REORDERALBUM, {'albumid': album['id'], 'beforeid': beforeid}))
                 ),
                 # reorder album down
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30062).encode('utf-8')),
-                    'RunPlugin({0})'.format(buildurl('/reorderalbum', {'albumid': album['id'], 'afterid': afterid}))
+                    'RunPlugin({0})'.format(buildurl(URLPATH_REORDERALBUM, {'albumid': album['id'], 'afterid': afterid}))
                 ),
                 # rename album
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30060).encode('utf-8')),
-                    'RunPlugin({0})'.format(buildurl('/renamealbum', {'albumid': album['id']}))
+                    'RunPlugin({0})'.format(buildurl(URLPATH_RENAMEALBUM, {'albumid': album['id']}))
                 ),
                 # delete album
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30063).encode('utf-8')),
-                    'RunPlugin({0})'.format(buildurl('/deletealbum', {'albumid': album['id']}))
+                    'RunPlugin({0})'.format(buildurl(URLPATH_DELETEALBUM, {'albumid': album['id']}))
                 ),
                 # create new album
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30064).encode('utf-8')),
-                    'RunPlugin({0})'.format(buildurl('/createalbum'))
+                    'RunPlugin({0})'.format(buildurl(URLPATH_CREATEALBUM))
                 ),
                 # search videos
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30051).encode('utf-8')),
-                    'Container.Update({0})'.format(buildurl('/searchvideos'))  # cnt.upd!
+                    'Container.Update({0})'.format(buildurl(URLPATH_LISTSEARCHEDVIDEOS))  # cnt.upd!
                 ),
             ]
         )
         listitems.append(
             (
-                buildurl('/albumvideos', {'albumid': album['id']}),
+                buildurl(URLPATH_LISTALBUMVIDEOS, {'albumid': album['id']}),
                 li,
                 isfolder
             )
         )
     # pagination
-    if offset + albumsperpage < albums['count']:
+    if offset + itemsperpage < albums['count']:
         listitems.append(
             (
-                buildurl('/albums', {'offset': offset + albumsperpage}),
+                buildurl(URLPATH_LISTALBUMS, {'offset': offset + itemsperpage}),
                 xbmcgui.ListItem(
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30034).encode('utf-8'))),
+                    '[COLOR {0}]{1}[/COLOR]'.format(
+                        ALT_COLOR, ADDON.getLocalizedString(30034).encode('utf-8')
+                    )
+                ),
                 True
             )
         )
@@ -1222,7 +1303,7 @@ def listalbums(offset=0):  # type: (int) -> None
     xbmcplugin.endOfDirectory(SYSARGV['handle'])
 
 
-@route('/reorderalbum')
+@route(URLPATH_REORDERALBUM)
 def reorderalbum(albumid, beforeid=None, afterid=None):  # type: (int, int, int) -> None
     """
     Reorder album.
@@ -1248,13 +1329,13 @@ def reorderalbum(albumid, beforeid=None, afterid=None):  # type: (int, int, int)
     xbmc.executebuiltin('Container.Refresh()')
 
 
-@route('/renamealbum')
+@route(URLPATH_RENAMEALBUM)
 def renamealbum(albumid):  # type: (int) -> None
     """
     Rename album.
     """
     albumid = int(albumid)
-    # request vk api for album data
+    # request vk api
     vkapi = initvkapi()
     try:
         album = vkapi.video.getAlbumById(
@@ -1282,7 +1363,7 @@ def renamealbum(albumid):  # type: (int) -> None
     xbmc.executebuiltin('Container.Refresh()')
 
 
-@route('/deletealbum')
+@route(URLPATH_DELETEALBUM)
 def deletealbum(albumid):  # type: (int) -> None
     """
     Delete album.
@@ -1308,7 +1389,7 @@ def deletealbum(albumid):  # type: (int) -> None
     xbmc.executebuiltin('Container.Refresh()')
 
 
-@route('/createalbum')
+@route(URLPATH_CREATEALBUM)
 def createalbum():  # type: () -> None
     """
     Create album.
@@ -1342,50 +1423,53 @@ def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
     # create list
     listitems = []
     isfolder = True
-    namekey = 'title' if listtype == '/likedcommunities' else 'name'
+    namekey = 'title' if listtype == URLPATH_LISTLIKEDCOMMUNITIES else 'name'
     for community in listdata['items']:
-        if listtype == '/likedcommunities':
+        if listtype == URLPATH_LISTLIKEDCOMMUNITIES:
             community['id'] = community['id'].split('_')[2]
         # create community item
         li = xbmcgui.ListItem(community[namekey].encode('utf-8'))
         # set art
-        li.setArt({'thumb': community['photo_200']})
+        li.setArt(
+            {
+                'thumb': community['photo_200']
+            }
+        )
         # create context menu
         cmi = []
-        # unlike/like community
-        if listtype == '/likedcommunities':
-            cmi.append(
+        # unlike community
+        if listtype == URLPATH_LISTLIKEDCOMMUNITIES:
+            cmi += [
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30071).encode('utf-8')),
-                    'RunPlugin({0})'.format(buildurl('/unlikecommunity', {'communityid': community['id']}))
+                    'RunPlugin({0})'.format(buildurl(URLPATH_UNLIKECOMMUNITY, {'communityid': community['id']}))
                 )
-            )
+            ]
+        # like community
         else:
-            cmi.append(
+            cmi += [
                 (
                     '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30070).encode('utf-8')),
-                    'RunPlugin({0})'.format(buildurl('/likecommunity', {'communityid': community['id']}))
+                    'RunPlugin({0})'.format(buildurl(URLPATH_LIKECOMMUNITY, {'communityid': community['id']}))
                 )
-            )
-        # unfollow community
-        cmi.append(
+            ]
+        cmi += [
+            # unfollow community
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30072).encode('utf-8')),
-                'RunPlugin({0})'.format(buildurl('/unfollowcommunity', {'communityid': community['id']}))
-            )
-        )
-        # search videos
-        cmi.append(
+                'RunPlugin({0})'.format(buildurl(URLPATH_UNFOLLOWCOMMUNITY, {'communityid': community['id']}))
+            ),
+            # search videos
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30051).encode('utf-8')),
-                'Container.Update({0})'.format(buildurl('/searchvideos'))  # cnt.upd!
-            )
-        )
+                'Container.Update({0})'.format(buildurl(URLPATH_LISTSEARCHEDVIDEOS))  # cnt.upd!
+            ),
+        ]
         li.addContextMenuItems(cmi)
         # add item to list
         listitems.append(
             (
-                buildurl('/communityvideos', {'communityid': '{0}'.format(community['id'])}),
+                buildurl(URLPATH_LISTCOMMUNITYVIDEOS, {'communityid': '{0}'.format(community['id'])}),
                 li,
                 isfolder
             )
@@ -1407,7 +1491,7 @@ def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
     xbmcplugin.endOfDirectory(SYSARGV['handle'])
 
 
-@route('/communities')
+@route(URLPATH_LISTCOMMUNITIES)
 def listcommunities(offset=0):  # type: (int) -> None
     """
     List communities.
@@ -1428,14 +1512,14 @@ def listcommunities(offset=0):  # type: (int) -> None
     # pagination
     if int(communities['count']) > offset + itemsperpage:
         communities['next'] = {
-            'url': buildurl('/communities', {'offset': offset + itemsperpage}),
+            'url': buildurl(URLPATH_LISTCOMMUNITIES, {'offset': offset + itemsperpage}),
         }
     xbmc.log('{0}: Communities: {1}'.format(ADDON.getAddonInfo('id'), communities))
     # build list
-    buildcommunitylist('/communities', communities)
+    buildcommunitylist(URLPATH_LISTCOMMUNITIES, communities)
 
 
-@route('/likedcommunities')
+@route(URLPATH_LISTLIKEDCOMMUNITIES)
 def listlikedcommunities(offset=0):  # type: (int) -> None
     """
     List liked communities.
@@ -1455,14 +1539,14 @@ def listlikedcommunities(offset=0):  # type: (int) -> None
     # pagination
     if int(likedcommunities['count']) > offset + itemsperpage:
         likedcommunities['next'] = {
-            'url': buildurl('/likedcommunities', {'offset': offset + itemsperpage}),
+            'url': buildurl(URLPATH_LISTLIKEDCOMMUNITIES, {'offset': offset + itemsperpage}),
         }
     xbmc.log('{0}: Liked communities: {1}'.format(ADDON.getAddonInfo('id'), likedcommunities))
     # build list
-    buildcommunitylist('/likedcommunities', likedcommunities)
+    buildcommunitylist(URLPATH_LISTLIKEDCOMMUNITIES, likedcommunities)
 
 
-@route('/likecommunity')
+@route(URLPATH_LIKECOMMUNITY)
 def likecommunity(communityid):  # type: (int) -> None
     """
     Like community.
@@ -1482,7 +1566,7 @@ def likecommunity(communityid):  # type: (int) -> None
     xbmc.executebuiltin('Container.Refresh()')
 
 
-@route('/unlikecommunity')
+@route(URLPATH_UNLIKECOMMUNITY)
 def unlikecommunity(communityid):  # type: (int) -> None
     """
     Unlike community.
@@ -1502,7 +1586,7 @@ def unlikecommunity(communityid):  # type: (int) -> None
     xbmc.executebuiltin('Container.Refresh()')
 
 
-@route('/unfollowcommunity')
+@route(URLPATH_UNFOLLOWCOMMUNITY)
 def unfollowcommunity(communityid):  # type: (int) -> None
     """
     Unfollow community.
