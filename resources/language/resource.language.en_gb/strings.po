@@ -16,7 +16,7 @@ msgstr ""
 "Language: en_GB\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-# Addon settings
+# Settings -----
 
 msgctxt "#30000"
 msgid "GENERAL"
@@ -31,11 +31,11 @@ msgid "Items per page"
 msgstr ""
 
 msgctxt "#30003"
-msgid "Force view mode for videos"
+msgid "Force custom view mode for videos"
 msgstr ""
 
 msgctxt "#30004"
-msgid "View mode [id]"
+msgid "View mode id"
 msgstr ""
 
 msgctxt "#30005"
@@ -63,7 +63,7 @@ msgid "Shorter than"
 msgstr ""
 
 msgctxt "#30011"
-msgid "Duration [minutes]"
+msgid "Duration in minutes"
 msgstr ""
 
 msgctxt "#30012"
@@ -87,18 +87,18 @@ msgid "VK user access token"
 msgstr ""
 
 msgctxt "#30017"
-msgid "LOGOUT"
+msgid "Logout user"
 msgstr ""
 
 msgctxt "#30018"
-msgid "Keep history of addon requests"
+msgid "Keep history of add-on requests"
 msgstr ""
 
 msgctxt "#30019"
 msgid "Keep history of played videos"
 msgstr ""
 
-# Errors
+# Errors -----
 
 msgctxt "#30020"
 msgid "VK authorization error!"
@@ -120,7 +120,7 @@ msgctxt "#30024"
 msgid "Video resolving error!"
 msgstr ""
 
-# Common
+# Common -----
 
 msgctxt "#30030"
 msgid "VK account email/phone"
@@ -139,79 +139,75 @@ msgid "Are you sure?"
 msgstr ""
 
 msgctxt "#30034"
-msgid "NEXT PAGE"
+msgid "Next page"
 msgstr ""
 
 msgctxt "#30035"
-msgid "Skip to offset"
+msgid "Skip to page"
 msgstr ""
 
-# Main menu
+msgctxt "#30036"
+msgid "Go to owner"
+msgstr ""
+
+# Menu -----
 
 msgctxt "#30040"
-msgid "SEARCH VIDEOS"
+msgid "Search"
 msgstr ""
 
 msgctxt "#30041"
-msgid "SEARCH HISTORY"
+msgid "Search history"
 msgstr ""
 
 msgctxt "#30042"
-msgid "MY VIDEOS"
+msgid "My videos"
 msgstr ""
 
 msgctxt "#30043"
-msgid "MY LIKED VIDEOS"
+msgid "My liked videos"
 msgstr ""
 
 msgctxt "#30044"
-msgid "MY VIDEO ALBUMS"
+msgid "My video albums"
 msgstr ""
 
 msgctxt "#30045"
-msgid "MY COMMUNITIES"
+msgid "My communities"
 msgstr ""
 
 msgctxt "#30046"
-msgid "MY LIKED COMMUNITIES"
+msgid "My liked communities"
 msgstr ""
 
 msgctxt "#30047"
-msgid "PLAYED VIDEOS"
+msgid "Played videos"
 msgstr ""
 
 msgctxt "#30048"
-msgid "WATCHLIST"
+msgid "Watchlist"
 msgstr ""
 
-# Videos
-
-msgctxt "#30051"
-msgid "Search videos"
-msgstr ""
-
-msgctxt "#30052"
-msgid "{0} videos found."
-msgstr ""
+# Videos -----
 
 msgctxt "#30053"
-msgid "Like video"
+msgid "Add to liked videos"
 msgstr ""
 
 msgctxt "#30054"
-msgid "Unlike video"
+msgid "Remove from liked videos"
 msgstr ""
 
 msgctxt "#30055"
-msgid "Add video to albums"
+msgid "Set video albums"
 msgstr ""
 
 msgctxt "#30056"
-msgid "Add video to watchlist"
+msgid "Add to watchlist"
 msgstr ""
 
 msgctxt "#30057"
-msgid "Delete video from watchlist"
+msgid "Remove from watchlist"
 msgstr ""
 
 msgctxt "#30058"
@@ -222,7 +218,7 @@ msgctxt "#30059"
 msgid "Clear played videos"
 msgstr ""
 
-# Video albums
+# Video albums -----
 
 msgctxt "#30060"
 msgid "Rename album"
@@ -244,25 +240,21 @@ msgctxt "#30064"
 msgid "Create new album"
 msgstr ""
 
-# Communities
+# Communities -----
 
 msgctxt "#30070"
-msgid "Like community"
+msgid "Add to liked communities"
 msgstr ""
 
 msgctxt "#30071"
-msgid "Unlike community"
+msgid "Remove from liked communities"
 msgstr ""
 
 msgctxt "#30072"
-msgid "Unfollow community"
+msgid "Leave community"
 msgstr ""
 
-# Search history
-
-msgctxt "#30080"
-msgid "Search similar"
-msgstr ""
+# Search -----
 
 msgctxt "#30081"
 msgid "Delete search"
@@ -270,4 +262,16 @@ msgstr ""
 
 msgctxt "#30082"
 msgid "Clear search history"
+msgstr ""
+
+msgctxt "#30083"
+msgid "Search videos"
+msgstr ""
+
+msgctxt "#30084"
+msgid "{0} videos searched"
+msgstr ""
+
+msgctxt "#30085"
+msgid "Search similar title"
 msgstr ""

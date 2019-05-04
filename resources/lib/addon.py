@@ -261,7 +261,7 @@ def dispatch():  # type: () -> None
     xbmc.log('{0}: Handler runtime: {1} sec.'.format(ADDON.getAddonInfo('id'), t2 - t1))
 
 
-# common
+# common -----
 
 
 @route(URLPATH_LOGOUT)
@@ -424,7 +424,7 @@ def skiptooffset(listtype):  # type: (str) -> None
     )
 
 
-# search history
+# search -----
 
 
 @route(URLPATH_LISTSEARCHHISTORY)
@@ -470,14 +470,14 @@ def listsearchhistory(offset=0):  # type: (int) -> None
                 ),
                 # search videos
                 (
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30051).encode('utf-8')),
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30083).encode('utf-8')),
                     'Container.Update({0})'.format(
                         buildurl(URLPATH_LISTSEARCHEDVIDEOS)
                     )
                 ),
-                # search similar
+                # search similar title
                 (
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30080).encode('utf-8')),
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30085).encode('utf-8')),
                     'Container.Update({0})'.format(
                         buildurl(URLPATH_LISTSEARCHEDVIDEOS, {'similarq': search['q'].encode('utf-8')})
                     )
@@ -549,7 +549,7 @@ def clearsearchhistory():  # type: () -> None
     xbmc.executebuiltin('Container.Refresh()')
 
 
-# videos
+# videos -----
 
 
 def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
@@ -665,16 +665,23 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
         cmi += [
             # search videos
             (
-                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30051).encode('utf-8')),
+                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30083).encode('utf-8')),
                 'Container.Update({0})'.format(
                     buildurl(URLPATH_LISTSEARCHEDVIDEOS)
                 )
             ),
-            # search similar
+            # search similar title
             (
-                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30080).encode('utf-8')),
+                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30085).encode('utf-8')),
                 'Container.Update({0})'.format(
                     buildurl(URLPATH_LISTSEARCHEDVIDEOS, {'similarq': videotitle})
+                )
+            ),
+            # Go to owner
+            (
+                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30100).encode('utf-8')),
+                'Container.Update({0})'.format(
+                    buildurl(URLPATH_LISTVIDEOS, {'ownerid': video['owner_id']})
                 )
             ),
             # skip to offset
@@ -686,7 +693,6 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
             ),
         ]
         li.addContextMenuItems(cmi)
-        # add video item to list
         listitems.append(
             (
                 buildurl(URLPATH_PLAYVIDEO, {'ownerid': video['owner_id'], 'videoid': video['id']}),
@@ -723,7 +729,7 @@ def listsearchedvideos(q='', similarq='', offset=0):  # type: (str, str, int) ->
     itemsperpage = int(ADDON.getSetting('itemsperpage'))
     # if q not passed, ask user for entering a new query / editing similar one
     if not q:
-        q = xbmcgui.Dialog().input(ADDON.getLocalizedString(30051).encode('utf-8'), defaultt=similarq)
+        q = xbmcgui.Dialog().input(ADDON.getLocalizedString(30083).encode('utf-8'), defaultt=similarq)
         if not q:
             return
     # request vk api
@@ -771,7 +777,7 @@ def listsearchedvideos(q='', similarq='', offset=0):  # type: (str, str, int) ->
         # notify search results count
         xbmcgui.Dialog().notification(
             ADDON.getAddonInfo('id'),
-            ADDON.getLocalizedString(30052).encode('utf-8').format(searchedvideos['count'])
+            ADDON.getLocalizedString(30084).encode('utf-8').format(searchedvideos['count'])
         )
     # build list
     buildvideolist(URLPATH_LISTSEARCHEDVIDEOS, searchedvideos)
@@ -826,27 +832,32 @@ def listwatchlist(offset=0):  # type: (int) -> None
 
 
 @route(URLPATH_LISTVIDEOS)
-def listvideos(offset=0):  # type: (int) -> None
+def listvideos(ownerid=None, offset=0):  # type: (int, int) -> None
     """
     List videos.
     """
+    if ownerid:
+        ownerid = int(ownerid)
     offset = int(offset)
     itemsperpage = int(ADDON.getSetting('itemsperpage'))
     # request vk api
     vkapi = initvkapi()
+    kwargs = {
+        'extended': 1,
+        'offset': offset,
+        'count': itemsperpage,
+    }
+    if ownerid:
+        kwargs['owner_id'] = ownerid
     try:
-        videos = vkapi.video.get(
-            extended=1,
-            offset=offset,
-            count=itemsperpage,
-        )
+        videos = vkapi.video.get(**kwargs)
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
     # pagination
     if int(videos['count']) > offset + itemsperpage:
         videos['next'] = {
-            'url': buildurl(URLPATH_LISTVIDEOS, {'offset': offset + itemsperpage}),
+            'url': buildurl(URLPATH_LISTVIDEOS, {'ownerid': ownerid, 'offset': offset + itemsperpage}),
         }
     xbmc.log('{0}: Videos: {1}'.format(ADDON.getAddonInfo('id'), videos))
     # build list
@@ -1204,13 +1215,13 @@ def clearplayedvideos():  # type: () -> None
     xbmc.executebuiltin('Container.Refresh()')
 
 
-# video albums
+# video albums -----
 
 
 @route(URLPATH_LISTALBUMS)
 def listalbums(offset=0):  # type: (int) -> None
     """
-    List albums.
+    List video albums.
     """
     offset = int(offset)
     itemsperpage = int(ADDON.getSetting('itemsperpage'))
@@ -1271,7 +1282,7 @@ def listalbums(offset=0):  # type: (int) -> None
                 ),
                 # search videos
                 (
-                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30051).encode('utf-8')),
+                    '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30083).encode('utf-8')),
                     'Container.Update({0})'.format(buildurl(URLPATH_LISTSEARCHEDVIDEOS))  # cnt.upd!
                 ),
             ]
@@ -1413,7 +1424,7 @@ def createalbum():  # type: () -> None
     xbmc.executebuiltin('Container.Refresh()')
 
 
-# communities
+# communities -----
 
 
 def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
@@ -1461,7 +1472,7 @@ def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
             ),
             # search videos
             (
-                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30051).encode('utf-8')),
+                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30083).encode('utf-8')),
                 'Container.Update({0})'.format(buildurl(URLPATH_LISTSEARCHEDVIDEOS))  # cnt.upd!
             ),
         ]
@@ -1620,6 +1631,7 @@ if __name__ == '__main__':
         dispatch()
     except AddonError as e:
         xbmcgui.Dialog().notification(
-            ADDON.getAddonInfo('id'), ADDON.getLocalizedString(e.errid).encode('utf-8'),
+            ADDON.getAddonInfo('id'),
+            ADDON.getLocalizedString(e.errid).encode('utf-8'),
             icon=xbmcgui.NOTIFICATION_ERROR
         )

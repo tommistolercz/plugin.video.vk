@@ -32,61 +32,58 @@ Common:
     - English
     - Czech
 - Manage add-on settings
-    - General
-        - Items per page
-        - Force view mode for videos  
-            - Video view mode id
-        - Search incl. adult videos  
-        - Search incl. own videos
-        - Search by video duration
-            - Duration mins
-        - Sort searched videos by
-        - Keep history of add-on requests    
-        - Keep history of played videos
-    - User
-        - VK user access token
-        - Logout
+    - Items per page
+    - Force custom view mode for videos 
+    - Search incl. adult videos  
+    - Search incl. own videos
+    - Search by video duration (any, longer/shorter than)
+    - Sort searched videos by (by relevance/date/duration)
+    - Keep history of add-on requests
+    - Keep history of played videos
+    - VK user access token
 - Authorize add-on
+- Logout user
 - List add-on menu
-- List next page
-- Skip to offset
+- Skip to page
 
 Search:
-- Search videos / List searched videos
-    - Search similar videos (by video title)
+- Search videos
+- Search similar title
 - List search history
-    - Delete search from history
-    - Clear search history
+- Delete search from history
+- Clear search history
 
 Videos:
+- List searched videos
 - List my videos
 - List my liked videos
 - List album videos
 - List community videos
 - List played videos
-    - Clear played videos
+- Clear played videos
 - List watchlist
-    - Add video to watchlist
-    - Delete video from watchlist
-    - Clear watchlist
+- Add video to watchlist
+- Remove video from watchlist
+- Clear watchlist
 - Play video
-- Like video
-- Unlike video
-- Add video to albums
+- Add to liked videos
+- Remove from liked videos
+- Set video albums
+- Go to owner
 
 Video albums:
 - List my video albums
-    - Rename album
-    - Reorder album up/down
-    - Delete album
-    - Create new album
+- Rename album
+- Reorder album up/down
+- Delete album
+- Create new album
 
 Communities:
 - List my communities
 - List my liked communities
-- Like community
-- Unlike community
-- Unfollow community
+- Add to liked communities
+- Remove from liked communities
+- Leave community
 
 ## Screenshots
 
@@ -103,13 +100,13 @@ Communities:
 ### v1.0.0 (2018-11-12)
 
 Added:
-- EN/CZ translation
+- EN/CZ translations
 - Manage add-on settings
 - Authorize add-on
 - List add-on menu
-- Logout
+- Logout user
 - Search videos
-- Search similar videos
+- Search similar title
 - List search history
 - Delete search from history
 - List videos
@@ -117,9 +114,9 @@ Added:
 - List album videos
 - List community videos
 - Play video
-- Like video
-- Unlike video
-- Add video to albums
+- Add to liked videos
+- Remove from liked videos
+- Set video albums
 - List albums
 - Rename album
 - Reorder album up/down
@@ -127,9 +124,9 @@ Added:
 - Create new album
 - List communities
 - List liked communities
-- Like community
-- Unlike community
-- Unfollow community
+- Add to liked communities
+- Remove from liked communities
+- Leave community
 
 ### v1.1.0 (2019-02-01)
 
@@ -143,7 +140,7 @@ Fixed:
 Added:
 - Infolabels showing video resolution in lists
 - Counter for Search history menu item    
-- Code enabling Stats (future feature)
+- Code enabling Usage stats (future feature)
 
 Changed:
 - Reduced using of Kodi notifications
@@ -155,11 +152,11 @@ Changed:
 ### v1.2.0 (2019-03-04)
 
 Fixed:
-- Reported unicode issues (#66) (#70)
-- Weak encoding error in main menu (search history item)
+- Reported unicode issues (#66, #70)
+- Weak encoding error in main menu
 
 Added:
-- Played videos list
+- Played videos (list)
 
 Changed:
 - Reused Search videos contextual action in all lists
@@ -173,14 +170,14 @@ Fixed:
 - Displaying of long video titles in video lists
 
 Added:
-- Watchlist video list
-- Add video to watchlist contextual action
-- Delete video from watchlist contextual action
-- Clear watchlist contextual action
-- Clear search history contextual action (#75)
-- Clear played videos contextual action (#75)
-- Keep history of addon requests setting (default false, not visible)
-- Keep history of played videos setting (default false)
+- Watchlist (list)
+- Add video to watchlist (contextual action)
+- Delete video from watchlist (contextual action)
+- Clear watchlist (contextual action)
+- Clear search history (contextual action) (#75)
+- Clear played videos (contextual action) (#75)
+- Keep history of add-on requests (setting, default false, not visible)
+- Keep history of played videos (setting, default false)
 
 Changed:
 - Optimized performance
@@ -193,14 +190,15 @@ Fixed:
 - [ ] Play video throws Video resolving error after session cookies expiration (#57)
 
 Added:
-- [x] Skip to offset contextual action
-- [ ] Go to owner contextual action
+- [ ] Skip to page (contextual action)
+- [ ] Go to owner (contextual action)
 
 Changed:
-- [x] Refined python code:
-    - [x] Refined set art code in video lists
-    - [x] Defined urlpaths as constants
-    - [x] Enabled debug logging of handler runtime   
-- [ ] Refine docs:
-    - [x] Separated Features and Changelog        
-    - [ ] Publish docs
+- Refined python code
+    - Refined set art code in video lists
+    - Defined consts for urlpaths
+    - Enabled debug logging of handler runtime
+    - [ ] Refactor Search videos / List searched videos
+    - [ ] Refactor settings (Logout: to menu, token: invisible)   
+- Refined language resources
+- [ ] Refine readme
