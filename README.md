@@ -48,7 +48,7 @@ Common:
 
 Search:
 - Search videos
-- Search similar title
+- Search by similar title
 - List search history
 - Delete search from history
 - Clear search history
@@ -106,7 +106,7 @@ Added:
 - List add-on menu
 - Logout user
 - Search videos
-- Search similar title
+- Search by similar title
 - List search history
 - Delete search from history
 - List videos
@@ -196,9 +196,10 @@ Added:
 Changed:
 - Refined python code
     - Refined set art code in video lists
+    - [ ] Refine notifications (id->name)
     - Defined consts for urlpaths
     - Enabled debug logging of handler runtime
     - [ ] Refactor Search videos / List searched videos
     - [ ] Refactor settings (Logout: to menu, token: invisible)   
 - Refined language resources
-- [ ] Refine readme
+- Refined readme

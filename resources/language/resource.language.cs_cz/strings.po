@@ -199,7 +199,7 @@ msgid "Remove from liked videos"
 msgstr "Odebrat z oblíbených videí"
 
 msgctxt "#30055"
-msgid "Set video albums"
+msgid "Set albums"
 msgstr "Zařadit do alb"
 
 msgctxt "#30056"
@@ -265,13 +265,13 @@ msgid "Clear search history"
 msgstr "Vymazat historii hledání"
 
 msgctxt "#30083"
-msgid "Search videos"
-msgstr "Hledat videa"
+msgid "Search"
+msgstr "Hledat"
 
 msgctxt "#30084"
 msgid "{0} videos searched"
 msgstr "{0} nalezených videí"
 
 msgctxt "#30085"
-msgid "Search similar title"
+msgid "Search by similar title"
 msgstr "Hledat podobný název"

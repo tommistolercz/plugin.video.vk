@@ -679,7 +679,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
             ),
             # Go to owner
             (
-                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30100).encode('utf-8')),
+                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30036).encode('utf-8')),
                 'Container.Update({0})'.format(
                     buildurl(URLPATH_LISTVIDEOS, {'ownerid': video['owner_id']})
                 )

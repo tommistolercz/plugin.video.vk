@@ -40,12 +40,13 @@ Added:
 Changed:
 - Refined python code
     - Refined set art code in video lists
+    - [ ] Refine notifications (id->name)
     - Defined consts for urlpaths
     - Enabled debug logging of handler runtime
     - [ ] Refactor Search videos / List searched videos
     - [ ] Refactor settings (Logout: to menu, token: invisible)
 - Refined language resources
-- [ ] Refine readme
+- Refined readme
         </news>
     </extension>
 </addon>

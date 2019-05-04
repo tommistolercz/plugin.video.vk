@@ -199,7 +199,7 @@ msgid "Remove from liked videos"
 msgstr ""
 
 msgctxt "#30055"
-msgid "Set video albums"
+msgid "Set albums"
 msgstr ""
 
 msgctxt "#30056"
@@ -265,7 +265,7 @@ msgid "Clear search history"
 msgstr ""
 
 msgctxt "#30083"
-msgid "Search videos"
+msgid "Search"
 msgstr ""
 
 msgctxt "#30084"
@@ -273,5 +273,5 @@ msgid "{0} videos searched"
 msgstr ""
 
 msgctxt "#30085"
-msgid "Search similar title"
+msgid "Search by similar title"
 msgstr ""
