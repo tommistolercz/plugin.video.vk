@@ -192,14 +192,16 @@ Fixed:
 Added:
 - [ ] Skip to page (contextual action)
 - [ ] Go to owner (contextual action)
+- [ ] Follow owner (contextual action)
 
 Changed:
-- Refined python code
-    - Refined set art code in video lists
-    - [ ] Refine notifications (id->name)
-    - Defined consts for urlpaths
-    - Enabled debug logging of handler runtime
+- [x] Refined readme
+- [x] Refined language resources
+    - [ ] Search incl. adult videos (default true) => Safe search (default true)
+- [x] Refined python code
+    - [x] Refined set art code in video lists
+    - [x] Refined notifications
+    - [x] Defined consts for urlpaths
+    - [x] Enabled debug logging of handler runtime
     - [ ] Refactor Search videos / List searched videos
-    - [ ] Refactor settings (Logout: to menu, token: invisible)   
-- Refined language resources
-- Refined readme
+    - [ ] Refactor settings (Logout: to menu, token: invisible)

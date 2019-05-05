@@ -28,25 +28,7 @@
         </assets>
         <news>
 ### v1.4.0-dev (not released)
-
-Fixed:
-- [ ] Play video fails on Video resolving error on iOS (#82)
-- [ ] Play video throws Video resolving error after session cookies expiration (#57)
-
-Added:
-- [ ] Skip to page (contextual action)
-- [ ] Go to owner (contextual action)
-
-Changed:
-- Refined python code
-    - Refined set art code in video lists
-    - [ ] Refine notifications (id->name)
-    - Defined consts for urlpaths
-    - Enabled debug logging of handler runtime
-    - [ ] Refactor Search videos / List searched videos
-    - [ ] Refactor settings (Logout: to menu, token: invisible)
-- Refined language resources
-- Refined readme
+TBD
         </news>
     </extension>
 </addon>

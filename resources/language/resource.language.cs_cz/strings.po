@@ -147,8 +147,8 @@ msgid "Skip to page"
 msgstr "Přeskočit na stranu"
 
 msgctxt "#30036"
-msgid "Go to owner"
-msgstr "Přejít na vlastníka"
+msgid "Go to"
+msgstr "Přejít na"
 
 # Menu -----
 

@@ -273,7 +273,7 @@ def logout():  # type: () -> None
     deletecookies()
     ADDON.setSetting('vkuseraccesstoken', '')
     xbmc.log('{0}: User logged out.'.format(ADDON.getAddonInfo('id')))
-    xbmcgui.Dialog().notification(ADDON.getAddonInfo('id'), ADDON.getLocalizedString(30032).encode('utf-8'))
+    xbmcgui.Dialog().notification(ADDON.getAddonInfo('name'), ADDON.getLocalizedString(30032).encode('utf-8'))
 
 
 @route(URLPATH_LISTADDONMENU)
@@ -560,6 +560,13 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
     listitems = []
     isfolder = False
     thumbsizes = ['photo_1280', 'photo_800', 'photo_640', 'photo_320']
+    ownernames = {}
+    ownernames.update(
+        {str(-g['id']): g['screen_name'].encode('utf-8') for g in listdata['groups'] if 'groups' in listdata}
+    )
+    ownernames.update(
+        {str(p['id']): '{0} {1}'.format(p['first_name'].encode('utf-8'), p['last_name'].encode('utf-8')) for p in listdata['profiles'] if 'profiles' in listdata}
+    )
     for video in listdata['items']:
         # create video item
         videotitle = video['title'].encode('utf-8').replace('.', ' ').replace('_', ' ')  # wrapable
@@ -613,7 +620,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                     )
                 )
             ]
-        # add video to albums
+        # set albums
         cmi += [
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30055).encode('utf-8')),
@@ -662,7 +669,28 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                     )
                 )
             ]
+        # go to owner
+        elif listtype == URLPATH_LISTSEARCHEDVIDEOS and str(video['owner_id']) in ownernames:
+            cmi += [
+                (
+                    '[COLOR {0}]{1} {2}[/COLOR]'.format(
+                        ALT_COLOR,
+                        ADDON.getLocalizedString(30036).encode('utf-8'),
+                        ownernames[str(video['owner_id'])]
+                    ),
+                    'Container.Update({0})'.format(
+                        buildurl(URLPATH_LISTVIDEOS, {'ownerid': video['owner_id']})
+                    )
+                )
+            ]
         cmi += [
+            # skip to page
+            (
+                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30035).encode('utf-8')),
+                'RunPlugin({0})'.format(
+                    buildurl(URLPATH_SKIPTOOFFSET, {'listtype': listtype})
+                )
+            ),
             # search videos
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30083).encode('utf-8')),
@@ -670,25 +698,11 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                     buildurl(URLPATH_LISTSEARCHEDVIDEOS)
                 )
             ),
-            # search similar title
+            # search by similar title
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30085).encode('utf-8')),
                 'Container.Update({0})'.format(
                     buildurl(URLPATH_LISTSEARCHEDVIDEOS, {'similarq': videotitle})
-                )
-            ),
-            # Go to owner
-            (
-                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30036).encode('utf-8')),
-                'Container.Update({0})'.format(
-                    buildurl(URLPATH_LISTVIDEOS, {'ownerid': video['owner_id']})
-                )
-            ),
-            # skip to offset
-            (
-                '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30035).encode('utf-8')),
-                'RunPlugin({0})'.format(
-                    buildurl(URLPATH_SKIPTOOFFSET, {'listtype': listtype})
                 )
             ),
         ]
@@ -776,7 +790,7 @@ def listsearchedvideos(q='', similarq='', offset=0):  # type: (str, str, int) ->
         xbmc.log('{0}: Search history db updated: {1}'.format(ADDON.getAddonInfo('id'), lastsearch))
         # notify search results count
         xbmcgui.Dialog().notification(
-            ADDON.getAddonInfo('id'),
+            ADDON.getAddonInfo('name'),
             ADDON.getLocalizedString(30084).encode('utf-8').format(searchedvideos['count'])
         )
     # build list
@@ -1631,7 +1645,7 @@ if __name__ == '__main__':
         dispatch()
     except AddonError as e:
         xbmcgui.Dialog().notification(
-            ADDON.getAddonInfo('id'),
+            ADDON.getAddonInfo('name'),
             ADDON.getLocalizedString(e.errid).encode('utf-8'),
             icon=xbmcgui.NOTIFICATION_ERROR
         )

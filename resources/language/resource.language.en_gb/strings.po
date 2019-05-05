@@ -147,7 +147,7 @@ msgid "Skip to page"
 msgstr ""
 
 msgctxt "#30036"
-msgid "Go to owner"
+msgid "Go to"
 msgstr ""
 
 # Menu -----
