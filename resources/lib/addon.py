@@ -78,7 +78,8 @@ URLPATH_LISTCOMMUNITIES = '/communities'
 URLPATH_LISTLIKEDCOMMUNITIES = '/likedcommunities'
 URLPATH_LIKECOMMUNITY = '/likecommunity'
 URLPATH_UNLIKECOMMUNITY = '/unlikecommunity'
-URLPATH_UNFOLLOWCOMMUNITY = '/unfollowcommunity'
+URLPATH_FOLLOWCOMMUNITY = '/followcommunity'
+URLPATH_LEAVECOMMUNITY = '/leavecommunity'
 
 
 # global vars
@@ -561,12 +562,10 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
     isfolder = False
     thumbsizes = ['photo_1280', 'photo_800', 'photo_640', 'photo_320']
     ownernames = {}
-    ownernames.update(
-        {str(-g['id']): g['screen_name'].encode('utf-8') for g in listdata['groups'] if 'groups' in listdata}
-    )
-    ownernames.update(
-        {str(p['id']): '{0} {1}'.format(p['first_name'].encode('utf-8'), p['last_name'].encode('utf-8')) for p in listdata['profiles'] if 'profiles' in listdata}
-    )
+    if 'groups' in listdata:
+        ownernames.update({str(-g['id']): g['screen_name'].encode('utf-8') for g in listdata['groups']})
+    if 'profiles' in listdata:
+        ownernames.update({str(p['id']): '{0} {1}'.format(p['first_name'].encode('utf-8'), p['last_name'].encode('utf-8')) for p in listdata['profiles']})
     for video in listdata['items']:
         # create video item
         videotitle = video['title'].encode('utf-8').replace('.', ' ').replace('_', ' ')  # wrapable
@@ -669,9 +668,9 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                     )
                 )
             ]
-        # go to owner
-        elif listtype == URLPATH_LISTSEARCHEDVIDEOS and str(video['owner_id']) in ownernames:
+        if listtype == URLPATH_LISTSEARCHEDVIDEOS and str(video['owner_id']) in ownernames:
             cmi += [
+                # go to owner
                 (
                     '[COLOR {0}]{1} {2}[/COLOR]'.format(
                         ALT_COLOR,
@@ -681,7 +680,18 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                     'Container.Update({0})'.format(
                         buildurl(URLPATH_LISTVIDEOS, {'ownerid': video['owner_id']})
                     )
-                )
+                ),
+                # follow owner
+                (
+                    '[COLOR {0}]{1} {2}[/COLOR]'.format(
+                        ALT_COLOR,
+                        ADDON.getLocalizedString(30037).encode('utf-8'),
+                        ownernames[str(video['owner_id'])]
+                    ),
+                    'RunPlugin({0})'.format(
+                        buildurl(URLPATH_FOLLOWCOMMUNITY, {'communityid': video['owner_id']})
+                    )
+                ),
             ]
         cmi += [
             # skip to page
@@ -1479,10 +1489,10 @@ def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
                 )
             ]
         cmi += [
-            # unfollow community
+            # leave community
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(ALT_COLOR, ADDON.getLocalizedString(30072).encode('utf-8')),
-                'RunPlugin({0})'.format(buildurl(URLPATH_UNFOLLOWCOMMUNITY, {'communityid': community['id']}))
+                'RunPlugin({0})'.format(buildurl(URLPATH_LEAVECOMMUNITY, {'communityid': community['id']}))
             ),
             # search videos
             (
@@ -1611,10 +1621,30 @@ def unlikecommunity(communityid):  # type: (int) -> None
     xbmc.executebuiltin('Container.Refresh()')
 
 
-@route(URLPATH_UNFOLLOWCOMMUNITY)
-def unfollowcommunity(communityid):  # type: (int) -> None
+@route(URLPATH_FOLLOWCOMMUNITY)
+def followcommunity(communityid):  # type: (int) -> None
     """
-    Unfollow community.
+    Follow community.
+    """
+    communityid = int(communityid)
+    # request vk api
+    vkapi = initvkapi()
+    try:
+        vkapi.groups.join(
+            group_id=communityid
+        )
+    except vk.VkAPIError:
+        xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
+        raise AddonError(ERR_VK_API)
+    xbmc.log('{0}: Community followed: {1}'.format(ADDON.getAddonInfo('id'), communityid))
+    # refresh content
+    xbmc.executebuiltin('Container.Refresh()')
+
+
+@route(URLPATH_LEAVECOMMUNITY)
+def leavecommunity(communityid):  # type: (int) -> None
+    """
+    Leave community.
     """
     communityid = int(communityid)
     # request vk api
@@ -1626,7 +1656,7 @@ def unfollowcommunity(communityid):  # type: (int) -> None
     except vk.VkAPIError:
         xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK API error!'), level=xbmc.LOGERROR)
         raise AddonError(ERR_VK_API)
-    xbmc.log('{0}: Community unfollowed: {1}'.format(ADDON.getAddonInfo('id'), communityid))
+    xbmc.log('{0}: Community left: {1}'.format(ADDON.getAddonInfo('id'), communityid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 

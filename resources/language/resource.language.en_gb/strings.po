@@ -150,6 +150,10 @@ msgctxt "#30036"
 msgid "Go to"
 msgstr ""
 
+msgctxt "#30037"
+msgid "Follow"
+msgstr ""
+
 # Menu -----
 
 msgctxt "#30040"

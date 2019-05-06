@@ -83,6 +83,7 @@ Communities:
 - List my liked communities
 - Add to liked communities
 - Remove from liked communities
+- Follow community
 - Leave community
 
 ## Screenshots
@@ -186,13 +187,13 @@ Changed:
 ### v1.4.0-dev (not released)
 
 Fixed:
-- [ ] Play video fails on Video resolving error on iOS (#82)
-- [ ] Play video throws Video resolving error after session cookies expiration (#57)
+- [ ] Play video throws video resolving error after session cookies expiration (#57)
+- [ ] Play video fails on video resolving error on iOS (#82)
 
 Added:
+- [x] Go to owner (contextual action)
+- [x] Follow owner (contextual action)
 - [ ] Skip to page (contextual action)
-- [ ] Go to owner (contextual action)
-- [ ] Follow owner (contextual action)
 
 Changed:
 - [x] Refined readme
