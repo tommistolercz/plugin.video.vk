@@ -28,9 +28,7 @@ Kodi add-on for watching videos from VK.com social network.
 ## Features
 
 Common:
-- Translations
-    - English
-    - Czech
+- Translations: English, Czech
 - Manage add-on settings
     - Items per page
     - Force custom view mode for videos 
@@ -188,21 +186,29 @@ Changed:
 
 Fixed:
 - [ ] Play video throws video resolving error after session cookies expiration (#57)
-- [ ] Play video fails on video resolving error on iOS (#82)
+- [x] Play video fails on video resolving error on iOS (#82)
+- [x] Video resolver bug due which the best available quality to not always be played  
 
 Added:
-- [x] Go to owner (contextual action)
-- [x] Follow owner (contextual action)
-- [ ] Skip to page (contextual action)
+- [x] Skip to page
+    - listype: communitylist, albumlist, searchhistorylist
+    - min/max ?
+- [x] Go to community 
+    - listtype: searchedvideos, ...?
+    - ownerid < 0 ?
+- [x] Follow community
+    - dtto constraints
 
 Changed:
 - [x] Refined readme
 - [x] Refined language resources
     - [ ] Search incl. adult videos (default true) => Safe search (default true)
 - [x] Refined python code
+    - [x] Refined Play video code
     - [x] Refined set art code in video lists
     - [x] Refined notifications
     - [x] Defined consts for urlpaths
     - [x] Enabled debug logging of handler runtime
     - [ ] Refactor Search videos / List searched videos
     - [ ] Refactor settings (Logout: to menu, token: invisible)
+    - [ ] Refactor list___videos()
