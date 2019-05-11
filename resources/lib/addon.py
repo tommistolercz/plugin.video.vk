@@ -987,14 +987,10 @@ def playvideo(ownerid, videoid):  # type: (int, int) -> None
     # resolve playable streams via vk videoinfo url
     vksession = initvksession()
     vi = vksession.requests_session.get(
-        url='https://vk.com/al_video.php',
-        params={
-            'act': 'show_inline',
-            'al': 1,
-            'video': oidid,
-        },
+        url='https://vk.com/al_video.php?act=show_inline&al=1&video={0}'.format(oidid),
         headers={
-            'User-Agent': '{0}/{1}'.format(ADDON.getAddonInfo('id'), __version__),
+            # 'User-Agent': '{0}/{1}'.format(ADDON.getAddonInfo('id'), __version__),
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/601.5.17 (KHTML, like Gecko) Version/9.1 Safari/601.5.17',
         }
     )
     try:
