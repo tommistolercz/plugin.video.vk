@@ -27,20 +27,25 @@ Kodi add-on for watching videos from VK.com social network.
 
 ## Features
 
-Common:
-- Translations: English, Czech
-- Manage add-on settings
-    - Items per page
-    - Force custom view mode for videos 
-    - Search incl. adult videos  
-    - Search incl. own videos
-    - Search by video duration (any, longer/shorter than)
-    - Sort searched videos by (by relevance/date/duration)
-    - Keep history of add-on requests
-    - Keep history of played videos
-    - VK user access token
+Translations:
+- English
+- Czech
+
+Add-on settings:
+- Items per page
+- Force custom view mode for videos
+- Search incl. adult videos
+- Search incl. own videos
+- Search by video duration (any, longer/shorter than)
+- Sort searched videos (by relevance, date, duration)
+- Keep history of add-on requests
+- Keep history of played videos    
+
+ Auth:
 - Authorize add-on
 - Logout user
+
+Navigation:
 - List add-on menu
 - Skip to page
 
