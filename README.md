@@ -39,7 +39,8 @@ Add-on settings:
 - Search by video duration (any, longer/shorter than)
 - Sort searched videos (by relevance, date, duration)
 - Keep history of add-on requests
-- Keep history of played videos    
+- Keep history of played videos
+- VK login (email/phone)
 
  Auth:
 - Authorize add-on
@@ -195,18 +196,21 @@ Fixed:
 - [x] Video resolver bug due which the best available quality to not always be played  
 
 Added:
+- [x] VK login (email/tel) setting
 - [x] Skip to page
     - listype: communitylist, albumlist, searchhistorylist
     - min/max ?
 - [x] Go to community, Follow community
     - listtype: searchedvideos, ...?
     - ownerid < 0 ?
-
+ 
 Changed:
+- [x] Changed VK user access token setting (invisible)
 - [x] Refined readme
 - [x] Refined language resources
 - [x] Refined python code
     - [x] Refined Play video code
+    - [x] Changed video resolver user agent
     - [x] Refined set art code in video lists
     - [x] Refined notifications
     - [x] Defined consts for urlpaths

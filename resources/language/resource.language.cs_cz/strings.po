@@ -119,12 +119,12 @@ msgid "Video resolving error!"
 msgstr "Chyba video resolvingu!"
 
 msgctxt "#30030"
-msgid "VK account email/phone"
-msgstr "Email/Tel VK účtu"
+msgid "VK login (email/phone)"
+msgstr "VK login (email/tel)"
 
 msgctxt "#30031"
-msgid "VK account password"
-msgstr "Heslo VK účtu"
+msgid "VK password"
+msgstr "VK heslo"
 
 msgctxt "#30032"
 msgid "User logged out."

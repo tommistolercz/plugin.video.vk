@@ -110,9 +110,14 @@ def initvksession():  # type: () -> vk.Session
     """
     if ADDON.getSetting('vkuseraccesstoken') == '':
         # ask user for entering vk credentials for authorizing add-on
-        login = xbmcgui.Dialog().input(ADDON.getLocalizedString(30030).encode('utf-8'))
-        pswd = xbmcgui.Dialog().input(ADDON.getLocalizedString(30031).encode('utf-8'),
-                                      option=xbmcgui.ALPHANUM_HIDE_INPUT)
+        login = xbmcgui.Dialog().input(
+            ADDON.getLocalizedString(30030).encode('utf-8'),
+            defaultt=ADDON.getSetting('vkuserlogin')
+        )
+        pswd = xbmcgui.Dialog().input(
+            ADDON.getLocalizedString(30031).encode('utf-8'),
+            option=xbmcgui.ALPHANUM_HIDE_INPUT
+        )
         if not login or not pswd:
             xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK authorization error!'), level=xbmc.LOGERROR)
             raise AddonError(ERR_VK_AUTH)
@@ -123,11 +128,13 @@ def initvksession():  # type: () -> vk.Session
             xbmc.log('{0}: {1}'.format(ADDON.getAddonInfo('id'), 'VK authorization error!'), level=xbmc.LOGERROR)
             raise AddonError(ERR_VK_AUTH)
         xbmc.log('{0}: VK session created.'.format(ADDON.getAddonInfo('id')))
-        # save obtained token + cookies
+        # save login + obtained token
+        ADDON.setSetting('vkuserlogin', login)
         ADDON.setSetting('vkuseraccesstoken', vksession.access_token)
+        # save cookies
         savecookies(vksession.auth_session.cookies)
     else:
-        # restore existing vk session (using token)
+        # restore existing vk session sending a token
         try:
             vksession = vk.Session(ADDON.getSetting('vkuseraccesstoken'))
         except vk.VkAuthError:
@@ -988,9 +995,9 @@ def playvideo(ownerid, videoid):  # type: (int, int) -> None
     vi = vksession.requests_session.get(
         url='https://vk.com/al_video.php?act=show_inline&al=1&video={0}'.format(oidid),
         headers={
-            # 'User-Agent': '{0}/{1}'.format(ADDON.getAddonInfo('id'), __version__),  # not accepted at all
-            # 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/601.5.17 (KHTML, like Gecko) Version/9.1 Safari/601.5.17',  # accepted but ugly
-            'User-Agent': 'Mozilla/5.0',
+            # 'User-Agent': '{0}/{1}'.format(ADDON.getAddonInfo('id'), __version__),  # nok mac/ios
+            # 'User-Agent': 'Mozilla/5.0',  # nok mac
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/601.5.17 (KHTML, like Gecko) Version/9.1 Safari/601.5.17',
         }
     )
     xbmc.log('{0}: vi.content: {1}'.format(ADDON.getAddonInfo('id'), vi.content))

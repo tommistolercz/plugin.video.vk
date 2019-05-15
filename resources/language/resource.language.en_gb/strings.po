@@ -119,11 +119,11 @@ msgid "Video resolving error!"
 msgstr ""
 
 msgctxt "#30030"
-msgid "VK account email/phone"
+msgid "VK login (email/phone)"
 msgstr ""
 
 msgctxt "#30031"
-msgid "VK account password"
+msgid "VK password"
 msgstr ""
 
 msgctxt "#30032"
