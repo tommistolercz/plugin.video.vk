@@ -198,16 +198,13 @@ Added:
 - [x] Skip to page
     - listype: communitylist, albumlist, searchhistorylist
     - min/max ?
-- [x] Go to community 
+- [x] Go to community, Follow community
     - listtype: searchedvideos, ...?
     - ownerid < 0 ?
-- [x] Follow community
-    - dtto constraints
 
 Changed:
 - [x] Refined readme
 - [x] Refined language resources
-    - [ ] Search incl. adult videos (default true) => Safe search (default true)
 - [x] Refined python code
     - [x] Refined Play video code
     - [x] Refined set art code in video lists
