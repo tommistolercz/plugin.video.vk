@@ -46,7 +46,7 @@ Add-on settings:
 - Authorize add-on
 - Logout user
 
-Navigation:
+Navigation
 - List add-on menu
 - Skip to page
 
@@ -70,9 +70,9 @@ Videos:
 - Remove video from watchlist
 - Clear watchlist
 - Play video
-- Add to liked videos
-- Remove from liked videos
-- Set video albums
+- Like video
+- Unlike video
+- Add video to albums
 - Go to owner
 
 Video albums:
@@ -85,8 +85,8 @@ Video albums:
 Communities:
 - List my communities
 - List my liked communities
-- Add to liked communities
-- Remove from liked communities
+- Like community
+- Unlike community
 - Follow community
 - Leave community
 
@@ -109,7 +109,7 @@ Added:
 - Manage add-on settings
 - Authorize add-on
 - List add-on menu
-- Logout user
+- Logout
 - Search videos
 - Search by similar title
 - List search history
@@ -119,9 +119,9 @@ Added:
 - List album videos
 - List community videos
 - Play video
-- Add to liked videos
-- Remove from liked videos
-- Set video albums
+- Like video
+- Unlike video
+- Add video to albums
 - List albums
 - Rename album
 - Reorder album up/down
@@ -129,18 +129,18 @@ Added:
 - Create new album
 - List communities
 - List liked communities
-- Add to liked communities
-- Remove from liked communities
+- Like community
+- Unlike community
 - Leave community
 
 ### v1.1.0 (2019-02-01)
 
 Fixed:
 - Various unicode issues
-- Content refreshing for contextual actions
+- Content refreshing issues
 - Pagination bug
 - Items per page setting bug
-- Logout button visibility bug
+- Logout user button visibility bug
  
 Added:
 - Infolabels showing video resolution in lists
@@ -148,7 +148,7 @@ Added:
 - Code enabling Usage stats (future feature)
 
 Changed:
-- Reduced using of Kodi notifications
+- Removed most of Kodi notifications
 - Utilized TinyDB for persisting add-on data
 - Refined complete python code
 - Refined language resources
@@ -164,7 +164,7 @@ Added:
 - Played videos (list)
 
 Changed:
-- Reused Search videos contextual action in all lists
+- Search videos (contextual action, avail. in all lists)
 - Refactored add-on file structure and python code
 
 ### v1.3.0 (2019-04-17)
@@ -191,30 +191,35 @@ Changed:
 ### v1.4.0-dev (not released)
 
 Fixed:
-- [ ] Play video throws video resolving error after session cookies expiration (#57)
 - [x] Play video fails on video resolving error on iOS (#82)
-- [x] Video resolver bug due which the best available quality to not always be played  
+- [x] Video resolver bug due which the best available quality to not always be played
+- [ ] Play video throws video resolving error after session cookies expiration (#57)  
 
 Added:
 - [x] VK login (email/tel) setting
 - [x] Skip to page
-    - listype: communitylist, albumlist, searchhistorylist
-    - min/max ?
+    - [ ] ? listype: communitylist, albumlist, searchhistorylist
+    - [ ] ? min/max
 - [x] Go to community, Follow community
-    - listtype: searchedvideos, ...?
-    - ownerid < 0 ?
- 
+    - [ ] ? listtype: searchedvideos, likedvideos, ...?
+    - [ ] ? ownerid < 0
+    - [ ] ? follow > api error: negid?
+    
 Changed:
+- [x] Refined pagination (next/last page nr)
 - [x] Changed VK user access token setting (invisible)
 - [x] Refined readme
 - [x] Refined language resources
-- [x] Refined python code
-    - [x] Refined Play video code
-    - [x] Changed video resolver user agent
-    - [x] Refined set art code in video lists
-    - [x] Refined notifications
-    - [x] Defined consts for urlpaths
-    - [x] Enabled debug logging of handler runtime
-    - [ ] Refactor Search videos / List searched videos
-    - [ ] Refactor settings (Logout: to menu, token: invisible)
-    - [ ] Refactor list___videos()****
+- [x] Refined Play video code
+- [x] Changed video resolver user agent
+- [x] Refined set art code in video lists
+- [x] Refined notifications
+- [x] Defined consts for urlpaths
+- [x] Enabled debug logging of handler runtime
+
+?
+- Search videos -> Search history + New search
+- Refactor Search videos / List searched videos
+- Refactor list___videos()
+- log api error details
+- dispatch: log kwargs
