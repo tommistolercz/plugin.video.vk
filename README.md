@@ -40,13 +40,13 @@ Add-on settings:
 - Sort searched videos (by relevance, date, duration)
 - Keep history of add-on requests
 - Keep history of played videos
-- VK login (email/phone)
+- VK user login (email/phone)
 
  Auth:
 - Authorize add-on
 - Logout user
 
-Navigation
+Navigation:
 - List add-on menu
 - Skip to page
 
@@ -191,31 +191,26 @@ Changed:
 ### v1.4.0-dev (not released)
 
 Fixed:
-- [x] Play video fails on video resolving error on iOS (#82)
-- [x] Video resolver bug due which the best available quality to not always be played
-- [ ] Play video throws video resolving error after session cookies expiration (#57)  
+- Play video fails on video resolving error on iOS (#82)
+- Video resolver bug due which the best available quality to not always be played (#86)
 
 Added:
-- [x] VK login (email/tel) setting
-- [x] Skip to page
-    - [ ] ? listype: communitylist, albumlist, searchhistorylist
-    - [ ] ? min/max
-- [x] Go to community, Follow community
-    - [ ] ? listtype: searchedvideos, likedvideos, ...?
-    - [ ] ? ownerid < 0
-    - [ ] ? follow > api error: negid?
+- VK user login (setting) (#85)
+- Skip to page (contextual action) (#84)
+- Go to owner (#87)    
+- Follow owner (#88) 
     
 Changed:
+- [x] VK user access token setting (as invisible)
+- [x] Video resolver user agent (as const)
+- [x] Debug logging (handler runtime)
 - [x] Refined pagination (next/last page nr)
-- [x] Changed VK user access token setting (invisible)
-- [x] Refined readme
-- [x] Refined language resources
 - [x] Refined Play video code
-- [x] Changed video resolver user agent
 - [x] Refined set art code in video lists
 - [x] Refined notifications
 - [x] Defined consts for urlpaths
-- [x] Enabled debug logging of handler runtime
+- [x] Refined language resources
+- [x] Refined readme
 
 ?
 - Search videos -> Search history + New search
