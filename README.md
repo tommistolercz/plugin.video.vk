@@ -88,7 +88,7 @@ Communities:
 - Like community
 - Unlike community
 - Follow community
-- Leave community
+- Unfollow community
 
 ## Screenshots
 
@@ -131,7 +131,7 @@ Added:
 - List liked communities
 - Like community
 - Unlike community
-- Leave community
+- Unfollow community
 
 ### v1.1.0 (2019-02-01)
 
@@ -196,25 +196,15 @@ Fixed:
 
 Added:
 - VK user login (setting) (#85)
-- Skip to page (contextual action) (#84)
-- Go to owner (#87)    
-- Follow owner (#88) 
-    
+  
 Changed:
-- [x] VK user access token setting (as invisible)
-- [x] Video resolver user agent (as const)
-- [x] Debug logging (handler runtime)
-- [x] Refined pagination (next/last page nr)
-- [x] Refined Play video code
-- [x] Refined set art code in video lists
-- [x] Refined notifications
-- [x] Defined consts for urlpaths
-- [x] Refined language resources
-- [x] Refined readme
-
-?
-- Search videos -> Search history + New search
-- Refactor Search videos / List searched videos
-- Refactor list___videos()
-- log api error details
-- dispatch: log kwargs
+- VK user access token setting (as invisible)
+- Pagination item (next/last page nr)
+- Debug logging (handler runtime)
+- Video resolver user agent (as const)
+- Urlpaths (as consts)
+- Optimized play video code
+- Optimized set art code in video lists
+- Refined notifications
+- Refined language resources
+- Refined readme
