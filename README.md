@@ -6,8 +6,9 @@ Kodi add-on for watching videos from VK.com social network.
 
 - [Requirements](#requirements)
 - [Installation](#installation)
-- [Features and changelog](#features-and-changelog)
+- [Features](#features)
 - [Screenshots](#screenshots)
+- [Changelog](#changelog)
 
 ## Requirements
 
@@ -24,90 +25,66 @@ Kodi add-on for watching videos from VK.com social network.
 
     [How to install add-ons from zip files](https://kodi.wiki/view/HOW-TO:Install_add-ons_from_zip_files)
 
-## Features and changelog
+## Features
 
-### v1.3.0 (2019-04-17)
+Translations:
+- English
+- Czech
 
-- [x] Fixed pagination for `/searchhistory`, `/playedvideos` (#74)
-- [x] Fixed bug in `/deletealbum`
-- [x] Fixed displaying of long video titles in lists
-- [x] Added new features:
-    - [x] `/watchlist` video list
-    - [x] `/addvideotowatchlist` action
-    - [x] `/deletevideofromwatchlist` action
-    - [x] `/clearwatchlist` action
-    - [x] `/clearsearchhistory` action (#75)
-    - [x] `/clearplayedvideos` action (#75)
-- [x] Added new settings:
-    - [x] `keepaddonrequesthistory` (default false, not visible)
-    - [x] `keepplayedvideohistory` (default false)
-- [x] Optimized performance
-- [x] Refined python code
+Add-on settings:
+- Items per page
+- Force custom view mode for videos
+- Search incl. adult videos
+- Search incl. own videos
+- Search by video duration (any, longer/shorter than)
+- Sort searched videos (by relevance, date, duration)
+- Keep history of add-on requests
+- Keep history of played videos
 
-### v1.2.0 (2019-03-04)
+ Auth:
+- Authorize add-on
+- Logout user
 
-- [x] Fixed unicode issues:
-    - [x] Fixed reported unicode issues (#66) (#70)
-    - [x] Fixed weak encoding error in main menu (search history item)
-- [x] Added new features:
-    - [x] `/playedvideos` video list
-    - [x] `/searchvideos` action (available in all lists)
-- [x] Refactored add-on file structure and python code
+Navigation:
+- List add-on menu
 
-### v1.1.0 (2019-02-01)
-
-- [x] Fixed unicode issues
-- [x] Fixed content refreshing after contextual actions
-- [x] Fixed pagination bug
-- [x] Fixed itemsperpage setting bug
-- [x] Fixed Logout user button visibility bug 
-- [x] Added info-labels showing video resolution in lists
-- [x] Added counter for Search history in menu
-- [x] Added code enabling Addict stats future feature
-- [x] Reduced using of Kodi notifications
-- [x] Utilized TinyDB for persisting add-on data
-- [x] Refined complete python code
-- [x] Refined language resources
-- [x] Renamed cookies data file to be non-hidden
-
-### v1.0.0 (2018-11-12)
-
-Common:
-- [x] EN/CZ language version
-- [x] Manage add-on settings
-- [x] Authorize add-on
-- [x] List menu
-- [x] Logout user
-
-Search history:
-- [x] List search history
-- [x] Delete search
+Search:
+- Search videos
+- Search by similar title
+- List search history
+- Delete search from history
+- Clear search history
 
 Videos:
-- [x] Search videos
-- [x] Search similar videos
-- [x] List videos
-- [x] List liked videos
-- [x] List album videos
-- [x] List community videos
-- [x] Play video
-- [x] Like video
-- [x] Unlike video
-- [x] Add video to albums
+- List searched videos
+- List my videos
+- List my liked videos
+- List album videos
+- List community videos
+- List played videos
+- Clear played videos
+- List watchlist
+- Add video to watchlist
+- Remove video from watchlist
+- Clear watchlist
+- Play video
+- Like video
+- Unlike video
+- Add video to albums
 
 Video albums:
-- [x] List albums
-- [x] Rename album
-- [x] Reorder album up/down
-- [x] Delete album
-- [x] Create new album
+- List my video albums
+- Rename album
+- Reorder album up/down
+- Delete album
+- Create new album
 
 Communities:
-- [x] List communities
-- [x] List liked communities
-- [x] Like community
-- [x] Unlike community
-- [x] Unfollow community
+- List my communities
+- List my liked communities
+- Like community
+- Unlike community
+- Unfollow community
 
 ## Screenshots
 
@@ -117,4 +94,92 @@ Communities:
 
 ![Screenshot 3: Add-on menu](resources/media/screenshot3.jpg)
 
-![Screenshot 4: Add-on content](resources/media/screenshot4.jpg)
+![Screenshot 4: Add-on video list](resources/media/screenshot4.jpg)
+
+## Changelog
+
+### v1.0.0 (2018-11-12)
+
+Added:
+- EN/CZ translations
+- Manage add-on settings
+- Authorize add-on
+- List add-on menu
+- Logout
+- Search videos
+- Search by similar title
+- List search history
+- Delete search from history
+- List videos
+- List liked videos
+- List album videos
+- List community videos
+- Play video
+- Like video
+- Unlike video
+- Add video to albums
+- List albums
+- Rename album
+- Reorder album up/down
+- Delete album
+- Create new album
+- List communities
+- List liked communities
+- Like community
+- Unlike community
+- Unfollow community
+
+### v1.1.0 (2019-02-01)
+
+Fixed:
+- Various unicode issues
+- Content refreshing issues
+- Pagination bug
+- Items per page setting bug
+- Logout user button visibility bug
+ 
+Added:
+- Infolabels showing video resolution in lists
+- Counter for Search history menu item    
+- Code enabling Usage stats (future feature)
+
+Changed:
+- Removed most of Kodi notifications
+- Utilized TinyDB for persisting add-on data
+- Refined complete python code
+- Refined language resources
+- Renamed cookies data file to be non-hidden
+
+### v1.2.0 (2019-03-04)
+
+Fixed:
+- Reported unicode issues (#66, #70)
+- Weak encoding error in main menu
+
+Added:
+- Played videos (list)
+
+Changed:
+- Search videos (contextual action, avail. in all lists)
+- Refactored add-on file structure and python code
+
+### v1.3.0 (2019-04-17)
+
+Fixed:
+- Missing pagination for Search history and Played videos (#74)
+- Bug in Delete album
+- Displaying of long video titles in video lists
+
+Added:
+- Watchlist (list)
+- Add video to watchlist (contextual action)
+- Delete video from watchlist (contextual action)
+- Clear watchlist (contextual action)
+- Clear search history (contextual action) (#75)
+- Clear played videos (contextual action) (#75)
+- Keep history of add-on requests (setting, default false, not visible)
+- Keep history of played videos (setting, default false)
+
+Changed:
+- Optimized performance
+- Refined python code
