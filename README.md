@@ -199,12 +199,16 @@ Added:
   
 Changed:
 - VK user access token setting (as invisible)
-- Pagination item (next/last page nr)
-- Debug logging (handler runtime)
-- Video resolver user agent (as const)
-- Urlpaths (as consts)
-- Optimized play video code
-- Optimized set art code in video lists
-- Refined notifications
-- Refined language resources
-- Refined readme
+- Pagination item (next/last page nr, last->first pos.)
+- Notifications (?)
+- Optimized performance (video lists, play video, ...)
+- Refined python code (consts, handler runtime debug logging, ...)
+- Updated language resources
+- Updated readme
+
+TODO/INPROGRESS:
+- go to owner
+- follow owner
+- skip to page
+? fix menu counters issue: my liked communities (0)
+? dispatch: convert str=>int in urlargs
