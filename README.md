@@ -1,4 +1,4 @@
-![Add-on icon](resources/icon.png)
+![Add-on icon](./resources/icon.png)
 
 # VK (plugin.video.vk)
 
@@ -22,7 +22,7 @@ Kodi add-on for watching videos from VK.com social network.
     
 2. Install it in Kodi:<br>
     `Kodi > Settings > Add-ons > Install from zip file...`
-
+    
     [How to install add-ons from zip files](https://kodi.wiki/view/HOW-TO:Install_add-ons_from_zip_files)
 
 ## Features
@@ -34,11 +34,11 @@ Translations:
 Add-on settings:
 - Items per page
 - Force custom view mode for videos
-- Search incl. adult videos
+- Search without age restrictions
 - Search incl. own videos
 - Search by video duration (any, longer/shorter than)
 - Sort searched videos (by relevance, date, duration)
-- Keep history of add-on requests
+- Keep history of add-on requests (hidden)
 - Keep history of played videos
 - VK user login (email/phone)
 
@@ -52,7 +52,7 @@ Navigation:
 
 Search:
 - Search videos
-- Search by similar title
+- Search videos by similar title
 - List search history
 - Delete search from history
 - Clear search history
@@ -72,8 +72,8 @@ Videos:
 - Play video
 - Like video
 - Unlike video
-- Add video to albums
-- Go to owner
+- Set albums for video
+- Go to community (owning)
 
 Video albums:
 - List my video albums
@@ -92,80 +92,44 @@ Communities:
 
 ## Screenshots
 
-![Screenshot 1: Add-on info](resources/media/screenshot1.jpg)
+![Screenshot 1: Add-on info](./resources/media/screenshot1.jpg)
 
-![Screenshot 2: Add-on settings](resources/media/screenshot2.jpg)
+![Screenshot 2: Add-on settings](./resources/media/screenshot2.jpg)
 
-![Screenshot 3: Add-on menu](resources/media/screenshot3.jpg)
+![Screenshot 3: Add-on menu](./resources/media/screenshot3.jpg)
 
-![Screenshot 4: Add-on content](resources/media/screenshot4.jpg)
+![Screenshot 4: Add-on content](./resources/media/screenshot4.jpg)
 
 ## Changelog
 
-### v1.0.0 (2018-11-12)
+- [v1.4.0-dev (unreleased)](#v140-dev-unreleased)
+- [v1.3.0 (2019-04-17)](#v130-2019-04-17)
+- [v1.2.0 (2019-03-04)](#v120-2019-03-04)
+- [v1.1.0 (2019-02-01)](#v110-2019-02-01)
+- [v1.0.0 (2018-11-12)](#v100-2018-11-12)
 
-Added:
-- EN/CZ translations
-- Manage add-on settings
-- Authorize add-on
-- List add-on menu
-- Logout
-- Search videos
-- Search by similar title
-- List search history
-- Delete search from history
-- List videos
-- List liked videos
-- List album videos
-- List community videos
-- Play video
-- Like video
-- Unlike video
-- Add video to albums
-- List albums
-- Rename album
-- Reorder album up/down
-- Delete album
-- Create new album
-- List communities
-- List liked communities
-- Like community
-- Unlike community
-- Unfollow community
+### v1.4.0-dev (unreleased)
 
-### v1.1.0 (2019-02-01)
+Todo:
+- Skip to page (contextual action) (#84)
+- fix api issues (no results): execute.getMenuCounters(), fave.getLinks()
 
 Fixed:
-- Various unicode issues
-- Content refreshing issues
-- Pagination bug
-- Items per page setting bug
-- Logout user button visibility bug
- 
-Added:
-- Infolabels showing video resolution in lists
-- Counter for Search history menu item    
-- Code enabling Usage stats (future feature)
-
-Changed:
-- Removed most of Kodi notifications
-- Utilized TinyDB for persisting add-on data
-- Refined complete python code
-- Refined language resources
-- Renamed cookies data file to be non-hidden
-
-### v1.2.0 (2019-03-04)
-
-Fixed:
-- Reported unicode issues (#66, #70)
-- Weak encoding error in main menu
+- Play video fails on video resolving error on iOS (#82)
+- Video resolver bug due which the best available quality to not always be played (#86)
 
 Added:
-- Played videos (list)
-
+- VK user login (setting) (#85)
+- Go to community (contextual action) (#87)
+- Follow community (contextual action) (#88)
+  
 Changed:
-- Search videos (contextual action, avail. in all lists)
-- Refactored add-on file structure and python code
+- VK user access token setting (invisible)
+- Pagination item (next/last page nr, moved to first pos.)
+- Notifications (?)
+- Optimized performance (video lists, play video, debug logging, ...)
+- Updated language resources
+- Updated readme
 
 ### v1.3.0 (2019-04-17)
 
@@ -188,27 +152,67 @@ Changed:
 - Optimized performance
 - Refined python code
 
-### v1.4.0-dev (not released)
+### v1.2.0 (2019-03-04)
 
 Fixed:
-- Play video fails on video resolving error on iOS (#82)
-- Video resolver bug due which the best available quality to not always be played (#86)
+- Reported unicode issues (#66, #70)
+- Weak encoding error in main menu
 
 Added:
-- VK user login (setting) (#85)
-  
-Changed:
-- VK user access token setting (as invisible)
-- Pagination item (next/last page nr, last->first pos.)
-- Notifications (?)
-- Optimized performance (video lists, play video, ...)
-- Refined python code (consts, handler runtime debug logging, ...)
-- Updated language resources
-- Updated readme
+- Played videos (list)
 
-TODO/INPROGRESS:
-- go to owner
-- follow owner
-- skip to page
-? fix menu counters issue: my liked communities (0)
-? dispatch: convert str=>int in urlargs
+Changed:
+- Search videos (contextual action, avail. in all lists)
+- Refactored add-on file structure and python code
+
+### v1.1.0 (2019-02-01)
+
+Fixed:
+- Various unicode issues
+- Content refreshing issues
+- Pagination bug
+- Items per page setting bug
+- Logout user button visibility bug
+ 
+Added:
+- Infolabels showing video resolution in lists
+- Counter for Search history menu item    
+- Code enabling Usage stats (future feature)
+
+Changed:
+- Removed most of Kodi notifications
+- Utilized TinyDB for persisting add-on data
+- Refined complete python code
+- Refined language resources
+- Renamed cookies data file to be non-hidden
+
+### v1.0.0 (2018-11-12)
+
+Added:
+- EN/CZ translations
+- Manage add-on settings
+- Authorize add-on
+- List add-on menu
+- Logout
+- Search videos
+- Search by similar title
+- List search history
+- Delete search from history
+- List videos
+- List liked videos
+- List album videos
+- List community videos
+- Play video
+- Like video
+- Unlike video
+- Set albums for video
+- List albums
+- Rename album
+- Reorder album up/down
+- Delete album
+- Create new album
+- List communities
+- List liked communities
+- Like community
+- Unlike community
+- Unfollow community

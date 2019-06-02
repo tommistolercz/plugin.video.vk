@@ -39,7 +39,7 @@ msgid "View mode id"
 msgstr ""
 
 msgctxt "#30005"
-msgid "Search incl. adult videos"
+msgid "Search without age restrictions"
 msgstr ""
 
 msgctxt "#30006"

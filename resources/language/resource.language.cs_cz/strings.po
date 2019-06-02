@@ -39,8 +39,8 @@ msgid "View mode id"
 msgstr "View mode id"
 
 msgctxt "#30005"
-msgid "Search incl. adult videos"
-msgstr "Hledat vč. videí pro dospělé"
+msgid "Search without age restrictions"
+msgstr "Hledat bez věkového omezení"
 
 msgctxt "#30006"
 msgid "Search incl. own videos"
