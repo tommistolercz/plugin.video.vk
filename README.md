@@ -73,7 +73,7 @@ Videos:
 - Like video
 - Unlike video
 - Set albums for video
-- Go to community (owning)
+- Go to (owning) community
 
 Video albums:
 - List my video albums
@@ -111,7 +111,6 @@ Communities:
 ### v1.4.0-dev (unreleased)
 
 Todo:
-- Skip to page (contextual action) (#84)
 - fix api issues (no results): execute.getMenuCounters(), fave.getLinks()
 
 Fixed:
@@ -120,6 +119,7 @@ Fixed:
 
 Added:
 - VK user login (setting) (#85)
+- Skip to page (contextual action) (#84)
 - Go to community (contextual action) (#87)
 - Follow community (contextual action) (#88)
   

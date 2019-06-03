@@ -59,7 +59,7 @@ URLPATH_LISTWATCHLIST = '/watchlist'
 URLPATH_LISTVIDEOS = '/videos'
 URLPATH_LISTLIKEDVIDEOS = '/likedvideos'
 URLPATH_LISTALBUMVIDEOS = '/albumvideos'
-URLPATH_LISTCOMMUNITYVIDEOS = '/communityvideos'  # todo: deprecated
+URLPATH_LISTCOMMUNITYVIDEOS = '/communityvideos'  # deprecated
 URLPATH_CLEARPLAYEDVIDEOS = '/clearplayedvideos'
 URLPATH_CLEARWATCHLIST = '/clearwatchlist'
 URLPATH_PLAYVIDEO = '/playvideo'
@@ -423,25 +423,28 @@ def listaddonmenu():  # type: () -> None
 
 
 @route(URLPATH_SKIPTOPAGE)
-def skiptopage(page, lastpage, skipurl):  # type: (int, int, str) -> None
+def skiptopage(page, lastpage, urlpath, urlargs):  # type: (int, int, str, str) -> None
     """
     Skip to page.
     """
     page = int(page)
     lastpage = int(lastpage)
-    # ask user for entering page to skip to.
-    skipto = xbmcgui.Dialog().input(
+    # ask user for entering page nr.
+    topage = xbmcgui.Dialog().input(
         '{0} ({1}-{2})'.format(ADDON.getLocalizedString(30035).encode('utf-8'), 1, lastpage),
         defaultt=str(page),
         type=xbmcgui.INPUT_NUMERIC
     )
-    if not skipto or not (1 <= int(skipto) <= lastpage) or int(skipto) == page:
+    if not topage or not (1 <= int(topage) <= lastpage) or int(topage) == page:
         return
-    # refresh content
+    xbmc.log('plugin.video.vk: Skipped to page: {}'.format(topage))
+    # rebuild url to skip to
+    urlargs = eval(urlargs)  # ugly!
+    urlargs.update(
+        {'offset': (int(topage) - 1) * int(ADDON.getSetting('itemsperpage'))}
+    )
     xbmc.executebuiltin(
-        'Container.Update({0})'.format(
-            buildurl(skipurl, {'offset': (int(skipto) - 1) * int(ADDON.getSetting('itemsperpage'))})
-        )
+        'Container.Update({0})'.format(buildurl(urlpath, urlargs))
     )
 
 
@@ -485,7 +488,8 @@ def listsearchhistory(offset=0):  # type: (int) -> None
                             {
                                 'page': int(offset / itemsperpage) + 1,
                                 'lastpage': int(math.ceil(float(searchhistory['count']) / itemsperpage)),
-                                'skipurl': buildurl(URLPATH_LISTSEARCHHISTORY),
+                                'urlpath': URLPATH_LISTSEARCHHISTORY,
+                                'urlargs': str({}),  # ugly!
                             }
                         )
                     )
@@ -632,7 +636,8 @@ def listsearchedvideos(q='', similarq='', offset=0):  # type: (str, str, int) ->
     # pagination data
     if searchedvideos['count'] > offset + itemsperpage:
         searchedvideos['pagination'] = {
-            'skipurl': buildurl(URLPATH_LISTSEARCHEDVIDEOS, {'q': q}),
+            'urlpath': URLPATH_LISTSEARCHEDVIDEOS,
+            'urlargs': {'q': q},
             'nexturl': buildurl(URLPATH_LISTSEARCHEDVIDEOS, {'q': q, 'offset': offset + itemsperpage}),
             'page': int(offset / itemsperpage) + 1,
             'lastpage': int(math.ceil(float(searchedvideos['count']) / itemsperpage)),
@@ -679,10 +684,11 @@ def listplayedvideos(offset=0):  # type: (int) -> None
     # pagination data
     if playedvideos['count'] > offset + itemsperpage:
         playedvideos['pagination'] = {
-            'skipurl': buildurl(URLPATH_LISTPLAYEDVIDEOS),
+            'urlpath': URLPATH_LISTPLAYEDVIDEOS,
+            'urlargs': {},
             'nexturl': buildurl(URLPATH_LISTPLAYEDVIDEOS, {'offset': offset + itemsperpage}),
             'page': int(offset / itemsperpage) + 1,
-            'lastpage': int(math.ceil(float(playedvideos['count']) / itemsperpage))
+            'lastpage': int(math.ceil(float(playedvideos['count']) / itemsperpage)),
         }
     xbmc.log('plugin.video.vk: Played videos: {}'.format(playedvideos))
     # build list
@@ -706,10 +712,11 @@ def listwatchlist(offset=0):  # type: (int) -> None
     # pagination data
     if watchlist['count'] > offset + itemsperpage:
         watchlist['pagination'] = {
-            'skipurl': buildurl(URLPATH_LISTWATCHLIST),
+            'urlpath': URLPATH_LISTWATCHLIST,
+            'urlargs': {},
             'nexturl': buildurl(URLPATH_LISTWATCHLIST, {'offset': offset + itemsperpage}),
             'page': int(offset / itemsperpage) + 1,
-            'lastpage': int(math.ceil(float(watchlist['count']) / itemsperpage))
+            'lastpage': int(math.ceil(float(watchlist['count']) / itemsperpage)),
         }
     xbmc.log('plugin.video.vk: Watchlist: {}'.format(watchlist))
     # build list
@@ -741,10 +748,11 @@ def listvideos(ownerid=None, offset=0):  # type: (int, int) -> None
     # pagination data
     if videos['count'] > offset + itemsperpage:
         videos['pagination'] = {
-            'skipurl': buildurl(URLPATH_LISTVIDEOS, {'ownerid': ownerid}),
+            'urlpath': URLPATH_LISTVIDEOS,
+            'urlargs': {'ownerid': ownerid},
             'nexturl': buildurl(URLPATH_LISTVIDEOS, {'ownerid': ownerid, 'offset': offset + itemsperpage}),
             'page': int(offset / itemsperpage) + 1,
-            'lastpage': int(math.ceil(float(videos['count']) / itemsperpage))
+            'lastpage': int(math.ceil(float(videos['count']) / itemsperpage)),
         }
     xbmc.log('plugin.video.vk: Videos: {}'.format(videos))
     # build list
@@ -772,10 +780,11 @@ def listlikedvideos(offset=0):  # type: (int) -> None
     # pagination data
     if likedvideos['count'] > offset + itemsperpage:
         likedvideos['pagination'] = {
-            'skipurl': buildurl(URLPATH_LISTLIKEDVIDEOS),
+            'urlpath': URLPATH_LISTLIKEDVIDEOS,
+            'urlargs': {},
             'nexturl': buildurl(URLPATH_LISTLIKEDVIDEOS, {'offset': offset + itemsperpage}),
             'page': int(offset / itemsperpage) + 1,
-            'lastpage': int(math.ceil(float(likedvideos['count']) / itemsperpage))
+            'lastpage': int(math.ceil(float(likedvideos['count']) / itemsperpage)),
         }
     xbmc.log('plugin.video.vk: Liked videos: {}'.format(likedvideos))
     # build list
@@ -805,10 +814,11 @@ def listalbumvideos(albumid, offset=0):  # type: (int, int) -> None
     # pagination data
     if albumvideos['count'] > offset + itemsperpage:
         albumvideos['pagination'] = {
-            'skipurl': buildurl(URLPATH_LISTALBUMVIDEOS, {'albumid': albumid}),
+            'urlpath': URLPATH_LISTALBUMVIDEOS,
+            'urlargs': {'albumid': albumid},
             'nexturl': buildurl(URLPATH_LISTALBUMVIDEOS, {'albumid': albumid, 'offset': offset + itemsperpage}),
             'page': int(offset / itemsperpage) + 1,
-            'lastpage': int(math.ceil(float(albumvideos['count']) / itemsperpage))
+            'lastpage': int(math.ceil(float(albumvideos['count']) / itemsperpage)),
         }
     xbmc.log('plugin.video.vk: Album videos: {}'.format(albumvideos))
     # build list
@@ -838,10 +848,11 @@ def listcommunityvideos(communityid, offset=0):  # type: (int, int) -> None
     # pagination data
     if communityvideos['count'] > offset + itemsperpage:
         communityvideos['pagination'] = {
-            'skipurl': buildurl(URLPATH_LISTCOMMUNITYVIDEOS, {'communityid': communityid}),
+            'urlpath': URLPATH_LISTCOMMUNITYVIDEOS,
+            'urlargs': {'communityid': communityid},
             'nexturl': buildurl(URLPATH_LISTCOMMUNITYVIDEOS, {'communityid': communityid, 'offset': offset + itemsperpage}),
             'page': int(offset / itemsperpage) + 1,
-            'lastpage': int(math.ceil(float(communityvideos['count']) / itemsperpage))
+            'lastpage': int(math.ceil(float(communityvideos['count']) / itemsperpage)),
         }
     xbmc.log('plugin.video.vk: Community videos: {}'.format(communityvideos))
     # build list
@@ -878,7 +889,8 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                             {
                                 'page': listdata['pagination']['page'],
                                 'lastpage': listdata['pagination']['lastpage'],
-                                'skipurl': listdata['pagination']['skipurl'],
+                                'urlpath': listdata['pagination']['urlpath'],
+                                'urlargs': str(listdata['pagination']['urlargs']),  # ugly!
                             }
                         )
                     )
@@ -1361,7 +1373,8 @@ def listalbums(offset=0):  # type: (int) -> None
                             {
                                 'page': int(offset / itemsperpage) + 1,
                                 'lastpage': int(math.ceil(float(albums['count']) / itemsperpage)),
-                                'skipurl': buildurl(URLPATH_LISTALBUMS),
+                                'urlpath': URLPATH_LISTALBUMS,
+                                'urlargs': str({}),  # ugly!
                             }
                         )
                     )
@@ -1568,10 +1581,11 @@ def listcommunities(offset=0):  # type: (int) -> None
     # pagination data
     if communities['count'] > offset + itemsperpage:
         communities['pagination'] = {
-            'skipurl': buildurl(URLPATH_LISTCOMMUNITIES),
+            'urlpath': URLPATH_LISTCOMMUNITIES,
+            'urlargs': {},
             'nexturl': buildurl(URLPATH_LISTCOMMUNITIES, {'offset': offset + itemsperpage}),
             'page': int(offset / itemsperpage) + 1,
-            'lastpage': int(math.ceil(float(communities['count']) / itemsperpage))
+            'lastpage': int(math.ceil(float(communities['count']) / itemsperpage)),
         }
     xbmc.log('plugin.video.vk: Communities: {}'.format(communities))
     # build list
@@ -1598,10 +1612,11 @@ def listlikedcommunities(offset=0):  # type: (int) -> None
     # pagination data
     if likedcommunities['count'] > offset + itemsperpage:
         likedcommunities['pagination'] = {
-            'skipurl': buildurl(URLPATH_LISTLIKEDCOMMUNITIES),
+            'urlpath': URLPATH_LISTLIKEDCOMMUNITIES,
+            'urlargs': {},
             'nexturl': buildurl(URLPATH_LISTLIKEDCOMMUNITIES, {'offset': offset + itemsperpage}),
             'page': int(offset / itemsperpage) + 1,
-            'lastpage': int(math.ceil(float(likedcommunities['count']) / itemsperpage))
+            'lastpage': int(math.ceil(float(likedcommunities['count']) / itemsperpage)),
         }
     xbmc.log('plugin.video.vk: Liked communities: {}'.format(likedcommunities))
     # build list
@@ -1634,7 +1649,8 @@ def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
                             {
                                 'page': listdata['pagination']['page'],
                                 'lastpage': listdata['pagination']['lastpage'],
-                                'skipurl': listdata['pagination']['skipurl'],
+                                'urlpath': listdata['pagination']['urlpath'],
+                                'urlargs': str(listdata['pagination']['urlargs']),  # ugly!
                             }
                         )
                     )
