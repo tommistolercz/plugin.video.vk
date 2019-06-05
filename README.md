@@ -102,13 +102,13 @@ Communities:
 
 ## Changelog
 
-- [v1.4.0-dev (unreleased)](#v140-dev-unreleased)
+- [v1.4.0 (unreleased)](#v140-unreleased)
 - [v1.3.0 (2019-04-17)](#v130-2019-04-17)
 - [v1.2.0 (2019-03-04)](#v120-2019-03-04)
 - [v1.1.0 (2019-02-01)](#v110-2019-02-01)
 - [v1.0.0 (2018-11-12)](#v100-2018-11-12)
 
-### v1.4.0-dev (unreleased)
+### v1.4.0 (unreleased)
 
 Todo:
 - fix api issues (no results): execute.getMenuCounters(), fave.getLinks()
