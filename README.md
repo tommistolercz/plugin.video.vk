@@ -92,41 +92,37 @@ Communities:
 
 ## Screenshots
 
-![Screenshot 1: Add-on info](./resources/media/screenshot1.jpg)
+![Screenshot 1: Add-on settings](./resources/media/screenshot01.jpg)
 
-![Screenshot 2: Add-on settings](./resources/media/screenshot2.jpg)
+![Screenshot 2: Add-on menu](./resources/media/screenshot02.jpg)
 
-![Screenshot 3: Add-on menu](./resources/media/screenshot3.jpg)
-
-![Screenshot 4: Add-on content](./resources/media/screenshot4.jpg)
+![Screenshot 3: Add-on content](./resources/media/screenshot03.jpg)
 
 ## Changelog
 
-- [v1.4.0 (unreleased)](#v140-unreleased)
+- [v1.4.0 (2019-06-06)](#v140-2019-06-06)
 - [v1.3.0 (2019-04-17)](#v130-2019-04-17)
 - [v1.2.0 (2019-03-04)](#v120-2019-03-04)
 - [v1.1.0 (2019-02-01)](#v110-2019-02-01)
 - [v1.0.0 (2018-11-12)](#v100-2018-11-12)
 
-### v1.4.0 (unreleased)
-
-Todo:
-- fix api issues (no results): execute.getMenuCounters(), fave.getLinks()
+### v1.4.0 (2019-06-06)
 
 Fixed:
 - Play video fails on video resolving error on iOS (#82)
 - Video resolver bug due which the best available quality to not always be played (#86)
 
 Added:
-- VK user login (setting) (#85)
-- Skip to page (contextual action) (#84)
 - Go to community (contextual action) (#87)
 - Follow community (contextual action) (#88)
+- Skip to page (contextual action) (#84)
+- VK user login (setting) (#85)
   
 Changed:
-- VK user access token setting (invisible)
 - Pagination item (next/last page nr, moved to first pos.)
-- Notifications (?)
+- Unfollow community (user confirmation)
+- VK user access token setting (invisible)
+- Notifications
 - Optimized performance (video lists, play video, debug logging, ...)
 - Updated language resources
 - Updated readme

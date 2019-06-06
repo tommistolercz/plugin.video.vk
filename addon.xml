@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.vk" name="VK" version="1.4.0-dev" provider-name="TomMistolerCZ">
+<addon id="plugin.video.vk" name="VK" version="1.4.0" provider-name="TomMistolerCZ">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.requests" version="2.8.1"/>
@@ -21,14 +21,31 @@
         <source>https://github.com/tommistolercz/plugin.video.vk</source>
         <assets>
             <icon>resources/icon.png</icon>
-            <screenshot>resources/media/screenshot1.jpg</screenshot>
-            <screenshot>resources/media/screenshot2.jpg</screenshot>
-            <screenshot>resources/media/screenshot3.jpg</screenshot>
-            <screenshot>resources/media/screenshot4.jpg</screenshot>
+            <screenshot>resources/media/screenshot01.jpg</screenshot>
+            <screenshot>resources/media/screenshot02.jpg</screenshot>
+            <screenshot>resources/media/screenshot03.jpg</screenshot>
         </assets>
         <news>
-### v1.4.0-dev (unreleased)
-TBD
+### v1.4.0 (2019-06-06)
+
+Fixed:
+- Play video fails on video resolving error on iOS (#82)
+- Video resolver bug due which the best available quality to not always be played (#86)
+
+Added:
+- Go to community (contextual action) (#87)
+- Follow community (contextual action) (#88)
+- Skip to page (contextual action) (#84)
+- VK user login (setting) (#85)
+
+Changed:
+- Pagination item (next/last page nr, moved to first pos.)
+- Unfollow community (user confirmation)
+- VK user access token setting (invisible)
+- Notifications
+- Optimized performance (video lists, play video, debug logging, ...)
+- Updated language resources
+- Updated readme
         </news>
     </extension>
 </addon>

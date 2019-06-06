@@ -1,7 +1,7 @@
 # coding=utf-8
 
 __all__ = []
-__version__ = "1.4.0-dev"
+__version__ = "1.4.0"
 
 import datetime
 import math
@@ -9,7 +9,7 @@ import os
 import pickle
 import re
 import sys
-import time  # debug
+import time
 import urllib  # py2
 import urlparse  # py2
 
@@ -23,7 +23,7 @@ import vk
 
 
 # colors
-COLOR_ALT = 'blue'  # vk blue: 4877a4
+COLOR_ALT = 'blue'
 
 # db table names
 DBT_ADDONREQUESTS = 'addonRequests'
@@ -1789,6 +1789,12 @@ def unfollowcommunity(communityid):  # type: (int) -> None
     Unfollow community.
     """
     communityid = abs(int(communityid))  # positive id!
+    # ask user for confirmation
+    if not xbmcgui.Dialog().yesno(
+            ADDON.getLocalizedString(30072).encode('utf-8'),
+            ADDON.getLocalizedString(30033).encode('utf-8')
+    ):
+        return
     # request vk api
     vkapi = initvkapi()
     try:
