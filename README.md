@@ -26,6 +26,7 @@ Kodi add-on for watching videos from VK.com social network.
     [How to install add-ons from zip files](https://kodi.wiki/view/HOW-TO:Install_add-ons_from_zip_files)
 
 ## Features
+<<<<<<< HEAD
 
 Translations:
 - English
@@ -126,6 +127,67 @@ Changed:
 - Optimized performance (video lists, play video, debug logging, ...)
 - Updated language resources
 - Updated readme
+=======
+
+Translations:
+- English
+- Czech
+
+Add-on settings:
+- Items per page
+- Force custom view mode for videos
+- Search incl. adult videos
+- Search incl. own videos
+- Search by video duration (any, longer/shorter than)
+- Sort searched videos (by relevance, date, duration)
+- Keep history of add-on requests
+- Keep history of played videos
+
+ Auth:
+- Authorize add-on
+- Logout user
+
+Navigation:
+- List add-on menu
+
+Search:
+- Search videos
+- Search by similar title
+- List search history
+- Delete search from history
+- Clear search history
+
+Videos:
+- List searched videos
+- List my videos
+- List my liked videos
+- List album videos
+- List community videos
+- List played videos
+- Clear played videos
+- List watchlist
+- Add video to watchlist
+- Remove video from watchlist
+- Clear watchlist
+- Play video
+- Like video
+- Unlike video
+- Add video to albums
+
+Video albums:
+- List my video albums
+- Rename album
+- Reorder album up/down
+- Delete album
+- Create new album
+
+Communities:
+- List my communities
+- List my liked communities
+- Like community
+- Unlike community
+- Unfollow community
+>>>>>>> 1bf586169383b83466d48ff62e5d735da23f3705
 
 ### v1.3.0 (2019-04-17)
 
@@ -184,6 +246,15 @@ Changed:
 
 ### v1.0.0 (2018-11-12)
 
+<<<<<<< HEAD
+=======
+![Screenshot 4: Add-on video list](resources/media/screenshot4.jpg)
+
+## Changelog
+
+### v1.0.0 (2018-11-12)
+
+>>>>>>> 1bf586169383b83466d48ff62e5d735da23f3705
 Added:
 - EN/CZ translations
 - Manage add-on settings
@@ -201,7 +272,11 @@ Added:
 - Play video
 - Like video
 - Unlike video
+<<<<<<< HEAD
 - Set albums for video
+=======
+- Add video to albums
+>>>>>>> 1bf586169383b83466d48ff62e5d735da23f3705
 - List albums
 - Rename album
 - Reorder album up/down
@@ -212,3 +287,61 @@ Added:
 - Like community
 - Unlike community
 - Unfollow community
+<<<<<<< HEAD
+=======
+
+### v1.1.0 (2019-02-01)
+
+Fixed:
+- Various unicode issues
+- Content refreshing issues
+- Pagination bug
+- Items per page setting bug
+- Logout user button visibility bug
+ 
+Added:
+- Infolabels showing video resolution in lists
+- Counter for Search history menu item    
+- Code enabling Usage stats (future feature)
+
+Changed:
+- Removed most of Kodi notifications
+- Utilized TinyDB for persisting add-on data
+- Refined complete python code
+- Refined language resources
+- Renamed cookies data file to be non-hidden
+
+### v1.2.0 (2019-03-04)
+
+Fixed:
+- Reported unicode issues (#66, #70)
+- Weak encoding error in main menu
+
+Added:
+- Played videos (list)
+
+Changed:
+- Search videos (contextual action, avail. in all lists)
+- Refactored add-on file structure and python code
+
+### v1.3.0 (2019-04-17)
+
+Fixed:
+- Missing pagination for Search history and Played videos (#74)
+- Bug in Delete album
+- Displaying of long video titles in video lists
+
+Added:
+- Watchlist (list)
+- Add video to watchlist (contextual action)
+- Delete video from watchlist (contextual action)
+- Clear watchlist (contextual action)
+- Clear search history (contextual action) (#75)
+- Clear played videos (contextual action) (#75)
+- Keep history of add-on requests (setting, default false, not visible)
+- Keep history of played videos (setting, default false)
+
+Changed:
+- Optimized performance
+- Refined python code
+>>>>>>> 1bf586169383b83466d48ff62e5d735da23f3705
