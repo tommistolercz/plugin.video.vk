@@ -6,17 +6,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: KODI Addons\n"
 "Report-Msgid-Bugs-To: http://trac.kodi.tv/\n"
-"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Kodi Translation Team\n"
+"PO-Revision-Date: 2019-05-07 20:30+0200\n"
+"Last-Translator: Tomáš Mistoler <tomas.mistoler@gmail.com>\n"
 "Language-Team: Czech (Czech Republic) (http://www.transifex.com/projects/p/kodi-main/language/cs_CZ/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: cs_CZ\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-
-# Addon settings
+"X-Generator: Poedit 2.2.1\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-Basepath: .\n"
 
 msgctxt "#30000"
 msgid "GENERAL"
@@ -31,16 +31,16 @@ msgid "Items per page"
 msgstr "Položek na stránku"
 
 msgctxt "#30003"
-msgid "Force view mode for videos"
-msgstr "Vynutit zobrazení pro videa"
+msgid "Force custom view mode for videos"
+msgstr "Vynutit vlastní zobrazení pro videa"
 
 msgctxt "#30004"
-msgid "View mode [id]"
-msgstr "Typ zobrazení [id]"
+msgid "View mode id"
+msgstr "View mode id"
 
 msgctxt "#30005"
-msgid "Search incl. adult videos"
-msgstr "Hledat vč. videí pro dospělé"
+msgid "Search without age restrictions"
+msgstr "Hledat bez věkového omezení"
 
 msgctxt "#30006"
 msgid "Search incl. own videos"
@@ -63,8 +63,8 @@ msgid "Shorter than"
 msgstr "Kratší než"
 
 msgctxt "#30011"
-msgid "Duration [minutes]"
-msgstr "Délka [minut]"
+msgid "Duration in minutes"
+msgstr "Délka v minutách"
 
 msgctxt "#30012"
 msgid "Sort searched videos"
@@ -87,18 +87,16 @@ msgid "VK user access token"
 msgstr "VK uživatelský token"
 
 msgctxt "#30017"
-msgid "LOGOUT"
-msgstr "ODHLÁSIT"
+msgid "Logout user"
+msgstr "Odhlásit uživatele"
 
 msgctxt "#30018"
-msgid "Keep history of addon requests"
+msgid "Keep history of add-on requests"
 msgstr "Ukládat historii volání doplňku"
 
 msgctxt "#30019"
 msgid "Keep history of played videos"
 msgstr "Ukládat historii přehraných videí"
-
-# Errors
 
 msgctxt "#30020"
 msgid "VK authorization error!"
@@ -114,21 +112,19 @@ msgstr "Chyba routingu!"
 
 msgctxt "#30023"
 msgid "Data file error!"
-msgstr "Chyba dat. souboru!"
+msgstr "Chyba datového souboru!"
 
 msgctxt "#30024"
 msgid "Video resolving error!"
 msgstr "Chyba video resolvingu!"
 
-# Common
-
 msgctxt "#30030"
-msgid "VK account email/phone"
-msgstr "Email/Tel VK účtu"
+msgid "VK login (email/phone)"
+msgstr "VK login (email/tel)"
 
 msgctxt "#30031"
-msgid "VK account password"
-msgstr "Heslo VK účtu"
+msgid "VK password"
+msgstr "VK heslo"
 
 msgctxt "#30032"
 msgid "User logged out."
@@ -139,76 +135,76 @@ msgid "Are you sure?"
 msgstr "Jste si jisti?"
 
 msgctxt "#30034"
-msgid "NEXT PAGE"
-msgstr "DALŠÍ STRANA"
+msgid "Next page"
+msgstr "Další strana"
 
-# Main menu
+msgctxt "#30035"
+msgid "Skip to page"
+msgstr "Přeskočit na stranu"
+
+msgctxt "#30036"
+msgid "Go to"
+msgstr "Přejít na"
+
+msgctxt "#30037"
+msgid "Follow"
+msgstr "Sledovat"
 
 msgctxt "#30040"
-msgid "SEARCH VIDEOS"
-msgstr "HLEDAT VIDEA"
-
-msgctxt "#30041"
-msgid "SEARCH HISTORY"
-msgstr "HISTORIE HLEDÁNÍ"
-
-msgctxt "#30042"
-msgid "MY VIDEOS"
-msgstr "MOJE VIDEA"
-
-msgctxt "#30043"
-msgid "MY LIKED VIDEOS"
-msgstr "MOJE OBLÍBENÁ VIDEA"
-
-msgctxt "#30044"
-msgid "MY VIDEO ALBUMS"
-msgstr "MOJE VIDEO ALBA"
-
-msgctxt "#30045"
-msgid "MY COMMUNITIES"
-msgstr "MOJE KOMUNITY"
-
-msgctxt "#30046"
-msgid "MY LIKED COMMUNITIES"
-msgstr "MOJE OBLÍBENÉ KOMUNITY"
-
-msgctxt "#30047"
-msgid "PLAYED VIDEOS"
-msgstr "PŘEHRANÁ VIDEA"
-
-msgctxt "#30048"
-msgid "WATCHLIST"
-msgstr "WATCHLIST"
-
-# Videos
-
-msgctxt "#30051"
 msgid "Search videos"
 msgstr "Hledat videa"
 
-msgctxt "#30052"
-msgid "{0} videos found."
-msgstr "{0} videí nalezeno."
+msgctxt "#30041"
+msgid "Search history"
+msgstr "Historie hledání"
+
+msgctxt "#30042"
+msgid "My videos"
+msgstr "Moje videa"
+
+msgctxt "#30043"
+msgid "My liked videos"
+msgstr "Moje oblíbená videa"
+
+msgctxt "#30044"
+msgid "My video albums"
+msgstr "Moje video alba"
+
+msgctxt "#30045"
+msgid "My communities"
+msgstr "Moje komunity"
+
+msgctxt "#30046"
+msgid "My liked communities"
+msgstr "Moje oblíbené komunity"
+
+msgctxt "#30047"
+msgid "Played videos"
+msgstr "Přehraná videa"
+
+msgctxt "#30048"
+msgid "Watchlist"
+msgstr "Watchlist"
 
 msgctxt "#30053"
-msgid "Like video"
-msgstr "Video se mi líbí"
+msgid "Add to liked videos"
+msgstr "Přidat do oblíbených videí"
 
 msgctxt "#30054"
-msgid "Unlike video"
-msgstr "Video už se mi nelíbí"
+msgid "Remove from liked videos"
+msgstr "Odebrat z oblíbených videí"
 
 msgctxt "#30055"
-msgid "Add video to albums"
-msgstr "Zařadit video do alb"
+msgid "Set albums"
+msgstr "Zařadit do alb"
 
 msgctxt "#30056"
-msgid "Add video to watchlist"
-msgstr "Přidat video na watchlist"
+msgid "Add to watchlist"
+msgstr "Přidat na watchlist"
 
 msgctxt "#30057"
-msgid "Delete video from watchlist"
-msgstr "Smazat video z watchlistu"
+msgid "Remove from watchlist"
+msgstr "Odebrat z watchlistu"
 
 msgctxt "#30058"
 msgid "Clear watchlist"
@@ -217,8 +213,6 @@ msgstr "Vymazat watchlist"
 msgctxt "#30059"
 msgid "Clear played videos"
 msgstr "Vymazat přehraná videa"
-
-# Video albums
 
 msgctxt "#30060"
 msgid "Rename album"
@@ -240,25 +234,17 @@ msgctxt "#30064"
 msgid "Create new album"
 msgstr "Vytvořit nové album"
 
-# Communities
-
 msgctxt "#30070"
-msgid "Like community"
-msgstr "Komunita se mi líbí"
+msgid "Add to liked communities"
+msgstr "Přidat do oblíbených komunit"
 
 msgctxt "#30071"
-msgid "Unlike community"
-msgstr "Komunita už se mi nelíbí"
+msgid "Remove from liked communities"
+msgstr "Odebrat z oblíbených komunit"
 
 msgctxt "#30072"
-msgid "Unfollow community"
+msgid "Leave community"
 msgstr "Opustit komunitu"
-
-# Search history
-
-msgctxt "#30080"
-msgid "Search similar"
-msgstr "Hledat podobné"
 
 msgctxt "#30081"
 msgid "Delete search"
@@ -266,4 +252,16 @@ msgstr "Smazat hledání"
 
 msgctxt "#30082"
 msgid "Clear search history"
-msgstr "Vymazat historii"
+msgstr "Vymazat historii hledání"
+
+msgctxt "#30083"
+msgid "Search videos"
+msgstr "Hledat videa"
+
+msgctxt "#30084"
+msgid "{0} videos searched"
+msgstr "{0} nalezených videí"
+
+msgctxt "#30085"
+msgid "Search by similar title"
+msgstr "Hledat podobný název"

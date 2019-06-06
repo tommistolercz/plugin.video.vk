@@ -15,7 +15,8 @@
         <setting label="30019" id="keepplayedvideohistory" type="bool" default="false"/>
     </category>
     <category label="30001">
-        <setting label="30016" id="vkuseraccesstoken" type="text" default=""/>
+        <setting label="30030" id="vkuserlogin" type="text" default=""/>
+        <setting label="30016" id="vkuseraccesstoken" type="text" default="" visible="false"/>
         <setting label="30017" id="vkuserlogout" type="action" action="RunPlugin(plugin://plugin.video.vk/logout)" visible="!eq(-1,)"/>
     </category>
 </settings>

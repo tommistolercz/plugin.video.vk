@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.vk" name="VK" version="1.3.0" provider-name="TomMistolerCZ">
+<addon id="plugin.video.vk" name="VK" version="1.4.0" provider-name="TomMistolerCZ">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.requests" version="2.8.1"/>
@@ -21,94 +21,31 @@
         <source>https://github.com/tommistolercz/plugin.video.vk</source>
         <assets>
             <icon>resources/icon.png</icon>
-            <screenshot>resources/media/screenshot1.jpg</screenshot>
-            <screenshot>resources/media/screenshot2.jpg</screenshot>
-            <screenshot>resources/media/screenshot3.jpg</screenshot>
-            <screenshot>resources/media/screenshot4.jpg</screenshot>
+            <screenshot>resources/media/screenshot01.jpg</screenshot>
+            <screenshot>resources/media/screenshot02.jpg</screenshot>
+            <screenshot>resources/media/screenshot03.jpg</screenshot>
         </assets>
         <news>
-### v1.3.0 (2019-04-17)
+### v1.4.0 (2019-06-06)
 
-- [x] Fixed pagination for `/searchhistory`, `/playedvideos` (#74)
-- [x] Fixed bug in `/deletealbum`
-- [x] Fixed displaying of long video titles in lists
-- [x] Added new features:
-    - [x] `/watchlist` video list
-    - [x] `/addvideotowatchlist` action
-    - [x] `/deletevideofromwatchlist` action
-    - [x] `/clearwatchlist` action
-    - [x] `/clearsearchhistory` action (#75)
-    - [x] `/clearplayedvideos` action (#75)
-- [x] Added new settings:
-    - [x] `keepaddonrequesthistory` (default false, not visible)
-    - [x] `keepplayedvideohistory` (default false)
-- [x] Optimized performance
-- [x] Refined python code
+Fixed:
+- Play video fails on video resolving error on iOS (#82)
+- Video resolver bug due which the best available quality to not always be played (#86)
 
-### v1.2.0 (2019-03-04)
+Added:
+- Go to community (contextual action) (#87)
+- Follow community (contextual action) (#88)
+- Skip to page (contextual action) (#84)
+- VK user login (setting) (#85)
 
-- [x] Fixed unicode issues:
-    - [x] Fixed reported unicode issues (#66) (#70)
-    - [x] Fixed weak encoding error in main menu (search history item)
-- [x] Added new features:
-    - [x] `/playedvideos` video list
-    - [x] `/searchvideos` action (available in all lists)
-- [x] Refactored add-on file structure and python code
-
-### v1.1.0 (2019-02-01)
-
-- [x] Fixed unicode issues
-- [x] Fixed content refreshing after contextual actions
-- [x] Fixed pagination bug
-- [x] Fixed itemsperpage setting bug
-- [x] Fixed Logout user button visibility bug
-- [x] Added info-labels showing video resolution in lists
-- [x] Added counter for Search history in menu
-- [x] Added code enabling Addict stats future feature
-- [x] Reduced using of Kodi notifications
-- [x] Utilized TinyDB for persisting add-on data
-- [x] Refined complete python code
-- [x] Refined language resources
-- [x] Renamed cookies data file to be non-hidden
-
-### v1.0.0 (2018-11-12)
-
-Common:
-- [x] EN/CZ language version
-- [x] Manage add-on settings
-- [x] Authorize add-on
-- [x] List menu
-- [x] Logout user
-
-Search history:
-- [x] List search history
-- [x] Delete search
-
-Videos:
-- [x] Search videos
-- [x] Search similar videos
-- [x] List videos
-- [x] List liked videos
-- [x] List album videos
-- [x] List community videos
-- [x] Play video
-- [x] Like video
-- [x] Unlike video
-- [x] Add video to albums
-
-Video albums:
-- [x] List albums
-- [x] Rename album
-- [x] Reorder album up/down
-- [x] Delete album
-- [x] Create new album
-
-Communities:
-- [x] List communities
-- [x] List liked communities
-- [x] Like community
-- [x] Unlike community
-- [x] Unfollow community
+Changed:
+- Pagination item (next/last page nr, moved to first pos.)
+- Unfollow community (user confirmation)
+- VK user access token setting (invisible)
+- Notifications
+- Optimized performance (video lists, play video, debug logging, ...)
+- Updated language resources
+- Updated readme
         </news>
     </extension>
 </addon>
