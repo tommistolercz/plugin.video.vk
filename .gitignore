@@ -1,7 +1,4 @@
 *.pyc
 *.pyo
-_Archiv_/
-.idea/
-.gtm/
-resources/lib/tests/
+resources/lib/tests/.pytest_cache/
 /addon_data/

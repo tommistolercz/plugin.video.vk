@@ -21,7 +21,7 @@
   </component>
   <component name="DBNavigator.Project.DatabaseBrowserManager">
     <autoscroll-to-editor value="false" />
-    <autoscroll-from-editor value="true" />
+    <autoscroll-from-editor value="false" />
     <show-object-properties value="true" />
     <loaded-nodes />
   </component>
