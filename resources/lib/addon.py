@@ -1,7 +1,7 @@
 # coding=utf-8
 
 __all__ = []
-__version__ = "1.4.0"
+__version__ = "1.5.0"
 
 import datetime
 import math
@@ -47,38 +47,39 @@ ITEMTYPE_FOLDER = True
 ITEMTYPE_NOTFOLDER = False
 
 # url paths
-URLPATH_LISTADDONMENU = '/'
-URLPATH_LOGOUT = '/logout'
-URLPATH_SKIPTOPAGE = '/skiptopage'
-URLPATH_LISTSEARCHHISTORY = '/searchhistory'
-URLPATH_CLEARSEARCHHISTORY = '/clearsearchhistory'
-URLPATH_DELETESEARCH = '/deletesearch'
-URLPATH_LISTSEARCHEDVIDEOS = '/searchvideos'
-URLPATH_LISTPLAYEDVIDEOS = '/playedvideos'
-URLPATH_LISTWATCHLIST = '/watchlist'
-URLPATH_LISTVIDEOS = '/videos'
-URLPATH_LISTLIKEDVIDEOS = '/likedvideos'
-URLPATH_LISTALBUMVIDEOS = '/albumvideos'
-URLPATH_LISTCOMMUNITYVIDEOS = '/communityvideos'  # deprecated
-URLPATH_CLEARPLAYEDVIDEOS = '/clearplayedvideos'
-URLPATH_CLEARWATCHLIST = '/clearwatchlist'
-URLPATH_PLAYVIDEO = '/playvideo'
-URLPATH_LIKEVIDEO = '/likevideo'
-URLPATH_UNLIKEVIDEO = '/unlikevideo'
-URLPATH_ADDVIDEOTOWATCHLIST = '/addvideotowatchlist'
-URLPATH_DELETEVIDEOFROMWATCHLIST = '/deletevideofromwatchlist'
 URLPATH_ADDVIDEOTOALBUMS = '/addvideotoalbums'
-URLPATH_LISTALBUMS = '/albums'
-URLPATH_REORDERALBUM = '/reorderalbum'
-URLPATH_RENAMEALBUM = '/renamealbum'
+URLPATH_ADDVIDEOTOWATCHLIST = '/addvideotowatchlist'
+URLPATH_CLEARPLAYEDVIDEOS = '/clearplayedvideos'
+URLPATH_CLEARSEARCHHISTORY = '/clearsearchhistory'
+URLPATH_CLEARWATCHLIST = '/clearwatchlist'
 URLPATH_CREATEALBUM = '/createalbum'
 URLPATH_DELETEALBUM = '/deletealbum'
-URLPATH_LISTCOMMUNITIES = '/communities'
-URLPATH_LISTLIKEDCOMMUNITIES = '/likedcommunities'
-URLPATH_LIKECOMMUNITY = '/likecommunity'
-URLPATH_UNLIKECOMMUNITY = '/unlikecommunity'
+URLPATH_DELETESEARCH = '/deletesearch'
+URLPATH_DELETEVIDEOFROMWATCHLIST = '/deletevideofromwatchlist'
 URLPATH_FOLLOWCOMMUNITY = '/followcommunity'
+URLPATH_LIKECOMMUNITY = '/likecommunity'
+URLPATH_LIKEVIDEO = '/likevideo'
+URLPATH_LISTADDONMENU = '/'
+URLPATH_LISTALBUMS = '/albums'
+URLPATH_LISTALBUMVIDEOS = '/albumvideos'  # deprecated
+URLPATH_LISTCOMMUNITIES = '/communities'
+URLPATH_LISTCOMMUNITYVIDEOS = '/communityvideos'  # deprecated
+URLPATH_LISTLIKEDCOMMUNITIES = '/likedcommunities'
+URLPATH_LISTLIKEDVIDEOS = '/likedvideos'
+URLPATH_LISTPLAYEDVIDEOS = '/playedvideos'
+URLPATH_LISTSEARCHHISTORY = '/searchhistory'
+URLPATH_LISTSEARCHEDVIDEOS = '/searchedvideos'
+URLPATH_LISTVIDEOS = '/videos'
+URLPATH_LISTWATCHLIST = '/watchlist'
+URLPATH_LOGOUT = '/logout'
+URLPATH_PLAYVIDEO = '/playvideo'
+URLPATH_RENAMEALBUM = '/renamealbum'
+URLPATH_REORDERALBUM = '/reorderalbum'
+URLPATH_SEARCHVIDEOS = '/searchvideos'
+URLPATH_SKIPTOPAGE = '/skiptopage'
 URLPATH_UNFOLLOWCOMMUNITY = '/unfollowcommunity'
+URLPATH_UNLIKECOMMUNITY = '/unlikecommunity'
+URLPATH_UNLIKEVIDEO = '/unlikevideo'
 
 # vk api config
 VKAPI_APPID = '6432748'
@@ -177,7 +178,7 @@ def savecookies(cookiejar):  # type: (object) -> None
     """
     Save cookiejar object to add-on data file, truncate if exists.
     """
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_COOKIES))
+    fp = buildfp(FILENAME_COOKIES)
     try:
         with open(fp, 'wb') as f:
             pickle.dump(cookiejar, f)
@@ -191,7 +192,7 @@ def loadcookies():  # type: () -> object
     """
     Load cookiejar object from add-on data file, must exist since auth.
     """
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_COOKIES))
+    fp = buildfp(FILENAME_COOKIES)
     try:
         with open(fp, 'rb') as f:
             cookiejar = pickle.load(f)
@@ -206,13 +207,21 @@ def deletecookies():  # type: () -> None
     """
     Delete cookies add-on data file.
     """
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_COOKIES))
+    fp = buildfp(FILENAME_COOKIES)
     try:
         os.remove(fp)
     except os.error:
         xbmc.log('plugin.video.vk: Data file error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_DATAFILE)
     xbmc.log('plugin.video.vk: Cookies deleted: {}'.format(fp))
+
+
+def buildfp(filename):  # type: (str) -> str
+    """
+    Build add-on data file path.
+    """
+    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), filename))
+    return fp
 
 
 def buildurl(urlpath, urlargs=None):  # type: (str, dict) -> str
@@ -263,8 +272,7 @@ def dispatch():  # type: () -> None
             'urlpath': urlpath,
             'urlargs': urlargs,
         }
-        fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-        db = tinydb.TinyDB(fp)
+        db = tinydb.TinyDB(buildfp(FILENAME_DB))
         db.table(DBT_ADDONREQUESTS).insert(lastrequest)
         xbmc.log('plugin.video.vk: Addon requests db updated: {}'.format(lastrequest))
     # call handler
@@ -280,22 +288,7 @@ def dispatch():  # type: () -> None
     xbmc.log('plugin.video.vk: Handler runtime: {} sec.'.format(t2 - t1))
 
 
-# auth -----
-
-
-@route(URLPATH_LOGOUT)
-def logout():  # type: () -> None
-    """
-    Logout user.
-    """
-    # delete cookies + reset user access token
-    deletecookies()
-    ADDON.setSetting('vkuseraccesstoken', '')
-    xbmc.log('plugin.video.vk: User logged out.')
-    xbmcgui.Dialog().notification(ADDON.getAddonInfo('name'), ADDON.getLocalizedString(30032).encode('utf-8'))
-
-
-# navigation -----
+# general -----
 
 
 @route(URLPATH_LISTADDONMENU)
@@ -303,15 +296,13 @@ def listaddonmenu():  # type: () -> None
     """
     List add-on menu.
     """
-    # collect menu counters from db...
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-    db = tinydb.TinyDB(fp)
+    # collect menu counters from db and vkapi
+    db = tinydb.TinyDB(buildfp(FILENAME_DB))
     counters = {
         'searchhistory': len(db.table(DBT_SEARCHHISTORY)),
         'playedvideos': len(db.table(DBT_PLAYEDVIDEOS)),
         'watchlist': len(db.table(DBT_WATCHLIST)),
     }
-    # ...and from vkapi
     vkapi = initvkapi()
     try:
         counters.update(vkapi.execute.getMenuCounters())
@@ -323,7 +314,7 @@ def listaddonmenu():  # type: () -> None
     kodilist = [
         # search videos
         (
-            buildurl(URLPATH_LISTSEARCHEDVIDEOS),
+            buildurl(URLPATH_SEARCHVIDEOS),
             xbmcgui.ListItem(
                 ADDON.getLocalizedString(30040).encode('utf-8')
             ),
@@ -448,6 +439,18 @@ def skiptopage(page, lastpage, urlpath, urlargs):  # type: (int, int, str, str) 
     )
 
 
+@route(URLPATH_LOGOUT)
+def logout():  # type: () -> None
+    """
+    Logout user.
+    """
+    # delete cookies + reset user access token
+    deletecookies()
+    ADDON.setSetting('vkuseraccesstoken', '')
+    xbmc.log('plugin.video.vk: User logged out.')
+    xbmcgui.Dialog().notification(ADDON.getAddonInfo('name'), ADDON.getLocalizedString(30032).encode('utf-8'))
+
+
 # search -----
 
 
@@ -459,8 +462,7 @@ def listsearchhistory(offset=0):  # type: (int) -> None
     offset = int(offset)
     itemsperpage = int(ADDON.getSetting('itemsperpage'))
     # query db
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-    db = tinydb.TinyDB(fp)
+    db = tinydb.TinyDB(buildfp(FILENAME_DB))
     searchhistory = {
         'count': len(db.table(DBT_SEARCHHISTORY)),
         'items': db.table(DBT_SEARCHHISTORY).all()[offset:offset + itemsperpage]
@@ -530,15 +532,15 @@ def listsearchhistory(offset=0):  # type: (int) -> None
             # search videos
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30083).encode('utf-8')),
-                'Container.Update({0})'.format(
-                    buildurl(URLPATH_LISTSEARCHEDVIDEOS)
+                'RunPlugin({0})'.format(
+                    buildurl(URLPATH_SEARCHVIDEOS)
                 )
             ),
-            # search similar title
+            # search videos by similar title
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30085).encode('utf-8')),
-                'Container.Update({0})'.format(
-                    buildurl(URLPATH_LISTSEARCHEDVIDEOS, {'similarq': search['q'].encode('utf-8')})
+                'RunPlugin({0})'.format(
+                    buildurl(URLPATH_SEARCHVIDEOS, {'defq': search['q'].encode('utf-8')})
                 )
             ),
         ]
@@ -570,8 +572,7 @@ def deletesearch(searchid):  # type: (int) -> None
     ):
         return
     # query db for deleting
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-    db = tinydb.TinyDB(fp)
+    db = tinydb.TinyDB(buildfp(FILENAME_DB))
     db.table(DBT_SEARCHHISTORY).remove(doc_ids=[searchid])
     xbmc.log('plugin.video.vk: Search deleted: {}'.format(searchid))
     # refresh content
@@ -590,28 +591,40 @@ def clearsearchhistory():  # type: () -> None
     ):
         return
     # purge db table
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-    tinydb.TinyDB(fp).purge_table(DBT_SEARCHHISTORY)
+    db = tinydb.TinyDB(buildfp(FILENAME_DB))
+    db.purge_table(DBT_SEARCHHISTORY)
     xbmc.log('plugin.video.vk: Search history cleared.')
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
+
+
+@route(URLPATH_SEARCHVIDEOS)
+def searchvideos(defq=''):  # type: (str) -> None
+    """
+    Search videos.
+    """
+    # ask user for entering/editing a new query
+    q = xbmcgui.Dialog().input(ADDON.getLocalizedString(30083).encode('utf-8'), defaultt=defq)
+    if not q:
+        return
+    # update content
+    xbmc.executebuiltin(
+        'Container.Update({0})'.format(
+            buildurl(URLPATH_LISTSEARCHEDVIDEOS, {'q': q})
+        )
+    )
 
 
 # videos -----
 
 
 @route(URLPATH_LISTSEARCHEDVIDEOS)
-def listsearchedvideos(q='', similarq='', offset=0):  # type: (str, str, int) -> None
+def listsearchedvideos(q, offset=0):  # type: (str, int) -> None
     """
     List searched videos.
     """
     offset = int(offset)
     itemsperpage = int(ADDON.getSetting('itemsperpage'))
-    # if q not passed, ask user for entering a new query / editing similar one
-    if not q:
-        q = xbmcgui.Dialog().input(ADDON.getLocalizedString(30083).encode('utf-8'), defaultt=similarq)
-        if not q:
-            return
     # request vk api
     vkapi = initvkapi()
     kwargs = {
@@ -642,17 +655,14 @@ def listsearchedvideos(q='', similarq='', offset=0):  # type: (str, str, int) ->
             'page': int(offset / itemsperpage) + 1,
             'lastpage': int(math.ceil(float(searchedvideos['count']) / itemsperpage)),
         }
-    xbmc.log('plugin.video.vk: Searched videos: {}'.format(searchedvideos))
-    # only once
-    if offset == 0:
-        # update search history db with the last search
+    if not offset:
+        # update search history db
         lastsearch = {
             'q': q.lower(),
             'resultsCount': int(searchedvideos['count']),
-            'lastUsed': datetime.datetime.now().isoformat()
+            'lastUsed': datetime.datetime.now().isoformat(),
         }
-        fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-        db = tinydb.TinyDB(fp)
+        db = tinydb.TinyDB(buildfp(FILENAME_DB))
         db.table(DBT_SEARCHHISTORY).upsert(
             lastsearch,
             tinydb.where('q') == lastsearch['q']
@@ -663,6 +673,7 @@ def listsearchedvideos(q='', similarq='', offset=0):  # type: (str, str, int) ->
             ADDON.getAddonInfo('name'),
             ADDON.getLocalizedString(30084).encode('utf-8').format(searchedvideos['count'])
         )
+    # xbmc.log('plugin.video.vk: Searched videos: {}'.format(searchedvideos))
     # build list
     buildvideolist(URLPATH_LISTSEARCHEDVIDEOS, searchedvideos)
 
@@ -675,8 +686,7 @@ def listplayedvideos(offset=0):  # type: (int) -> None
     offset = int(offset)
     itemsperpage = int(ADDON.getSetting('itemsperpage'))
     # query db
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-    db = tinydb.TinyDB(fp)
+    db = tinydb.TinyDB(buildfp(FILENAME_DB))
     playedvideos = {
         'count': len(db.table(DBT_PLAYEDVIDEOS)),
         'items': db.table(DBT_PLAYEDVIDEOS).all()[offset:offset + itemsperpage]
@@ -703,8 +713,7 @@ def listwatchlist(offset=0):  # type: (int) -> None
     offset = int(offset)
     itemsperpage = int(ADDON.getSetting('itemsperpage'))
     # query db
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-    db = tinydb.TinyDB(fp)
+    db = tinydb.TinyDB(buildfp(FILENAME_DB))
     watchlist = {
         'count': len(db.table(DBT_WATCHLIST)),
         'items': db.table(DBT_WATCHLIST).all()[offset:offset + itemsperpage]
@@ -938,7 +947,28 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
         )
         # create context menu
         cmi = []
-        if not video['is_favorite']:
+        if 'added_to_watchlist' not in video:
+            cmi += [
+                # add video to watchlist
+                (
+                    '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30056).encode('utf-8')),
+                    'RunPlugin({0})'.format(
+                        buildurl(URLPATH_ADDVIDEOTOWATCHLIST, {'ownerid': video['owner_id'], 'videoid': video['id']})
+                    )
+                )
+            ]
+        else:
+            cmi += [
+                # delete video from watchlist
+                (
+                    '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30057).encode('utf-8')),
+                    'RunPlugin({0})'.format(
+                        buildurl(URLPATH_DELETEVIDEOFROMWATCHLIST,
+                                 {'ownerid': video['owner_id'], 'videoid': video['id']})
+                    )
+                )
+            ]
+        if not video['is_favorite']:  # todo: seems to be always true, buggy?
             cmi += [
                 # like video
                 (
@@ -959,34 +989,21 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                 )
             ]
         cmi += [
-            # set albums
+            # set albums for video
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30055).encode('utf-8')),
                 'RunPlugin({0})'.format(
                     buildurl(URLPATH_ADDVIDEOTOALBUMS, {'ownerid': video['owner_id'], 'videoid': video['id']})
                 )
-            )
+            ),
+            # create new album
+            (
+                '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30064).encode('utf-8')),
+                'RunPlugin({0})'.format(
+                    buildurl(URLPATH_CREATEALBUM)
+                )
+            ),
         ]
-        if 'added_to_watchlist' not in video:
-            cmi += [
-                # add video to watchlist
-                (
-                    '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30056).encode('utf-8')),
-                    'RunPlugin({0})'.format(
-                        buildurl(URLPATH_ADDVIDEOTOWATCHLIST, {'ownerid': video['owner_id'], 'videoid': video['id']})
-                    )
-                )
-            ]
-        else:
-            cmi += [
-                # delete video from watchlist
-                (
-                    '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30057).encode('utf-8')),
-                    'RunPlugin({0})'.format(
-                        buildurl(URLPATH_DELETEVIDEOFROMWATCHLIST, {'ownerid': video['owner_id'], 'videoid': video['id']})
-                    )
-                )
-            ]
         if listtype == URLPATH_LISTWATCHLIST:
             cmi += [
                 # clear watchlist
@@ -1039,15 +1056,15 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
             # search videos
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30083).encode('utf-8')),
-                'Container.Update({0})'.format(
-                    buildurl(URLPATH_LISTSEARCHEDVIDEOS)
+                'RunPlugin({0})'.format(
+                    buildurl(URLPATH_SEARCHVIDEOS)
                 )
             ),
-            # search by similar title
+            # search videos by similar title
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30085).encode('utf-8')),
-                'Container.Update({0})'.format(
-                    buildurl(URLPATH_LISTSEARCHEDVIDEOS, {'similarq': videotitle})
+                'RunPlugin({0})'.format(
+                    buildurl(URLPATH_SEARCHVIDEOS, {'defq': videotitle})
                 )
             ),
         ]
@@ -1107,8 +1124,7 @@ def playvideo(ownerid, videoid):  # type: (int, int) -> None
                 'lastPlayed': datetime.datetime.now().isoformat(),
             }
         )
-        fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-        db = tinydb.TinyDB(fp)
+        db = tinydb.TinyDB(buildfp(FILENAME_DB))
         db.table(DBT_PLAYEDVIDEOS).upsert(
             video,
             tinydb.where('oidid') == oidid
@@ -1254,8 +1270,7 @@ def addvideotowatchlist(ownerid, videoid):  # type: (int, int) -> None
             'added_to_watchlist': datetime.datetime.now().isoformat(),
         }
     )
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-    db = tinydb.TinyDB(fp)
+    db = tinydb.TinyDB(buildfp(FILENAME_DB))
     db.table(DBT_WATCHLIST).upsert(
         video,
         tinydb.where('oidid') == oidid
@@ -1279,8 +1294,7 @@ def deletevideofromwatchlist(ownerid, videoid):  # type: (int, int) -> None
     ):
         return
     # query db for deleting
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-    db = tinydb.TinyDB(fp)
+    db = tinydb.TinyDB(buildfp(FILENAME_DB))
     db.table(DBT_WATCHLIST).remove(
         tinydb.where('oidid') == oidid
     )
@@ -1301,8 +1315,8 @@ def clearwatchlist():  # type: () -> None
     ):
         return
     # purge db table
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-    tinydb.TinyDB(fp).purge_table(DBT_WATCHLIST)
+    db = tinydb.TinyDB(buildfp(FILENAME_DB))
+    db.purge_table(DBT_WATCHLIST)
     xbmc.log('plugin.video.vk: Watchlist cleared.')
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
@@ -1320,8 +1334,8 @@ def clearplayedvideos():  # type: () -> None
     ):
         return
     # purge db table
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-    tinydb.TinyDB(fp).purge_table(DBT_PLAYEDVIDEOS)
+    db = tinydb.TinyDB(buildfp(FILENAME_DB))
+    db.purge_table(DBT_PLAYEDVIDEOS)
     xbmc.log('plugin.video.vk: Played videos cleared.')
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
@@ -1429,7 +1443,14 @@ def listalbums(offset=0):  # type: (int) -> None
             # search videos
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30083).encode('utf-8')),
-                'Container.Update({0})'.format(buildurl(URLPATH_LISTSEARCHEDVIDEOS))  # cnt.upd!
+                'RunPlugin({0})'.format(buildurl(URLPATH_SEARCHVIDEOS))
+            ),
+            # search videos by similar title (album title)
+            (
+                '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30085).encode('utf-8')),
+                'RunPlugin({0})'.format(
+                    buildurl(URLPATH_SEARCHVIDEOS, {'defq': album['title'].encode('utf-8')})
+                )
             ),
         ]
         li.addContextMenuItems(cmi)
@@ -1705,7 +1726,14 @@ def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
             # search videos
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30083).encode('utf-8')),
-                'Container.Update({0})'.format(buildurl(URLPATH_LISTSEARCHEDVIDEOS))  # cnt.upd!
+                'RunPlugin({0})'.format(buildurl(URLPATH_SEARCHVIDEOS))
+            ),
+            # search videos by similar title (community title/name)
+            (
+                '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30085).encode('utf-8')),
+                'RunPlugin({0})'.format(
+                    buildurl(URLPATH_SEARCHVIDEOS, {'defq': community['title' if listtype == URLPATH_LISTLIKEDCOMMUNITIES else 'name'].encode('utf-8')})
+                )
             ),
         ]
         li.addContextMenuItems(cmi)

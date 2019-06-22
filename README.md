@@ -1,8 +1,8 @@
 ![Add-on icon](./resources/icon.png)
 
-# VK (plugin.video.vk)
+# VK (plugin.video.vk) 
 
-Kodi add-on for watching videos from VK.com social network.
+#### Kodi add-on for watching videos from VK.com social network.
 
 - [Requirements](#requirements)
 - [Installation](#installation)
@@ -18,12 +18,13 @@ Kodi add-on for watching videos from VK.com social network.
 ## Installation
 
 1. Download the add-on zip file:<br>
-    [plugin.video.vk-1.4.0.zip](https://github.com/tommistolercz/plugin.video.vk/releases/download/v1.4.0/plugin.video.vk-1.4.0.zip)
+    [plugin.video.vk-1.5.0.zip](https://github.com/tommistolercz/plugin.video.vk/releases/download/v1.5.0/plugin.video.vk-1.5.0.zip)
     
 2. Install it in Kodi:<br>
-    `Kodi > Settings > Add-ons > Install from zip file...`
-    
+    `Kodi > Settings > Add-ons > Install from zip file...`    
     [How to install add-ons from zip files](https://kodi.wiki/view/HOW-TO:Install_add-ons_from_zip_files)
+
+Note: You can also install this add-on from [repository.tommistolercz](https://github.com/tommistolercz/repository.tommistolercz)
 
 ## Features
 
@@ -42,17 +43,15 @@ Add-on settings:
 - Keep history of played videos
 - VK user login (email/phone)
 
- Auth:
+Common:
 - Authorize add-on
 - Logout user
-
-Navigation:
 - List add-on menu
 - Skip to page
 
 Search:
 - Search videos
-- Search videos by similar title
+- Search videos by similar title (video, album, community)
 - List search history
 - Delete search from history
 - Clear search history
@@ -100,11 +99,40 @@ Communities:
 
 ## Changelog
 
+- [v1.5.0 (unreleased)](#v150-unreleased)
 - [v1.4.0 (2019-06-06)](#v140-2019-06-06)
 - [v1.3.0 (2019-04-17)](#v130-2019-04-17)
 - [v1.2.0 (2019-03-04)](#v120-2019-03-04)
 - [v1.1.0 (2019-02-01)](#v110-2019-02-01)
 - [v1.0.0 (2018-11-12)](#v100-2018-11-12)
+
+### v1.5.0 (unreleased)
+
+TBD:
+- Add russian translation (thanks to [somebody])
+- optimize logging of large list data (incl. formatting)
+- ckeck if all refreshes are needed
+- refactor color_alt const
+v1.6 (?):
+- Filters:
+    - filter duplicated videos (keep best quality)
+    - filter by quality (i.e. 1080p only)
+
+Fixed:
+- Content refreshing issues (#69)
+    ? duplic. search result notification
+
+Added:
+- Search videos by album/community title (contextual action reuse)
+- Create new album (made avail. from video list)
+    ? move to Set albums for video dialog
+    ? solving issue #76?
+
+Changed:
+- Optimized video contextual menu (actions order)  
+- Refactored buildfp()
+- Refactored searchvideos() vs listsearchedvideos()
+- Updated README (repository installation info and link)
 
 ### v1.4.0 (2019-06-06)
 
@@ -125,7 +153,7 @@ Changed:
 - Notifications
 - Optimized performance (video lists, play video, debug logging, ...)
 - Updated language resources
-- Updated readme
+- Updated README
 
 ### v1.3.0 (2019-04-17)
 
