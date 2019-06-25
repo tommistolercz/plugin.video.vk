@@ -24,7 +24,7 @@
     `Kodi > Settings > Add-ons > Install from zip file...`    
     [How to install add-ons from zip files](https://kodi.wiki/view/HOW-TO:Install_add-ons_from_zip_files)
 
-Note: You can also install this add-on from [repository.tommistolercz](https://github.com/tommistolercz/repository.tommistolercz)
+Note: You can also install the add-on from [repository.tommistolercz](https://github.com/tommistolercz/repository.tommistolercz)
 
 ## Features
 
@@ -108,31 +108,25 @@ Communities:
 
 ### v1.5.0 (unreleased)
 
-TBD:
-- Add russian translation (thanks to [somebody])
-- optimize logging of large list data (incl. formatting)
-- ckeck if all refreshes are needed
-- refactor color_alt const
-v1.6 (?):
-- Filters:
-    - filter duplicated videos (keep best quality)
-    - filter by quality (i.e. 1080p only)
-
 Fixed:
 - Content refreshing issues (#69)
-    ? duplic. search result notification
+- [TODO] `if not video['is_favorite']` seems to be always true
 
 Added:
-- Search videos by album/community title (contextual action reuse)
-- Create new album (made avail. from video list)
-    ? move to Set albums for video dialog
-    ? solving issue #76?
-
+- [TODO] Russian translation (thanks to ___)
+- Search videos by album/community title (contextual actions)
+- Create new album (contextual action, reused in video list)
+    - [TODO] move to Set albums for video dialog
+    - [TODO] solving issue #76?
 Changed:
-- Optimized video contextual menu (actions order)  
-- Refactored buildfp()
-- Refactored searchvideos() vs listsearchedvideos()
-- Updated README (repository installation info and link)
+- Optimized video contextual menu (actions order)
+- Optimized debug logging/formatting (all non-error logging commented)
+- Refactored python code:
+    - merged `listvideos()`, `listalbumvideos()`, `listcommunityvideos()`
+    - separated `searchvideos()` vs `listsearchedvideos()`
+    - added `buildfp()`
+    - [TODO] remove `COLOR_ALT`
+- Updated README with repository installation info
 
 ### v1.4.0 (2019-06-06)
 
