@@ -118,7 +118,7 @@ Added:
 - Search videos by album/community title (contextual actions, reused)
 - Create new album (contextual action, reused in video list)
     - [TODO] move to Set albums for video dialog
-    
+
 Changed:
 - Optimized video contextual menu (actions order)
 - Optimized debug logging/formatting (all non-error logging commented)
