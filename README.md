@@ -9,6 +9,7 @@
 - [Features](#features)
 - [Screenshots](#screenshots)
 - [Changelog](#changelog)
+- [Contributors](#contributors)
 
 ## Requirements
 
@@ -30,9 +31,10 @@ Note: You can also install the add-on from [repository.tommistolercz](https://gi
 
 Translations:
 - English
+- Russian
 - Czech
 
-Add-on settings:
+Settings:
 - Items per page
 - Force custom view mode for videos
 - Search without age restrictions
@@ -47,17 +49,16 @@ Common:
 - Authorize add-on
 - Logout user
 - List add-on menu
-- Skip to page
+- Skip to page nr.
 
 Search:
 - Search videos
-- Search videos by similar title (video, album, community)
+- Search videos by similar title (video/album/community) 
 - List search history
 - Delete search from history
 - Clear search history
 
 Videos:
-- List searched videos
 - List my videos
 - List my liked videos
 - List album videos
@@ -110,14 +111,14 @@ Communities:
 
 Fixed:
 - Content refreshing issues (#69)
-- [TODO] `if not video['is_favorite']` seems to be always true
+- Cannot create first video album (#76)
 
 Added:
-- [TODO] Russian translation (thanks to ___)
-- Search videos by album/community title (contextual actions)
+- Russian translation (thanks to Владимир Малявин)
+- Search videos by album/community title (contextual actions, reused)
 - Create new album (contextual action, reused in video list)
     - [TODO] move to Set albums for video dialog
-    - [TODO] solving issue #76?
+    
 Changed:
 - Optimized video contextual menu (actions order)
 - Optimized debug logging/formatting (all non-error logging commented)
@@ -126,7 +127,7 @@ Changed:
     - separated `searchvideos()` vs `listsearchedvideos()`
     - added `buildfp()`
     - [TODO] remove `COLOR_ALT`
-- Updated README with repository installation info
+- Updated README (repository installation info/link)
 
 ### v1.4.0 (2019-06-06)
 
@@ -234,3 +235,7 @@ Added:
 - Like community
 - Unlike community
 - Unfollow community
+
+## Contributors
+
+- Владимир Малявин

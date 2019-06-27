@@ -9,9 +9,9 @@ import os
 import pickle
 import re
 import sys
+# import time  # debug
 import urllib  # py2
 import urlparse  # py2
-# import time  # debug
 
 import xbmc
 import xbmcaddon
