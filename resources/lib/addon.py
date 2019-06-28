@@ -1142,7 +1142,7 @@ def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
             offset=0,
             count=100,
         )
-        # get list of album ids for video
+        # get album ids for video
         albumids = vkapi.video.getAlbumsByVideo(
             owner_id=ownerid,
             video_id=videoid,
@@ -1150,7 +1150,7 @@ def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
     except vk.VkAPIError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
-    # create and show dialog w current sel
+    # create dialog w current albums selected
     opts = []
     sel = []
     for i, album in enumerate(albums['items']):
@@ -1160,20 +1160,20 @@ def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
     newsel = xbmcgui.Dialog().multiselect(ADDON.getLocalizedString(30055).encode('utf-8'), opts, preselect=sel)
     if newsel is None or newsel == sel:
         return
-    # sel changed
+    # selected albums changed
     newalbumids = []
     for i in newsel:
         newalbumids.append(albums['items'][i]['id'])
     # request vk api
     try:
-        # remove sel album ids if any
+        # remove selected album ids if any
         if len(albumids) > 0:
             vkapi.video.removeFromAlbum(
                 owner_id=ownerid,
                 video_id=videoid,
                 album_ids=albumids
             )
-        # add new sel album ids if any
+        # add newly selected album ids if any
         if len(newalbumids) > 0:
             vkapi.video.addToAlbum(
                 owner_id=ownerid,

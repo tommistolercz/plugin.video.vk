@@ -117,16 +117,14 @@ Added:
 - Russian translation (thanks to Владимир Малявин)
 - Search videos by album/community title (contextual actions, reused)
 - Create new album (contextual action, reused in video list)
-    - [TODO] move to Set albums for video dialog
 
 Changed:
-- Optimized video contextual menu (actions order)
-- Optimized debug logging/formatting (all non-error logging commented)
+- Optimized video contextual menu
+- Optimized debug logging/formatting (all non-error logging disabled)
 - Refactored python code:
     - merged `listvideos()`, `listalbumvideos()`, `listcommunityvideos()`
     - separated `searchvideos()` vs `listsearchedvideos()`
     - added `buildfp()`
-    - [TODO] remove `COLOR_ALT`
 - Updated README (repository installation info/link)
 
 ### v1.4.0 (2019-06-06)

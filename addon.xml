@@ -10,10 +10,13 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">VK for Kodi</summary>
-        <description lang="en_GB">Kodi add-on for watching videos from VK.com social network.</description>
-        <disclaimer lang="en_GB">Author does not host or distribute any of the content displayed by this add-on.</disclaimer>
+        <summary lang="ru_RU"></summary>
         <summary lang="cs_CZ">VK pro Kodi</summary>
+        <description lang="en_GB">Kodi add-on for watching videos from VK.com social network.</description>
+        <description lang="ru_RU"></description>
         <description lang="cs_CZ">Kodi doplněk pro přehrávání videí ze sociální sítě VK.com.</description>
+        <disclaimer lang="en_GB">Author does not host or distribute any of the content displayed by this add-on.</disclaimer>
+        <disclaimer lang="ru_RU"></disclaimer>
         <disclaimer lang="cs_CZ">Autor doplňku se nepodílí na tvorbě či distribuci obsahu zobrazovaného tímto doplňkem.</disclaimer>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
@@ -27,7 +30,24 @@
         </assets>
         <news>
 ### v1.5.0 (unreleased)
-TBD
+
+Fixed:
+- Content refreshing issues (#69)
+- Cannot create first video album (#76)
+
+Added:
+- Russian translation (thanks to Владимир Малявин)
+- Search videos by album/community title (contextual actions, reused)
+- Create new album (contextual action, reused in video list)
+
+Changed:
+- Optimized video contextual menu
+- Optimized debug logging/formatting (all non-error logging disabled)
+- Refactored python code:
+- merged `listvideos()`, `listalbumvideos()`, `listcommunityvideos()`
+- separated `searchvideos()` vs `listsearchedvideos()`
+- added `buildfp()`
+- Updated README (repository installation info/link)
         </news>
     </extension>
 </addon>
