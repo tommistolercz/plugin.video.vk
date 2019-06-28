@@ -22,17 +22,16 @@
     [plugin.video.vk-1.5.0.zip](https://github.com/tommistolercz/plugin.video.vk/releases/download/v1.5.0/plugin.video.vk-1.5.0.zip)
     
 2. Install it in Kodi:<br>
-    `Kodi > Settings > Add-ons > Install from zip file...`    
+    `Kodi → Settings → Add-ons → Install from zip file...`    
     [How to install add-ons from zip files](https://kodi.wiki/view/HOW-TO:Install_add-ons_from_zip_files)
 
-Note: You can also install the add-on from [repository.tommistolercz](https://github.com/tommistolercz/repository.tommistolercz)
+Note: You can also install this add-on from [repository.tommistolercz](https://github.com/tommistolercz/repository.tommistolercz). 
+With this method, the add-on will auto-update when there is a new version available.
 
 ## Features
 
 Translations:
-- English
-- Russian
-- Czech
+- English, Russian, Czech
 
 Settings:
 - Items per page
@@ -100,21 +99,21 @@ Communities:
 
 ## Changelog
 
-- [v1.5.0 (unreleased)](#v150-unreleased)
+- [v1.5.0 (2019-06-29)](#v150-2019-06-29)
 - [v1.4.0 (2019-06-06)](#v140-2019-06-06)
 - [v1.3.0 (2019-04-17)](#v130-2019-04-17)
 - [v1.2.0 (2019-03-04)](#v120-2019-03-04)
 - [v1.1.0 (2019-02-01)](#v110-2019-02-01)
 - [v1.0.0 (2018-11-12)](#v100-2018-11-12)
 
-### v1.5.0 (unreleased)
+### v1.5.0 (2019-06-29)
 
 Fixed:
 - Content refreshing issues (#69)
 - Cannot create first video album (#76)
 
 Added:
-- Russian translation (thanks to Владимир Малявин)
+- RU translation (thanks to Владимир Малявин)
 - Search videos by album/community title (contextual actions, reused)
 - Create new album (contextual action, reused in video list)
 
@@ -236,4 +235,4 @@ Added:
 
 ## Contributors
 
-- Владимир Малявин
+- Владимир Малявин (RU translation)

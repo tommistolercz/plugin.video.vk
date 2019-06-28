@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.vk" name="VK" version="1.5.0-dev" provider-name="TomMistolerCZ">
+<addon id="plugin.video.vk" name="VK" version="1.5.0" provider-name="TomMistolerCZ">
     <requires>
         <import addon="xbmc.python" version="2.25.0"/>
         <import addon="script.module.requests" version="2.8.1"/>
@@ -10,13 +10,13 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">VK for Kodi</summary>
-        <summary lang="ru_RU"></summary>
+        <summary lang="ru_RU">ВКонтакте для Kodi</summary>
         <summary lang="cs_CZ">VK pro Kodi</summary>
         <description lang="en_GB">Kodi add-on for watching videos from VK.com social network.</description>
-        <description lang="ru_RU"></description>
+        <description lang="ru_RU">Плагин для просмотра видео в социальной сети ВКонтакте.</description>
         <description lang="cs_CZ">Kodi doplněk pro přehrávání videí ze sociální sítě VK.com.</description>
         <disclaimer lang="en_GB">Author does not host or distribute any of the content displayed by this add-on.</disclaimer>
-        <disclaimer lang="ru_RU"></disclaimer>
+        <disclaimer lang="ru_RU">Автор не размещает и не распространяет содержимое, отображаемое этим плагином.</disclaimer>
         <disclaimer lang="cs_CZ">Autor doplňku se nepodílí na tvorbě či distribuci obsahu zobrazovaného tímto doplňkem.</disclaimer>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
@@ -29,7 +29,7 @@
             <screenshot>resources/media/screenshot03.jpg</screenshot>
         </assets>
         <news>
-### v1.5.0 (unreleased)
+v1.5.0 (2019-06-29)
 
 Fixed:
 - Content refreshing issues (#69)
