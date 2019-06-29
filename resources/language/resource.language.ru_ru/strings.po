@@ -1,0 +1,267 @@
+# Kodi Media Center language file
+# Addon Name: VK
+# Addon id: plugin.video.vk
+# Addon Provider: TomMistolerCZ
+msgid ""
+msgstr ""
+"Project-Id-Version: KODI Addons\n"
+"Report-Msgid-Bugs-To: http://trac.kodi.tv/\n"
+"PO-Revision-Date: 2019-05-07 16:00+0300\n"
+"Last-Translator: Vladimir Maliavin <malyavin@gmail.com>\n"
+"Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/kodi-main/language/ru_RU/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ru_RU\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Generator: Poedit 2.2.1\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-Basepath: .\n"
+
+msgctxt "#30000"
+msgid "GENERAL"
+msgstr "Основные"
+
+msgctxt "#30001"
+msgid "USER"
+msgstr "Пользовательские"
+
+msgctxt "#30002"
+msgid "Items per page"
+msgstr "Колчество на странице"
+
+msgctxt "#30003"
+msgid "Force custom view mode for videos"
+msgstr "Режим принудительного просмотра"
+
+msgctxt "#30004"
+msgid "View mode id"
+msgstr "Режим просмотра"
+
+msgctxt "#30005"
+msgid "Search without age restrictions"
+msgstr "Поиск без возрастных ограничений"
+
+msgctxt "#30006"
+msgid "Search incl. own videos"
+msgstr "Искать, включая свои видео"
+
+msgctxt "#30007"
+msgid "Search by video duration"
+msgstr "Поиск по длительности"
+
+msgctxt "#30008"
+msgid "Any"
+msgstr "Любая"
+
+msgctxt "#30009"
+msgid "Longer than"
+msgstr "Длиннее, чем"
+
+msgctxt "#30010"
+msgid "Shorter than"
+msgstr "Короче, чем"
+
+msgctxt "#30011"
+msgid "Duration in minutes"
+msgstr "Длительность в минутах"
+
+msgctxt "#30012"
+msgid "Sort searched videos"
+msgstr "Сортировать найденные видео"
+
+msgctxt "#30013"
+msgid "By date"
+msgstr "По дате"
+
+msgctxt "#30014"
+msgid "By duration"
+msgstr "По длительности"
+
+msgctxt "#30015"
+msgid "By relevance"
+msgstr "По популярности"
+
+msgctxt "#30016"
+msgid "VK user access token"
+msgstr "Ключ авторизации"
+
+msgctxt "#30017"
+msgid "Logout user"
+msgstr "Выход"
+
+msgctxt "#30018"
+msgid "Keep history of add-on requests"
+msgstr "Хранить историю запросов плагина"
+
+msgctxt "#30019"
+msgid "Keep history of played videos"
+msgstr "Сохранить историю просмотренных видео"
+
+msgctxt "#30020"
+msgid "VK authorization error!"
+msgstr "Ошибка авторизации!"
+
+msgctxt "#30021"
+msgid "VK API error!"
+msgstr "Ошибка API!"
+
+msgctxt "#30022"
+msgid "Routing error!"
+msgstr "Ошибка управления!"
+
+msgctxt "#30023"
+msgid "Data file error!"
+msgstr "Ошибка дата-файла!"
+
+msgctxt "#30024"
+msgid "Video resolving error!"
+msgstr "Ошибка запроса видео!"
+
+msgctxt "#30030"
+msgid "VK login (email/phone)"
+msgstr "Логин (E-mail/Телефон)"
+
+msgctxt "#30031"
+msgid "VK password"
+msgstr "Пароль"
+
+msgctxt "#30032"
+msgid "User logged out."
+msgstr "Вы вышли"
+
+msgctxt "#30033"
+msgid "Are you sure?"
+msgstr "Вы уверены?"
+
+msgctxt "#30034"
+msgid "Next page"
+msgstr "Следующая страница"
+
+msgctxt "#30035"
+msgid "Skip to page"
+msgstr "Пропустить страницу"
+
+msgctxt "#30036"
+msgid "Go to"
+msgstr "Перейти к"
+
+msgctxt "#30037"
+msgid "Follow"
+msgstr "Подписка"
+
+msgctxt "#30040"
+msgid "Search videos"
+msgstr "Поиск видео"
+
+msgctxt "#30041"
+msgid "Search history"
+msgstr "История поиска"
+
+msgctxt "#30042"
+msgid "My videos"
+msgstr "Мои видео"
+
+msgctxt "#30043"
+msgid "My liked videos"
+msgstr "Мои любимые видео"
+
+msgctxt "#30044"
+msgid "My video albums"
+msgstr "Мои видео-альбомы"
+
+msgctxt "#30045"
+msgid "My communities"
+msgstr "Мои группы"
+
+msgctxt "#30046"
+msgid "My liked communities"
+msgstr "Мои любимые группы"
+
+msgctxt "#30047"
+msgid "Played videos"
+msgstr "Просмотренные видео"
+
+msgctxt "#30048"
+msgid "Watchlist"
+msgstr "Видео-лист"
+
+msgctxt "#30053"
+msgid "Add to liked videos"
+msgstr "Добавить в любимые видео"
+
+msgctxt "#30054"
+msgid "Remove from liked videos"
+msgstr "Удалить из любимых видео"
+
+msgctxt "#30055"
+msgid "Set albums"
+msgstr "Настройка альбомов"
+
+msgctxt "#30056"
+msgid "Add to watchlist"
+msgstr "Добавить в видео-лист"
+
+msgctxt "#30057"
+msgid "Remove from watchlist"
+msgstr "Удалить из видео-листа"
+
+msgctxt "#30058"
+msgid "Clear watchlist"
+msgstr "Очистить видео-лист"
+
+msgctxt "#30059"
+msgid "Clear played videos"
+msgstr "Очистить просмотренные видео"
+
+msgctxt "#30060"
+msgid "Rename album"
+msgstr "Переименовать видео-альбом"
+
+msgctxt "#30061"
+msgid "Move album up"
+msgstr "Переместить видео-альбом выше"
+
+msgctxt "#30062"
+msgid "Move album down"
+msgstr "Переместить видео-альбом ниже"
+
+msgctxt "#30063"
+msgid "Delete album"
+msgstr "Удалить видео-альбом"
+
+msgctxt "#30064"
+msgid "Create new album"
+msgstr "Создать видео-альбом"
+
+msgctxt "#30070"
+msgid "Add to liked communities"
+msgstr "Добавить в любимые группы"
+
+msgctxt "#30071"
+msgid "Remove from liked communities"
+msgstr "Удалить из любимых групп"
+
+msgctxt "#30072"
+msgid "Leave community"
+msgstr "Выйти из группы"
+
+msgctxt "#30081"
+msgid "Delete search"
+msgstr "Удалить поиск"
+
+msgctxt "#30082"
+msgid "Clear search history"
+msgstr "Очистить историю поиска"
+
+msgctxt "#30083"
+msgid "Search videos"
+msgstr "Найденные видео"
+
+msgctxt "#30084"
+msgid "{0} videos searched"
+msgstr "{0} видео найдено"
+
+msgctxt "#30085"
+msgid "Search by similar title"
+msgstr "Искать по похожему названию"

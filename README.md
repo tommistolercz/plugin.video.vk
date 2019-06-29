@@ -1,14 +1,15 @@
 ![Add-on icon](./resources/icon.png)
 
-# VK (plugin.video.vk)
+# VK (plugin.video.vk) 
 
-Kodi add-on for watching videos from VK.com social network.
+#### Kodi add-on for watching videos from VK.com social network.
 
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Features](#features)
 - [Screenshots](#screenshots)
 - [Changelog](#changelog)
+- [Contributors](#contributors)
 
 ## Requirements
 
@@ -18,20 +19,21 @@ Kodi add-on for watching videos from VK.com social network.
 ## Installation
 
 1. Download the add-on zip file:<br>
-    [plugin.video.vk-1.4.0.zip](https://github.com/tommistolercz/plugin.video.vk/releases/download/v1.4.0/plugin.video.vk-1.4.0.zip)
+    [plugin.video.vk-1.5.0.zip](https://github.com/tommistolercz/plugin.video.vk/releases/download/v1.5.0/plugin.video.vk-1.5.0.zip)
     
 2. Install it in Kodi:<br>
-    `Kodi > Settings > Add-ons > Install from zip file...`
-    
+    `Kodi → Settings → Add-ons → Install from zip file...`    
     [How to install add-ons from zip files](https://kodi.wiki/view/HOW-TO:Install_add-ons_from_zip_files)
+
+Note: You can also install this add-on from [repository.tommistolercz](https://github.com/tommistolercz/repository.tommistolercz). 
+With this method, the add-on will auto-update when there is a new version available.
 
 ## Features
 
 Translations:
-- English
-- Czech
+- English, Russian, Czech
 
-Add-on settings:
+Settings:
 - Items per page
 - Force custom view mode for videos
 - Search without age restrictions
@@ -42,23 +44,20 @@ Add-on settings:
 - Keep history of played videos
 - VK user login (email/phone)
 
- Auth:
+Common:
 - Authorize add-on
 - Logout user
-
-Navigation:
 - List add-on menu
-- Skip to page
+- Skip to page nr.
 
 Search:
 - Search videos
-- Search videos by similar title
+- Search videos by similar title (video/album/community) 
 - List search history
 - Delete search from history
 - Clear search history
 
 Videos:
-- List searched videos
 - List my videos
 - List my liked videos
 - List album videos
@@ -100,11 +99,32 @@ Communities:
 
 ## Changelog
 
+- [v1.5.0 (2019-06-29)](#v150-2019-06-29)
 - [v1.4.0 (2019-06-06)](#v140-2019-06-06)
 - [v1.3.0 (2019-04-17)](#v130-2019-04-17)
 - [v1.2.0 (2019-03-04)](#v120-2019-03-04)
 - [v1.1.0 (2019-02-01)](#v110-2019-02-01)
 - [v1.0.0 (2018-11-12)](#v100-2018-11-12)
+
+### v1.5.0 (2019-06-29)
+
+Fixed:
+- Content refreshing issues (#69)
+- Cannot create first video album (#76)
+
+Added:
+- RU translation (thanks to Владимир Малявин)
+- Search videos by album/community title (contextual actions, reused)
+- Create new album (contextual action, reused in video list)
+
+Changed:
+- Optimized video contextual menu
+- Optimized debug logging/formatting (all non-error logging disabled)
+- Refactored python code:
+    - merged `listvideos()`, `listalbumvideos()`, `listcommunityvideos()`
+    - separated `searchvideos()` vs `listsearchedvideos()`
+    - added `buildfp()`
+- Updated README (repository installation info/link)
 
 ### v1.4.0 (2019-06-06)
 
@@ -125,7 +145,7 @@ Changed:
 - Notifications
 - Optimized performance (video lists, play video, debug logging, ...)
 - Updated language resources
-- Updated readme
+- Updated README
 
 ### v1.3.0 (2019-04-17)
 
@@ -212,3 +232,7 @@ Added:
 - Like community
 - Unlike community
 - Unfollow community
+
+## Contributors
+
+- Владимир Малявин (RU translation)

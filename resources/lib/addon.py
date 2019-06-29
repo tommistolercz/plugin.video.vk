@@ -1,7 +1,7 @@
 # coding=utf-8
 
 __all__ = []
-__version__ = "1.4.0"
+__version__ = "1.5.0"
 
 import datetime
 import math
@@ -9,7 +9,7 @@ import os
 import pickle
 import re
 import sys
-import time
+# import time  # debug
 import urllib  # py2
 import urlparse  # py2
 
@@ -47,38 +47,37 @@ ITEMTYPE_FOLDER = True
 ITEMTYPE_NOTFOLDER = False
 
 # url paths
-URLPATH_LISTADDONMENU = '/'
-URLPATH_LOGOUT = '/logout'
-URLPATH_SKIPTOPAGE = '/skiptopage'
-URLPATH_LISTSEARCHHISTORY = '/searchhistory'
-URLPATH_CLEARSEARCHHISTORY = '/clearsearchhistory'
-URLPATH_DELETESEARCH = '/deletesearch'
-URLPATH_LISTSEARCHEDVIDEOS = '/searchvideos'
-URLPATH_LISTPLAYEDVIDEOS = '/playedvideos'
-URLPATH_LISTWATCHLIST = '/watchlist'
-URLPATH_LISTVIDEOS = '/videos'
-URLPATH_LISTLIKEDVIDEOS = '/likedvideos'
-URLPATH_LISTALBUMVIDEOS = '/albumvideos'
-URLPATH_LISTCOMMUNITYVIDEOS = '/communityvideos'  # deprecated
-URLPATH_CLEARPLAYEDVIDEOS = '/clearplayedvideos'
-URLPATH_CLEARWATCHLIST = '/clearwatchlist'
-URLPATH_PLAYVIDEO = '/playvideo'
-URLPATH_LIKEVIDEO = '/likevideo'
-URLPATH_UNLIKEVIDEO = '/unlikevideo'
-URLPATH_ADDVIDEOTOWATCHLIST = '/addvideotowatchlist'
-URLPATH_DELETEVIDEOFROMWATCHLIST = '/deletevideofromwatchlist'
 URLPATH_ADDVIDEOTOALBUMS = '/addvideotoalbums'
-URLPATH_LISTALBUMS = '/albums'
-URLPATH_REORDERALBUM = '/reorderalbum'
-URLPATH_RENAMEALBUM = '/renamealbum'
+URLPATH_ADDVIDEOTOWATCHLIST = '/addvideotowatchlist'
+URLPATH_CLEARPLAYEDVIDEOS = '/clearplayedvideos'
+URLPATH_CLEARSEARCHHISTORY = '/clearsearchhistory'
+URLPATH_CLEARWATCHLIST = '/clearwatchlist'
 URLPATH_CREATEALBUM = '/createalbum'
 URLPATH_DELETEALBUM = '/deletealbum'
+URLPATH_DELETESEARCH = '/deletesearch'
+URLPATH_DELETEVIDEOFROMWATCHLIST = '/deletevideofromwatchlist'
+URLPATH_FOLLOWCOMMUNITY = '/followcommunity'
+URLPATH_LIKECOMMUNITY = '/likecommunity'
+URLPATH_LIKEVIDEO = '/likevideo'
+URLPATH_LISTADDONMENU = '/'
+URLPATH_LISTALBUMS = '/albums'
 URLPATH_LISTCOMMUNITIES = '/communities'
 URLPATH_LISTLIKEDCOMMUNITIES = '/likedcommunities'
-URLPATH_LIKECOMMUNITY = '/likecommunity'
-URLPATH_UNLIKECOMMUNITY = '/unlikecommunity'
-URLPATH_FOLLOWCOMMUNITY = '/followcommunity'
+URLPATH_LISTLIKEDVIDEOS = '/likedvideos'
+URLPATH_LISTPLAYEDVIDEOS = '/playedvideos'
+URLPATH_LISTSEARCHHISTORY = '/searchhistory'
+URLPATH_LISTSEARCHEDVIDEOS = '/searchedvideos'
+URLPATH_LISTVIDEOS = '/videos'
+URLPATH_LISTWATCHLIST = '/watchlist'
+URLPATH_LOGOUT = '/logout'
+URLPATH_PLAYVIDEO = '/playvideo'
+URLPATH_RENAMEALBUM = '/renamealbum'
+URLPATH_REORDERALBUM = '/reorderalbum'
+URLPATH_SEARCHVIDEOS = '/searchvideos'
+URLPATH_SKIPTOPAGE = '/skiptopage'
 URLPATH_UNFOLLOWCOMMUNITY = '/unfollowcommunity'
+URLPATH_UNLIKECOMMUNITY = '/unlikecommunity'
+URLPATH_UNLIKEVIDEO = '/unlikevideo'
 
 # vk api config
 VKAPI_APPID = '6432748'
@@ -138,7 +137,7 @@ def initvksession():  # type: () -> vk.Session
         except vk.VkAuthError:
             xbmc.log('plugin.video.vk: VK auth error!', level=xbmc.LOGERROR)
             raise AddonError(ERR_VKAUTH)
-        xbmc.log('plugin.video.vk: VK session created.')
+        # xbmc.log('plugin.video.vk: VK session created.')
         # save login + obtained token
         ADDON.setSetting('vkuserlogin', login)
         ADDON.setSetting('vkuseraccesstoken', vksession.access_token)
@@ -151,7 +150,7 @@ def initvksession():  # type: () -> vk.Session
         except vk.VkAuthError:
             xbmc.log('plugin.video.vk: VK auth error!', level=xbmc.LOGERROR)
             raise AddonError(ERR_VKAUTH)
-        xbmc.log('plugin.video.vk: VK session restored using token.')
+        # xbmc.log('plugin.video.vk: VK session restored using token.')
         # load cookies
         vksession.requests_session.cookies = loadcookies()
     return vksession
@@ -169,7 +168,7 @@ def initvkapi(vksession=None):  # type: (vk.Session) -> vk.API
     except vk.VkAPIError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
-    xbmc.log('plugin.video.vk: VK API initialized.')
+    # xbmc.log('plugin.video.vk: VK API initialized.')
     return vkapi
 
 
@@ -177,28 +176,28 @@ def savecookies(cookiejar):  # type: (object) -> None
     """
     Save cookiejar object to add-on data file, truncate if exists.
     """
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_COOKIES))
+    fp = buildfp(FILENAME_COOKIES)
     try:
         with open(fp, 'wb') as f:
             pickle.dump(cookiejar, f)
     except IOError:
         xbmc.log('plugin.video.vk: Data file error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_DATAFILE)
-    xbmc.log('plugin.video.vk: Cookies saved: {}'.format(fp))
+    # xbmc.log('plugin.video.vk: Cookies saved to {}'.format(fp))
 
 
 def loadcookies():  # type: () -> object
     """
     Load cookiejar object from add-on data file, must exist since auth.
     """
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_COOKIES))
+    fp = buildfp(FILENAME_COOKIES)
     try:
         with open(fp, 'rb') as f:
             cookiejar = pickle.load(f)
     except IOError:
         xbmc.log('plugin.video.vk: Data file error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_DATAFILE)
-    xbmc.log('plugin.video.vk: Cookies loaded: {}'.format(fp))
+    # xbmc.log('plugin.video.vk: Cookies loaded from {}'.format(fp))
     return cookiejar
 
 
@@ -206,13 +205,21 @@ def deletecookies():  # type: () -> None
     """
     Delete cookies add-on data file.
     """
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_COOKIES))
+    fp = buildfp(FILENAME_COOKIES)
     try:
         os.remove(fp)
     except os.error:
         xbmc.log('plugin.video.vk: Data file error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_DATAFILE)
-    xbmc.log('plugin.video.vk: Cookies deleted: {}'.format(fp))
+    # xbmc.log('plugin.video.vk: Cookies deleted from {}'.format(fp))
+
+
+def buildfp(filename):  # type: (str) -> str
+    """
+    Build add-on data file path.
+    """
+    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), filename))
+    return fp
 
 
 def buildurl(urlpath, urlargs=None):  # type: (str, dict) -> str
@@ -263,39 +270,24 @@ def dispatch():  # type: () -> None
             'urlpath': urlpath,
             'urlargs': urlargs,
         }
-        fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-        db = tinydb.TinyDB(fp)
+        db = tinydb.TinyDB(buildfp(FILENAME_DB))
         db.table(DBT_ADDONREQUESTS).insert(lastrequest)
-        xbmc.log('plugin.video.vk: Addon requests db updated: {}'.format(lastrequest))
+        # xbmc.log('plugin.video.vk: Addon request history db updated: {}'.format(lastrequest))
     # call handler
     try:
         handler = ROUTING[urlpath]
     except KeyError:
         xbmc.log('plugin.video.vk: Routing error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_ROUTING)
-    xbmc.log('plugin.video.vk: Routing dispatched: {}'.format(handler.__name__))
-    t1 = time.clock()
+    # xbmc.log('plugin.video.vk: Calling handler: {}'.format(handler.__name__))
+    # rt = time.clock()
     handler(**urlargs)
-    t2 = time.clock()
-    xbmc.log('plugin.video.vk: Handler runtime: {} sec.'.format(t2 - t1))
+    # rt = time.clock() - rt
+    # xbmc.log('plugin.video.vk: Handler runtime: {} sec.'.format(rt))
+    # xbmc.log('plugin.video.vk: Routing dispatched.')
 
 
-# auth -----
-
-
-@route(URLPATH_LOGOUT)
-def logout():  # type: () -> None
-    """
-    Logout user.
-    """
-    # delete cookies + reset user access token
-    deletecookies()
-    ADDON.setSetting('vkuseraccesstoken', '')
-    xbmc.log('plugin.video.vk: User logged out.')
-    xbmcgui.Dialog().notification(ADDON.getAddonInfo('name'), ADDON.getLocalizedString(30032).encode('utf-8'))
-
-
-# navigation -----
+# general -----
 
 
 @route(URLPATH_LISTADDONMENU)
@@ -303,27 +295,25 @@ def listaddonmenu():  # type: () -> None
     """
     List add-on menu.
     """
-    # collect menu counters from db...
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-    db = tinydb.TinyDB(fp)
+    # collect menu counters from db and vkapi
+    db = tinydb.TinyDB(buildfp(FILENAME_DB))
     counters = {
         'searchhistory': len(db.table(DBT_SEARCHHISTORY)),
         'playedvideos': len(db.table(DBT_PLAYEDVIDEOS)),
         'watchlist': len(db.table(DBT_WATCHLIST)),
     }
-    # ...and from vkapi
     vkapi = initvkapi()
     try:
         counters.update(vkapi.execute.getMenuCounters())
     except vk.VkAPIError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
-    xbmc.log('plugin.video.vk: Counters: {}'.format(counters))
+    # xbmc.log('plugin.video.vk: Counters: {}'.format(counters))
     # create kodi list
     kodilist = [
         # search videos
         (
-            buildurl(URLPATH_LISTSEARCHEDVIDEOS),
+            buildurl(URLPATH_SEARCHVIDEOS),
             xbmcgui.ListItem(
                 ADDON.getLocalizedString(30040).encode('utf-8')
             ),
@@ -429,6 +419,7 @@ def skiptopage(page, lastpage, urlpath, urlargs):  # type: (int, int, str, str) 
     """
     page = int(page)
     lastpage = int(lastpage)
+    urlargs = eval(urlargs)  # ugly!
     # ask user for entering page nr.
     topage = xbmcgui.Dialog().input(
         '{0} ({1}-{2})'.format(ADDON.getLocalizedString(30035).encode('utf-8'), 1, lastpage),
@@ -437,14 +428,32 @@ def skiptopage(page, lastpage, urlpath, urlargs):  # type: (int, int, str, str) 
     )
     if not topage or not (1 <= int(topage) <= lastpage) or int(topage) == page:
         return
-    xbmc.log('plugin.video.vk: Skipped to page: {}'.format(topage))
-    # rebuild url to skip to
-    urlargs = eval(urlargs)  # ugly!
-    urlargs.update(
-        {'offset': (int(topage) - 1) * int(ADDON.getSetting('itemsperpage'))}
-    )
+    # xbmc.log('plugin.video.vk: Skipping to page {}'.format(topage))
+    # update content with url to skip to
     xbmc.executebuiltin(
-        'Container.Update({0})'.format(buildurl(urlpath, urlargs))
+        'Container.Update({0})'.format(
+            buildurl(
+                urlpath,
+                urlargs.update(
+                    {'offset': (int(topage) - 1) * int(ADDON.getSetting('itemsperpage'))}
+                )
+            )
+        )
+    )
+
+
+@route(URLPATH_LOGOUT)
+def logout():  # type: () -> None
+    """
+    Logout user.
+    """
+    # delete cookies + reset user access token
+    deletecookies()
+    ADDON.setSetting('vkuseraccesstoken', '')
+    # xbmc.log('plugin.video.vk: User logged out.')
+    xbmcgui.Dialog().notification(
+        ADDON.getAddonInfo('name'),
+        ADDON.getLocalizedString(30032).encode('utf-8')
     )
 
 
@@ -459,13 +468,12 @@ def listsearchhistory(offset=0):  # type: (int) -> None
     offset = int(offset)
     itemsperpage = int(ADDON.getSetting('itemsperpage'))
     # query db
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-    db = tinydb.TinyDB(fp)
+    db = tinydb.TinyDB(buildfp(FILENAME_DB))
     searchhistory = {
         'count': len(db.table(DBT_SEARCHHISTORY)),
         'items': db.table(DBT_SEARCHHISTORY).all()[offset:offset + itemsperpage]
     }
-    xbmc.log('plugin.video.vk: Search history: {}'.format(searchhistory))
+    # xbmc.log('plugin.video.vk: Search history: {}'.format(searchhistory))
     kodilist = []
     # create pagination item
     if searchhistory['count'] > offset + itemsperpage:
@@ -530,15 +538,15 @@ def listsearchhistory(offset=0):  # type: (int) -> None
             # search videos
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30083).encode('utf-8')),
-                'Container.Update({0})'.format(
-                    buildurl(URLPATH_LISTSEARCHEDVIDEOS)
+                'RunPlugin({0})'.format(
+                    buildurl(URLPATH_SEARCHVIDEOS)
                 )
             ),
-            # search similar title
+            # search videos by similar title
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30085).encode('utf-8')),
-                'Container.Update({0})'.format(
-                    buildurl(URLPATH_LISTSEARCHEDVIDEOS, {'similarq': search['q'].encode('utf-8')})
+                'RunPlugin({0})'.format(
+                    buildurl(URLPATH_SEARCHVIDEOS, {'defq': search['q'].encode('utf-8')})
                 )
             ),
         ]
@@ -570,10 +578,9 @@ def deletesearch(searchid):  # type: (int) -> None
     ):
         return
     # query db for deleting
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-    db = tinydb.TinyDB(fp)
+    db = tinydb.TinyDB(buildfp(FILENAME_DB))
     db.table(DBT_SEARCHHISTORY).remove(doc_ids=[searchid])
-    xbmc.log('plugin.video.vk: Search deleted: {}'.format(searchid))
+    # xbmc.log('plugin.video.vk: Search deleted: {}'.format(searchid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -590,28 +597,94 @@ def clearsearchhistory():  # type: () -> None
     ):
         return
     # purge db table
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-    tinydb.TinyDB(fp).purge_table(DBT_SEARCHHISTORY)
-    xbmc.log('plugin.video.vk: Search history cleared.')
+    db = tinydb.TinyDB(buildfp(FILENAME_DB))
+    db.purge_table(DBT_SEARCHHISTORY)
+    # xbmc.log('plugin.video.vk: Search history cleared.')
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
+
+
+@route(URLPATH_SEARCHVIDEOS)
+def searchvideos(defq=''):  # type: (str) -> None
+    """
+    Search videos.
+    """
+    # ask user for entering/editing a new query
+    q = xbmcgui.Dialog().input(ADDON.getLocalizedString(30083).encode('utf-8'), defaultt=defq)
+    if not q:
+        return
+    # update content with searched videos
+    xbmc.executebuiltin(
+        'Container.Update({0})'.format(
+            buildurl(URLPATH_LISTSEARCHEDVIDEOS, {'q': q})
+        )
+    )
 
 
 # videos -----
 
 
+@route(URLPATH_LISTPLAYEDVIDEOS)
+def listplayedvideos(offset=0):  # type: (int) -> None
+    """
+    List played videos.
+    """
+    offset = int(offset)
+    itemsperpage = int(ADDON.getSetting('itemsperpage'))
+    # query db
+    db = tinydb.TinyDB(buildfp(FILENAME_DB))
+    playedvideos = {
+        'count': len(db.table(DBT_PLAYEDVIDEOS)),
+        'items': db.table(DBT_PLAYEDVIDEOS).all()[offset:offset + itemsperpage]
+    }
+    # pagination data
+    if playedvideos['count'] > offset + itemsperpage:
+        playedvideos['pagination'] = {
+            'urlpath': URLPATH_LISTPLAYEDVIDEOS,
+            'urlargs': {},
+            'nexturl': buildurl(URLPATH_LISTPLAYEDVIDEOS, {'offset': offset + itemsperpage}),
+            'page': int(offset / itemsperpage) + 1,
+            'lastpage': int(math.ceil(float(playedvideos['count']) / itemsperpage)),
+        }
+    # xbmc.log('plugin.video.vk: Played videos: {}'.format(playedvideos))
+    # build list
+    buildvideolist(URLPATH_LISTPLAYEDVIDEOS, playedvideos)
+
+
+@route(URLPATH_LISTWATCHLIST)
+def listwatchlist(offset=0):  # type: (int) -> None
+    """
+    List watchlist.
+    """
+    offset = int(offset)
+    itemsperpage = int(ADDON.getSetting('itemsperpage'))
+    # query db
+    db = tinydb.TinyDB(buildfp(FILENAME_DB))
+    watchlist = {
+        'count': len(db.table(DBT_WATCHLIST)),
+        'items': db.table(DBT_WATCHLIST).all()[offset:offset + itemsperpage]
+    }
+    # pagination data
+    if watchlist['count'] > offset + itemsperpage:
+        watchlist['pagination'] = {
+            'urlpath': URLPATH_LISTWATCHLIST,
+            'urlargs': {},
+            'nexturl': buildurl(URLPATH_LISTWATCHLIST, {'offset': offset + itemsperpage}),
+            'page': int(offset / itemsperpage) + 1,
+            'lastpage': int(math.ceil(float(watchlist['count']) / itemsperpage)),
+        }
+    # xbmc.log('plugin.video.vk: Watchlist: {}'.format(watchlist))
+    # build list
+    buildvideolist(URLPATH_LISTWATCHLIST, watchlist)
+
+
 @route(URLPATH_LISTSEARCHEDVIDEOS)
-def listsearchedvideos(q='', similarq='', offset=0):  # type: (str, str, int) -> None
+def listsearchedvideos(q, offset=0):  # type: (str, int) -> None
     """
     List searched videos.
     """
     offset = int(offset)
     itemsperpage = int(ADDON.getSetting('itemsperpage'))
-    # if q not passed, ask user for entering a new query / editing similar one
-    if not q:
-        q = xbmcgui.Dialog().input(ADDON.getLocalizedString(30083).encode('utf-8'), defaultt=similarq)
-        if not q:
-            return
     # request vk api
     vkapi = initvkapi()
     kwargs = {
@@ -642,93 +715,38 @@ def listsearchedvideos(q='', similarq='', offset=0):  # type: (str, str, int) ->
             'page': int(offset / itemsperpage) + 1,
             'lastpage': int(math.ceil(float(searchedvideos['count']) / itemsperpage)),
         }
-    xbmc.log('plugin.video.vk: Searched videos: {}'.format(searchedvideos))
-    # only once
-    if offset == 0:
-        # update search history db with the last search
+    if not offset:
+        # update search history db
         lastsearch = {
             'q': q.lower(),
             'resultsCount': int(searchedvideos['count']),
-            'lastUsed': datetime.datetime.now().isoformat()
+            'lastUsed': datetime.datetime.now().isoformat(),
         }
-        fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-        db = tinydb.TinyDB(fp)
+        db = tinydb.TinyDB(buildfp(FILENAME_DB))
         db.table(DBT_SEARCHHISTORY).upsert(
             lastsearch,
             tinydb.where('q') == lastsearch['q']
         )
-        xbmc.log('plugin.video.vk: Search history db updated: {}'.format(lastsearch))
+        # xbmc.log('plugin.video.vk: Search history db updated: {}'.format(lastsearch))
         # notify search results count
         xbmcgui.Dialog().notification(
             ADDON.getAddonInfo('name'),
             ADDON.getLocalizedString(30084).encode('utf-8').format(searchedvideos['count'])
         )
+    # xbmc.log('plugin.video.vk: Searched videos: {}'.format(searchedvideos))
     # build list
     buildvideolist(URLPATH_LISTSEARCHEDVIDEOS, searchedvideos)
 
 
-@route(URLPATH_LISTPLAYEDVIDEOS)
-def listplayedvideos(offset=0):  # type: (int) -> None
-    """
-    List played videos.
-    """
-    offset = int(offset)
-    itemsperpage = int(ADDON.getSetting('itemsperpage'))
-    # query db
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-    db = tinydb.TinyDB(fp)
-    playedvideos = {
-        'count': len(db.table(DBT_PLAYEDVIDEOS)),
-        'items': db.table(DBT_PLAYEDVIDEOS).all()[offset:offset + itemsperpage]
-    }
-    # pagination data
-    if playedvideos['count'] > offset + itemsperpage:
-        playedvideos['pagination'] = {
-            'urlpath': URLPATH_LISTPLAYEDVIDEOS,
-            'urlargs': {},
-            'nexturl': buildurl(URLPATH_LISTPLAYEDVIDEOS, {'offset': offset + itemsperpage}),
-            'page': int(offset / itemsperpage) + 1,
-            'lastpage': int(math.ceil(float(playedvideos['count']) / itemsperpage)),
-        }
-    xbmc.log('plugin.video.vk: Played videos: {}'.format(playedvideos))
-    # build list
-    buildvideolist(URLPATH_LISTPLAYEDVIDEOS, playedvideos)
-
-
-@route(URLPATH_LISTWATCHLIST)
-def listwatchlist(offset=0):  # type: (int) -> None
-    """
-    List watchlist.
-    """
-    offset = int(offset)
-    itemsperpage = int(ADDON.getSetting('itemsperpage'))
-    # query db
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-    db = tinydb.TinyDB(fp)
-    watchlist = {
-        'count': len(db.table(DBT_WATCHLIST)),
-        'items': db.table(DBT_WATCHLIST).all()[offset:offset + itemsperpage]
-    }
-    # pagination data
-    if watchlist['count'] > offset + itemsperpage:
-        watchlist['pagination'] = {
-            'urlpath': URLPATH_LISTWATCHLIST,
-            'urlargs': {},
-            'nexturl': buildurl(URLPATH_LISTWATCHLIST, {'offset': offset + itemsperpage}),
-            'page': int(offset / itemsperpage) + 1,
-            'lastpage': int(math.ceil(float(watchlist['count']) / itemsperpage)),
-        }
-    xbmc.log('plugin.video.vk: Watchlist: {}'.format(watchlist))
-    # build list
-    buildvideolist(URLPATH_LISTWATCHLIST, watchlist)
-
-
 @route(URLPATH_LISTVIDEOS)
-def listvideos(ownerid=None, offset=0):  # type: (int, int) -> None
+def listvideos(ownerid=None, albumid=None, offset=0):  # type: (int, int, int) -> None
     """
-    List videos.
+    List videos, album videos, community videos.
     """
-    ownerid = int(ownerid) if ownerid is not None else None  # neg/pos!
+    if ownerid is not None:
+        ownerid = int(ownerid)
+    if albumid is not None:
+        albumid = int(albumid)
     offset = int(offset)
     itemsperpage = int(ADDON.getSetting('itemsperpage'))
     # request vk api
@@ -738,8 +756,10 @@ def listvideos(ownerid=None, offset=0):  # type: (int, int) -> None
         'offset': offset,
         'count': itemsperpage,
     }
-    if ownerid is not None:  # neg/pos!
-        kwargs['owner_id'] = int(ownerid)
+    if ownerid is not None:
+        kwargs['owner_id'] = ownerid  # negative id for communities
+    if albumid is not None:
+        kwargs['album_id'] = albumid
     try:
         videos = vkapi.video.get(**kwargs)
     except vk.VkAPIError:
@@ -749,12 +769,12 @@ def listvideos(ownerid=None, offset=0):  # type: (int, int) -> None
     if videos['count'] > offset + itemsperpage:
         videos['pagination'] = {
             'urlpath': URLPATH_LISTVIDEOS,
-            'urlargs': {'ownerid': ownerid},
-            'nexturl': buildurl(URLPATH_LISTVIDEOS, {'ownerid': ownerid, 'offset': offset + itemsperpage}),
+            'urlargs': {'ownerid': ownerid, 'albumid': albumid},
+            'nexturl': buildurl(URLPATH_LISTVIDEOS, {'ownerid': ownerid, 'albumid': albumid, 'offset': offset + itemsperpage}),
             'page': int(offset / itemsperpage) + 1,
             'lastpage': int(math.ceil(float(videos['count']) / itemsperpage)),
         }
-    xbmc.log('plugin.video.vk: Videos: {}'.format(videos))
+    # xbmc.log('plugin.video.vk: Videos: {}'.format(videos))
     # build list
     buildvideolist(URLPATH_LISTVIDEOS, videos)
 
@@ -786,77 +806,9 @@ def listlikedvideos(offset=0):  # type: (int) -> None
             'page': int(offset / itemsperpage) + 1,
             'lastpage': int(math.ceil(float(likedvideos['count']) / itemsperpage)),
         }
-    xbmc.log('plugin.video.vk: Liked videos: {}'.format(likedvideos))
+    # xbmc.log('plugin.video.vk: Liked videos: {}'.format(likedvideos))
     # build list
     buildvideolist(URLPATH_LISTLIKEDVIDEOS, likedvideos)
-
-
-@route(URLPATH_LISTALBUMVIDEOS)
-def listalbumvideos(albumid, offset=0):  # type: (int, int) -> None
-    """
-    List album videos.
-    """
-    albumid = int(albumid)
-    offset = int(offset)
-    itemsperpage = int(ADDON.getSetting('itemsperpage'))
-    # request vk api
-    vkapi = initvkapi()
-    try:
-        albumvideos = vkapi.video.get(
-            extended=1,
-            album_id=albumid,
-            offset=offset,
-            count=itemsperpage,
-        )
-    except vk.VkAPIError:
-        xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
-        raise AddonError(ERR_VKAPI)
-    # pagination data
-    if albumvideos['count'] > offset + itemsperpage:
-        albumvideos['pagination'] = {
-            'urlpath': URLPATH_LISTALBUMVIDEOS,
-            'urlargs': {'albumid': albumid},
-            'nexturl': buildurl(URLPATH_LISTALBUMVIDEOS, {'albumid': albumid, 'offset': offset + itemsperpage}),
-            'page': int(offset / itemsperpage) + 1,
-            'lastpage': int(math.ceil(float(albumvideos['count']) / itemsperpage)),
-        }
-    xbmc.log('plugin.video.vk: Album videos: {}'.format(albumvideos))
-    # build list
-    buildvideolist(URLPATH_LISTALBUMVIDEOS, albumvideos)
-
-
-@route(URLPATH_LISTCOMMUNITYVIDEOS)
-def listcommunityvideos(communityid, offset=0):  # type: (int, int) -> None
-    """
-    List community videos.
-    """
-    communityid = int(communityid)
-    offset = int(offset)
-    itemsperpage = int(ADDON.getSetting('itemsperpage'))
-    # request vk api
-    vkapi = initvkapi()
-    try:
-        communityvideos = vkapi.video.get(
-            extended=1,
-            owner_id=(-1 * communityid),  # neg.id required!
-            offset=offset,
-            count=itemsperpage,
-        )
-    except vk.VkAPIError:
-        xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
-        raise AddonError(ERR_VKAPI)
-    # pagination data
-    if communityvideos['count'] > offset + itemsperpage:
-        communityvideos['pagination'] = {
-            'urlpath': URLPATH_LISTCOMMUNITYVIDEOS,
-            'urlargs': {'communityid': communityid},
-            'nexturl': buildurl(URLPATH_LISTCOMMUNITYVIDEOS, {'communityid': communityid, 'offset': offset + itemsperpage}),
-            'page': int(offset / itemsperpage) + 1,
-            'lastpage': int(math.ceil(float(communityvideos['count']) / itemsperpage)),
-        }
-    xbmc.log('plugin.video.vk: Community videos: {}'.format(communityvideos))
-    # build list
-    buildvideolist(URLPATH_LISTCOMMUNITYVIDEOS, communityvideos)
 
 
 def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
@@ -938,6 +890,27 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
         )
         # create context menu
         cmi = []
+        if 'added_to_watchlist' not in video:
+            cmi += [
+                # add video to watchlist
+                (
+                    '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30056).encode('utf-8')),
+                    'RunPlugin({0})'.format(
+                        buildurl(URLPATH_ADDVIDEOTOWATCHLIST, {'ownerid': video['owner_id'], 'videoid': video['id']})
+                    )
+                )
+            ]
+        else:
+            cmi += [
+                # delete video from watchlist
+                (
+                    '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30057).encode('utf-8')),
+                    'RunPlugin({0})'.format(
+                        buildurl(URLPATH_DELETEVIDEOFROMWATCHLIST,
+                                 {'ownerid': video['owner_id'], 'videoid': video['id']})
+                    )
+                )
+            ]
         if not video['is_favorite']:
             cmi += [
                 # like video
@@ -959,34 +932,21 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                 )
             ]
         cmi += [
-            # set albums
+            # set albums for video
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30055).encode('utf-8')),
                 'RunPlugin({0})'.format(
                     buildurl(URLPATH_ADDVIDEOTOALBUMS, {'ownerid': video['owner_id'], 'videoid': video['id']})
                 )
-            )
+            ),
+            # create new album
+            (
+                '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30064).encode('utf-8')),
+                'RunPlugin({0})'.format(
+                    buildurl(URLPATH_CREATEALBUM)
+                )
+            ),
         ]
-        if 'added_to_watchlist' not in video:
-            cmi += [
-                # add video to watchlist
-                (
-                    '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30056).encode('utf-8')),
-                    'RunPlugin({0})'.format(
-                        buildurl(URLPATH_ADDVIDEOTOWATCHLIST, {'ownerid': video['owner_id'], 'videoid': video['id']})
-                    )
-                )
-            ]
-        else:
-            cmi += [
-                # delete video from watchlist
-                (
-                    '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30057).encode('utf-8')),
-                    'RunPlugin({0})'.format(
-                        buildurl(URLPATH_DELETEVIDEOFROMWATCHLIST, {'ownerid': video['owner_id'], 'videoid': video['id']})
-                    )
-                )
-            ]
         if listtype == URLPATH_LISTWATCHLIST:
             cmi += [
                 # clear watchlist
@@ -1039,15 +999,15 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
             # search videos
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30083).encode('utf-8')),
-                'Container.Update({0})'.format(
-                    buildurl(URLPATH_LISTSEARCHEDVIDEOS)
+                'RunPlugin({0})'.format(
+                    buildurl(URLPATH_SEARCHVIDEOS)
                 )
             ),
-            # search by similar title
+            # search videos by similar title
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30085).encode('utf-8')),
-                'Container.Update({0})'.format(
-                    buildurl(URLPATH_LISTSEARCHEDVIDEOS, {'similarq': videotitle})
+                'RunPlugin({0})'.format(
+                    buildurl(URLPATH_SEARCHVIDEOS, {'defq': videotitle})
                 )
             ),
         ]
@@ -1083,15 +1043,15 @@ def playvideo(ownerid, videoid):  # type: (int, int) -> None
         url='https://vk.com/al_video.php?act=show_inline&al=1&video={0}'.format(oidid),
         headers={'User-Agent': VKRESOLVER_UA}
     )
-    xbmc.log('plugin.video.vk: Resolving video info: {}'.format(vi.content))
+    # xbmc.log('plugin.video.vk: Resolving video info: {}'.format(vi.content))
     try:
         resolvedstreams = {m[0]: m[1] for m in re.findall(r'"url(\d+)":"([^"]+)"', vi.content.replace('\\', ''))}
         bestquality = sorted(resolvedstreams.keys(), key=lambda k: int(k)).pop()
     except IndexError:
         xbmc.log('plugin.video.vk: Video resolving error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_RESOLVING)
-    xbmc.log('plugin.video.vk: Playable streams resolved: {}.'.format(resolvedstreams))
-    xbmc.log('plugin.video.vk: Best quality found: {}'.format(bestquality))
+    # xbmc.log('plugin.video.vk: Playable streams resolved: {}.'.format(resolvedstreams))
+    # xbmc.log('plugin.video.vk: Best quality found: {}'.format(bestquality))
     # keep played video history, if enabled in settings
     if ADDON.getSetting('keepplayedvideohistory') == 'true':
         # request vk api
@@ -1107,13 +1067,12 @@ def playvideo(ownerid, videoid):  # type: (int, int) -> None
                 'lastPlayed': datetime.datetime.now().isoformat(),
             }
         )
-        fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-        db = tinydb.TinyDB(fp)
+        db = tinydb.TinyDB(buildfp(FILENAME_DB))
         db.table(DBT_PLAYEDVIDEOS).upsert(
             video,
             tinydb.where('oidid') == oidid
         )
-        xbmc.log('plugin.video.vk: Played videos db updated: {}'.format(video))
+        # xbmc.log('plugin.video.vk: Played video history db updated: {}'.format(video))
     # create playable item for kodi player
     xbmcplugin.setResolvedUrl(SYSARGV['handle'], True, xbmcgui.ListItem(path=resolvedstreams[bestquality]))
 
@@ -1125,7 +1084,7 @@ def likevideo(ownerid, videoid):  # type: (int, int) -> None
     """
     ownerid = int(ownerid)
     videoid = int(videoid)
-    oidid = str('{0}_{1}'.format(ownerid, videoid))
+    # oidid = str('{0}_{1}'.format(ownerid, videoid))
     # request vk api
     vkapi = initvkapi()
     try:
@@ -1137,7 +1096,7 @@ def likevideo(ownerid, videoid):  # type: (int, int) -> None
     except vk.VkAPIError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
-    xbmc.log('plugin.video.vk: Video liked: {}'.format(oidid))
+    # xbmc.log('plugin.video.vk: Video liked: {}'.format(oidid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -1149,7 +1108,7 @@ def unlikevideo(ownerid, videoid):  # type: (int, int) -> None
     """
     ownerid = int(ownerid)
     videoid = int(videoid)
-    oidid = str('{0}_{1}'.format(ownerid, videoid))
+    # oidid = str('{0}_{1}'.format(ownerid, videoid))
     # request vk api
     vkapi = initvkapi()
     try:
@@ -1161,7 +1120,7 @@ def unlikevideo(ownerid, videoid):  # type: (int, int) -> None
     except vk.VkAPIError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
-    xbmc.log('plugin.video.vk: Video unliked: {}'.format(oidid))
+    # xbmc.log('plugin.video.vk: Video unliked: {}'.format(oidid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -1173,7 +1132,7 @@ def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
     """
     ownerid = int(ownerid)
     videoid = int(videoid)
-    oidid = str('{0}_{1}'.format(ownerid, videoid))
+    # oidid = str('{0}_{1}'.format(ownerid, videoid))
     # request vk api
     vkapi = initvkapi()
     try:
@@ -1183,7 +1142,7 @@ def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
             offset=0,
             count=100,
         )
-        # get list of album ids for video
+        # get album ids for video
         albumids = vkapi.video.getAlbumsByVideo(
             owner_id=ownerid,
             video_id=videoid,
@@ -1191,7 +1150,7 @@ def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
     except vk.VkAPIError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
-    # create and show dialog w current sel
+    # create dialog w current albums selected
     opts = []
     sel = []
     for i, album in enumerate(albums['items']):
@@ -1201,20 +1160,20 @@ def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
     newsel = xbmcgui.Dialog().multiselect(ADDON.getLocalizedString(30055).encode('utf-8'), opts, preselect=sel)
     if newsel is None or newsel == sel:
         return
-    # sel changed
+    # selected albums changed
     newalbumids = []
     for i in newsel:
         newalbumids.append(albums['items'][i]['id'])
     # request vk api
     try:
-        # remove sel album ids if any
+        # remove selected album ids if any
         if len(albumids) > 0:
             vkapi.video.removeFromAlbum(
                 owner_id=ownerid,
                 video_id=videoid,
                 album_ids=albumids
             )
-        # add new sel album ids if any
+        # add newly selected album ids if any
         if len(newalbumids) > 0:
             vkapi.video.addToAlbum(
                 owner_id=ownerid,
@@ -1224,7 +1183,7 @@ def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
     except vk.VkAPIError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
-    xbmc.log('plugin.video.vk: Video added to albums: {}'.format(oidid))
+    # xbmc.log('plugin.video.vk: Video added to albums: {}'.format(oidid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -1254,14 +1213,13 @@ def addvideotowatchlist(ownerid, videoid):  # type: (int, int) -> None
             'added_to_watchlist': datetime.datetime.now().isoformat(),
         }
     )
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-    db = tinydb.TinyDB(fp)
+    db = tinydb.TinyDB(buildfp(FILENAME_DB))
     db.table(DBT_WATCHLIST).upsert(
         video,
         tinydb.where('oidid') == oidid
     )
-    xbmc.log('plugin.video.vk: Video added to watchlist: {}'.format(oidid))
-    # refresh content - not needed
+    # xbmc.log('plugin.video.vk: Video added to watchlist: {}'.format(oidid))
+    # refresh content - not needed here
 
 
 @route(URLPATH_DELETEVIDEOFROMWATCHLIST)
@@ -1279,12 +1237,11 @@ def deletevideofromwatchlist(ownerid, videoid):  # type: (int, int) -> None
     ):
         return
     # query db for deleting
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-    db = tinydb.TinyDB(fp)
+    db = tinydb.TinyDB(buildfp(FILENAME_DB))
     db.table(DBT_WATCHLIST).remove(
         tinydb.where('oidid') == oidid
     )
-    xbmc.log('plugin.video.vk: Video deleted from watchlist: {}'.format(oidid))
+    # xbmc.log('plugin.video.vk: Video deleted from watchlist: {}'.format(oidid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -1301,9 +1258,9 @@ def clearwatchlist():  # type: () -> None
     ):
         return
     # purge db table
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-    tinydb.TinyDB(fp).purge_table(DBT_WATCHLIST)
-    xbmc.log('plugin.video.vk: Watchlist cleared.')
+    db = tinydb.TinyDB(buildfp(FILENAME_DB))
+    db.purge_table(DBT_WATCHLIST)
+    # xbmc.log('plugin.video.vk: Watchlist cleared.')
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -1320,9 +1277,9 @@ def clearplayedvideos():  # type: () -> None
     ):
         return
     # purge db table
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), FILENAME_DB))
-    tinydb.TinyDB(fp).purge_table(DBT_PLAYEDVIDEOS)
-    xbmc.log('plugin.video.vk: Played videos cleared.')
+    db = tinydb.TinyDB(buildfp(FILENAME_DB))
+    db.purge_table(DBT_PLAYEDVIDEOS)
+    # xbmc.log('plugin.video.vk: Played videos cleared.')
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -1350,7 +1307,7 @@ def listalbums(offset=0):  # type: (int) -> None
     except vk.VkAPIError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
-    xbmc.log('plugin.video.vk: Albums: {}'.format(albums))
+    # xbmc.log('plugin.video.vk: Albums: {}'.format(albums))
     listitems = []
     # create pagination item
     if albums['count'] > offset + itemsperpage:
@@ -1429,13 +1386,20 @@ def listalbums(offset=0):  # type: (int) -> None
             # search videos
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30083).encode('utf-8')),
-                'Container.Update({0})'.format(buildurl(URLPATH_LISTSEARCHEDVIDEOS))  # cnt.upd!
+                'RunPlugin({0})'.format(buildurl(URLPATH_SEARCHVIDEOS))
+            ),
+            # search videos by similar title (album title)
+            (
+                '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30085).encode('utf-8')),
+                'RunPlugin({0})'.format(
+                    buildurl(URLPATH_SEARCHVIDEOS, {'defq': album['title'].encode('utf-8')})
+                )
             ),
         ]
         li.addContextMenuItems(cmi)
         listitems.append(
             (
-                buildurl(URLPATH_LISTALBUMVIDEOS, {'albumid': album['id']}),
+                buildurl(URLPATH_LISTVIDEOS, {'albumid': album['id']}),
                 li,
                 ITEMTYPE_FOLDER
             )
@@ -1468,7 +1432,7 @@ def reorderalbum(albumid, beforeid=None, afterid=None):  # type: (int, int, int)
     except vk.VkAPIError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
-    xbmc.log('plugin.video.vk: Album reordered: {}'.format(albumid))
+    # xbmc.log('plugin.video.vk: Album reordered: {}'.format(albumid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -1502,7 +1466,7 @@ def renamealbum(albumid):  # type: (int) -> None
     except vk.VkAPIError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
-    xbmc.log('plugin.video.vk: Album renamed: {}'.format(albumid))
+    # xbmc.log('plugin.video.vk: Album renamed: {}'.format(albumid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -1528,7 +1492,7 @@ def deletealbum(albumid):  # type: (int) -> None
     except vk.VkAPIError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
-    xbmc.log('plugin.video.vk: Album deleted: {}'.format(albumid))
+    # xbmc.log('plugin.video.vk: Album deleted: {}'.format(albumid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -1545,14 +1509,14 @@ def createalbum():  # type: () -> None
     # request vk api
     vkapi = initvkapi()
     try:
-        album = vkapi.video.addAlbum(
+        vkapi.video.addAlbum(
             title=albumtitle,
             privacy=3,  # 3=onlyme
         )
     except vk.VkAPIError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
-    xbmc.log('plugin.video.vk: Album created: {}'.format(album))
+    # xbmc.log('plugin.video.vk: Album created: {}'.format(albumtitle))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -1587,7 +1551,7 @@ def listcommunities(offset=0):  # type: (int) -> None
             'page': int(offset / itemsperpage) + 1,
             'lastpage': int(math.ceil(float(communities['count']) / itemsperpage)),
         }
-    xbmc.log('plugin.video.vk: Communities: {}'.format(communities))
+    # xbmc.log('plugin.video.vk: Communities: {}'.format(communities))
     # build list
     buildcommunitylist(URLPATH_LISTCOMMUNITIES, communities)
 
@@ -1618,7 +1582,7 @@ def listlikedcommunities(offset=0):  # type: (int) -> None
             'page': int(offset / itemsperpage) + 1,
             'lastpage': int(math.ceil(float(likedcommunities['count']) / itemsperpage)),
         }
-    xbmc.log('plugin.video.vk: Liked communities: {}'.format(likedcommunities))
+    # xbmc.log('plugin.video.vk: Liked communities: {}'.format(likedcommunities))
     # build list
     buildcommunitylist(URLPATH_LISTLIKEDCOMMUNITIES, likedcommunities)
 
@@ -1705,13 +1669,25 @@ def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
             # search videos
             (
                 '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30083).encode('utf-8')),
-                'Container.Update({0})'.format(buildurl(URLPATH_LISTSEARCHEDVIDEOS))  # cnt.upd!
+                'RunPlugin({0})'.format(buildurl(URLPATH_SEARCHVIDEOS))
+            ),
+            # search videos by similar title (community title/name)
+            (
+                '[COLOR {0}]{1}[/COLOR]'.format(COLOR_ALT, ADDON.getLocalizedString(30085).encode('utf-8')),
+                'RunPlugin({0})'.format(
+                    buildurl(
+                        URLPATH_SEARCHVIDEOS,
+                        {
+                            'defq': community['title' if listtype == URLPATH_LISTLIKEDCOMMUNITIES else 'name'].encode('utf-8')
+                        }
+                    )
+                )
             ),
         ]
         li.addContextMenuItems(cmi)
         listitems.append(
             (
-                buildurl(URLPATH_LISTCOMMUNITYVIDEOS, {'communityid': community['id']}),
+                buildurl(URLPATH_LISTVIDEOS, {'ownerid': -community['id']}),  # negative id required!
                 li,
                 ITEMTYPE_FOLDER
             )
@@ -1738,7 +1714,7 @@ def likecommunity(communityid):  # type: (int) -> None
     except vk.VkAPIError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
-    xbmc.log('plugin.video.vk: Community liked: {}'.format(communityid))
+    # xbmc.log('plugin.video.vk: Community liked: {}'.format(communityid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -1758,7 +1734,7 @@ def unlikecommunity(communityid):  # type: (int) -> None
     except vk.VkAPIError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
-    xbmc.log('plugin.video.vk: Community unliked: {}'.format(communityid))
+    # xbmc.log('plugin.video.vk: Community unliked: {}'.format(communityid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -1778,7 +1754,7 @@ def followcommunity(communityid):  # type: (int) -> None
     except vk.VkAPIError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
-    xbmc.log('plugin.video.vk: Community followed: {}'.format(communityid))
+    # xbmc.log('plugin.video.vk: Community followed: {}'.format(communityid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
@@ -1804,7 +1780,7 @@ def unfollowcommunity(communityid):  # type: (int) -> None
     except vk.VkAPIError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
-    xbmc.log('plugin.video.vk: Community unfollowed: {}'.format(communityid))
+    # xbmc.log('plugin.video.vk: Community unfollowed: {}'.format(communityid))
     # refresh content
     xbmc.executebuiltin('Container.Refresh()')
 
