@@ -1,7 +1,7 @@
 # coding=utf-8
 
 __all__ = []
-__version__ = "1.5.0"
+__version__ = "1.5.1"
 
 import datetime
 import math
@@ -239,9 +239,7 @@ def parseurl():  # type: () -> tuple
     urlpath = str(urlparse.urlsplit(SYSARGV['path'])[2])
     urlargs = {}
     if SYSARGV['qs'].startswith('?'):
-        urlargs = urlparse.parse_qs(SYSARGV['qs'].lstrip('?'))
-        for k, v in list(urlargs.items()):
-            urlargs[k] = v.pop()
+        urlargs = {k: eval(v) for k, v in urlparse.parse_qsl(SYSARGV['qs'].lstrip('?'))}
     return urlpath, urlargs
 
 
