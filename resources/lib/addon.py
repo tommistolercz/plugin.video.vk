@@ -239,7 +239,7 @@ def parseurl():  # type: () -> tuple
     urlpath = str(urlparse.urlsplit(SYSARGV['path'])[2])
     urlargs = {}
     if SYSARGV['qs'].startswith('?'):
-        urlargs = {k: eval(v) for k, v in urlparse.parse_qsl(SYSARGV['qs'].lstrip('?'))}
+        urlargs = dict(urlparse.parse_qsl(SYSARGV['qs'].lstrip('?')))
     return urlpath, urlargs
 
 
@@ -737,14 +737,12 @@ def listsearchedvideos(q, offset=0):  # type: (str, int) -> None
 
 
 @route(URLPATH_LISTVIDEOS)
-def listvideos(ownerid=None, albumid=None, offset=0):  # type: (int, int, int) -> None
+def listvideos(ownerid=0, albumid=0, offset=0):  # type: (int, int, int) -> None
     """
     List videos, album videos, community videos.
     """
-    if ownerid is not None:
-        ownerid = int(ownerid)
-    if albumid is not None:
-        albumid = int(albumid)
+    ownerid = int(ownerid)
+    albumid = int(albumid)
     offset = int(offset)
     itemsperpage = int(ADDON.getSetting('itemsperpage'))
     # request vk api
@@ -754,9 +752,9 @@ def listvideos(ownerid=None, albumid=None, offset=0):  # type: (int, int, int) -
         'offset': offset,
         'count': itemsperpage,
     }
-    if ownerid is not None:
+    if ownerid:
         kwargs['owner_id'] = ownerid  # negative id for communities
-    if albumid is not None:
+    if albumid:
         kwargs['album_id'] = albumid
     try:
         videos = vkapi.video.get(**kwargs)
