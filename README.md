@@ -19,7 +19,7 @@
 ## Installation
 
 1. Download the add-on zip file:<br>
-    [plugin.video.vk-1.5.0.zip](https://github.com/tommistolercz/plugin.video.vk/releases/download/v1.5.0/plugin.video.vk-1.5.0.zip)
+    [plugin.video.vk-1.5.1.zip](https://github.com/tommistolercz/plugin.video.vk/releases/download/v1.5.1/plugin.video.vk-1.5.1.zip)
     
 2. Install it in Kodi:<br>
     `Kodi → Settings → Add-ons → Install from zip file...`    
@@ -99,12 +99,18 @@ Communities:
 
 ## Changelog
 
+- [v1.5.1 (2019-07-03)](#v151-2019-07-03)
 - [v1.5.0 (2019-06-29)](#v150-2019-06-29)
 - [v1.4.0 (2019-06-06)](#v140-2019-06-06)
 - [v1.3.0 (2019-04-17)](#v130-2019-04-17)
 - [v1.2.0 (2019-03-04)](#v120-2019-03-04)
 - [v1.1.0 (2019-02-01)](#v110-2019-02-01)
 - [v1.0.0 (2018-11-12)](#v100-2018-11-12)
+
+### v1.5.1 (2019-07-03)
+
+Fixed:
+- Pagination issue in `listvideos()` 
 
 ### v1.5.0 (2019-06-29)
 
