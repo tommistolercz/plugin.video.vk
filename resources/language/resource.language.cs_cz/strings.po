@@ -265,3 +265,7 @@ msgstr "{0} nalezených videí"
 msgctxt "#30085"
 msgid "Search by similar title"
 msgstr "Hledat podobný název"
+
+msgctxt "#30090"
+msgid "Prefer HLS (adaptive bitrate)"
+msgstr "Preferovat HLS (adaptivní bitrate)"

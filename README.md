@@ -1,4 +1,4 @@
-![Add-on icon](./resources/icon.png)
+![Add-on icon](resources/icon.png)
 
 # VK (plugin.video.vk) 
 
@@ -42,6 +42,7 @@ Settings:
 - Sort searched videos (by relevance, date, duration)
 - Keep history of add-on requests (hidden)
 - Keep history of played videos
+- Prefer HLS (adaptive bitrate)
 - VK user login (email/phone)
 
 Common:
@@ -91,22 +92,45 @@ Communities:
 
 ## Screenshots
 
-![Screenshot 1: Add-on settings](./resources/media/screenshot01.jpg)
+![Screenshot 1: Add-on settings](resources/media/screenshot01.jpg)
 
-![Screenshot 2: Add-on menu](./resources/media/screenshot02.jpg)
+![Screenshot 2: Add-on menu](resources/media/screenshot02.jpg)
 
-![Screenshot 3: Add-on content](./resources/media/screenshot03.jpg)
+![Screenshot 3: Add-on content](resources/media/screenshot03.jpg)
 
 ## Changelog
 
-- [v1.5.1 (2019-07-03)](#v151-2019-07-03)
-- [v1.5.0 (2019-06-29)](#v150-2019-06-29)
-- [v1.4.0 (2019-06-06)](#v140-2019-06-06)
-- [v1.3.0 (2019-04-17)](#v130-2019-04-17)
-- [v1.2.0 (2019-03-04)](#v120-2019-03-04)
-- [v1.1.0 (2019-02-01)](#v110-2019-02-01)
-- [v1.0.0 (2018-11-12)](#v100-2018-11-12)
+### Backlog
 
+- Refactor except. handling (pass vkapi error details to kodi log)
+- Refactor building lists using classes/inher.
+- Check/optimize VKAPI wrapper (disable stderr logging)
+- Show more video infolabels: `video['likes']['count'], video['views], video['comments']`
+- ...
+
+### v1.6.0-dev
+
+Fixed:
+- Play video throws video resolving error after session cookies expiration (#57) 
+- Search videos not working on RPi (#96)
+- My liked communities list empty (#94)
+- Video['is_favorite'] always false? (#91)
+
+Added:
+- Prefer HLS (adaptive bitrate) (setting, default false)
+
+Changed:
+- Enabled external debugging and unit testing (pytest/mock)
+- Reworked vkauthsession handling
+- Reworked vkresolver (incl. support for HLS)
+- Refactored SYSARGV handling
+- Removed numbered formatting braces
+- Removed COLOR_ALT const
+- Improved overall performance by reducing VKAPI calls
+- Reduced size of thumbs in video lists (1280px no longer displayed)
+- Reused maxthumb logic in community lists (200px or 100px displayed)
+- Updated README (changelog, features, image paths)
+    
 ### v1.5.1 (2019-07-03)
 
 Fixed:
