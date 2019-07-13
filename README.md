@@ -114,7 +114,7 @@ Fixed:
 - Play video throws video resolving error after session cookies expiration (#57) 
 - Search videos not working on RPi (#96)
 - My liked communities list empty (#94)
-- Video['is_favorite'] always false? (#91)
+- Video is_favorite flag always false? (#91)
 
 Added:
 - Prefer HLS (adaptive bitrate) (setting, default false)
@@ -130,6 +130,7 @@ Changed:
 - Reduced size of thumbs in video lists (1280px no longer displayed)
 - Reused maxthumb logic in community lists (200px or 100px displayed)
 - Updated README (changelog, features, image paths)
+- [TODO] Update screenshots
     
 ### v1.5.1 (2019-07-03)
 

@@ -117,22 +117,17 @@ def test_initvkapi(context=addon):
 
 
 def test_vkapi_video_get(context=addon):
-    testvideo = TEST_VIDEO1
     context.ADDON = context.initaddon()
     vkapi = context.initvkapi()
     r = vkapi.video.get(
         album_id=None,
-        videos=testvideo['_oidid'],
+        videos=TEST_VIDEO['_oidid'],
         extended=True,
     )
     assert r['count'] == 1
 
 
-def test_playvideo(context=addon):
-    testvideo = TEST_VIDEO2
-    context.ADDON = context.initaddon()
-    context.playvideo(testvideo['owner_id'], testvideo['id'])
-    assert True
+# general
 
 
 def test_listaddonmenu(context=addon):
@@ -141,13 +136,74 @@ def test_listaddonmenu(context=addon):
     assert True
 
 
+# search
+
+
+def test_listsearchhistory(context=addon):
+    context.ADDON = context.initaddon()
+    context.listsearchhistory(offset=0)
+    assert True
+
+
+def test_searchvideos(context=addon):
+    context.ADDON = context.initaddon()
+    context.searchvideos(defq='')
+    assert True
+
+
+# videos
+
+
+def test_listsearchedvideos(context=addon):
+    context.ADDON = context.initaddon()
+    context.listsearchedvideos(q='test', offset=0)
+    assert True
+
+
+def test_listvideos(context=addon):
+    context.ADDON = context.initaddon()
+    context.listvideos(ownerid=0, albumid=0, offset=0)
+    context.listvideos(ownerid=-TEST_COMMUNITY['id'], albumid=0, offset=0)
+    assert True
+
+
+def test_listlikedvideos(context=addon):
+    context.ADDON = context.initaddon()
+    context.listlikedvideos(offset=0)
+    assert True
+
+
+def test_listwatchlist(context=addon):
+    context.ADDON = context.initaddon()
+    context.listwatchlist(offset=0)
+    assert True
+
+
+def test_playvideo(context=addon):
+    context.ADDON = context.initaddon()
+    context.playvideo(ownerid=TEST_VIDEO['owner_id'], videoid=TEST_VIDEO['id'])
+    assert True
+
+
+# communities
+
+
 def test_listcommunities(context=addon):
     context.ADDON = context.initaddon()
-    context.listcommunities()
+    context.listcommunities(offset=0)
     assert True
 
 
 def test_listlikedcommunities(context=addon):
     context.ADDON = context.initaddon()
-    context.listlikedcommunities()
+    context.listlikedcommunities(offset=0)
+    assert True
+
+
+# albums
+
+
+def test_listalbums(context=addon):
+    context.ADDON = context.initaddon()
+    context.listalbums(offset=0)
     assert True

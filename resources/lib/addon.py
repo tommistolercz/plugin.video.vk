@@ -848,7 +848,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
     Build video list.
     """
     listitems = []
-    thumbsizes = ['photo_800', 'photo_640', 'photo_320']
+    thumbsizes = ['photo_800', 'photo_640', 'photo_320']  # 'photo_1280'
     if 'groups' in listdata:
         # list => dict searchable by video's owner_id, negative!
         listdata['groups'] = {str(-group['id']): group for group in listdata['groups']}
@@ -946,37 +946,36 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                     )
                 )
             ]
-        if 'likes' in video:
-            if not video['likes']['user_likes']:
-                cmi += [
-                    # like video
-                    (
-                        '[COLOR blue]{}[/COLOR]'.format(
-                            ADDON.getLocalizedString(30053).encode('utf-8')
-                        ),
-                        'RunPlugin({})'.format(
-                            buildurl(
-                                URLPATH_LIKEVIDEO,
-                                {'ownerid': video['owner_id'], 'videoid': video['id']}
-                            )
+        if not video['is_favorite']:
+            cmi += [
+                # like video
+                (
+                    '[COLOR blue]{}[/COLOR]'.format(
+                        ADDON.getLocalizedString(30053).encode('utf-8')
+                    ),
+                    'RunPlugin({})'.format(
+                        buildurl(
+                            URLPATH_LIKEVIDEO,
+                            {'ownerid': video['owner_id'], 'videoid': video['id']}
                         )
                     )
-                ]
-            elif video['likes']['user_likes']:
-                cmi += [
-                    # unlike video
-                    (
-                        '[COLOR blue]{}[/COLOR]'.format(
-                            ADDON.getLocalizedString(30054).encode('utf-8')
-                        ),
-                        'RunPlugin({})'.format(
-                            buildurl(
-                                URLPATH_UNLIKEVIDEO,
-                                {'ownerid': video['owner_id'], 'videoid': video['id']}
-                            )
+                )
+            ]
+        elif video['is_favorite']:
+            cmi += [
+                # unlike video
+                (
+                    '[COLOR blue]{}[/COLOR]'.format(
+                        ADDON.getLocalizedString(30054).encode('utf-8')
+                    ),
+                    'RunPlugin({})'.format(
+                        buildurl(
+                            URLPATH_UNLIKEVIDEO,
+                            {'ownerid': video['owner_id'], 'videoid': video['id']}
                         )
                     )
-                ]
+                )
+            ]
         cmi += [
             # set albums for video
             (
