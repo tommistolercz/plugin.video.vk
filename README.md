@@ -2,7 +2,7 @@
 
 # VK (plugin.video.vk) 
 
-#### Kodi add-on for watching videos from VK.com social network.
+Kodi add-on for watching videos from VK.com social network.
 
 - [Requirements](#requirements)
 - [Installation](#installation)
@@ -13,15 +13,15 @@
 
 ## Requirements
 
-- [Kodi](https://kodi.tv) v17+ installed
+- [Kodi](https://kodi.tv) v17+
 - [VK.com](https://vk.com) user account
 
 ## Installation
 
 1. Download the add-on zip file:<br>
-    [plugin.video.vk-1.5.1.zip](https://github.com/tommistolercz/plugin.video.vk/releases/download/v1.5.1/plugin.video.vk-1.5.1.zip)
+    [plugin.video.vk-1.6.0.zip](https://github.com/tommistolercz/plugin.video.vk/releases/download/v1.6.0/plugin.video.vk-1.6.0.zip)
     
-2. Install it in Kodi:<br>
+2. Install in Kodi:<br>
     `Kodi → Settings → Add-ons → Install from zip file...`    
     [How to install add-ons from zip files](https://kodi.wiki/view/HOW-TO:Install_add-ons_from_zip_files)
 
@@ -49,11 +49,11 @@ Common:
 - Authorize add-on
 - Logout user
 - List add-on menu
-- Skip to page nr.
+- Skip to page
 
 Search:
 - Search videos
-- Search videos by similar title (video/album/community) 
+- Search videos by similar title 
 - List search history
 - Delete search from history
 - Clear search history
@@ -100,21 +100,13 @@ Communities:
 
 ## Changelog
 
-### Backlog
-
-- Refactor except. handling (pass vkapi error details to kodi log)
-- Refactor building lists using classes/inher.
-- Check/optimize VKAPI wrapper (disable stderr logging)
-- Show more video infolabels: `video['likes']['count'], video['views], video['comments']`
-- ...
-
-### v1.6.0-dev
+### v1.6.0 (not released)
 
 Fixed:
 - Play video throws video resolving error after session cookies expiration (#57) 
 - Search videos not working on RPi (#96)
 - My liked communities list empty (#94)
-- Video is_favorite flag always false? (#91)
+- Video['is_favorite'] always false? (#91)
 
 Added:
 - Prefer HLS (adaptive bitrate) (setting, default false)
