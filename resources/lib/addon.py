@@ -1,7 +1,6 @@
 # coding=utf-8
 
 __all__ = []
-__version__ = "1.6.0-dev"
 
 import datetime
 import HTMLParser
@@ -80,7 +79,7 @@ URLPATH_UNFOLLOWCOMMUNITY = '/unfollowcommunity'
 URLPATH_UNLIKECOMMUNITY = '/unlikecommunity'
 URLPATH_UNLIKEVIDEO = '/unlikevideo'
 
-# vk api
+# vk api config
 VKAPI_APPID = '6432748'
 VKAPI_LANG = 'en'
 VKAPI_SCOPE = 'email,friends,groups,offline,stats,status,video,wall'
