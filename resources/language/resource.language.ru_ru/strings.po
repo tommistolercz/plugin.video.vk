@@ -265,3 +265,7 @@ msgstr "{0} видео найдено"
 msgctxt "#30085"
 msgid "Search by similar title"
 msgstr "Искать по похожему названию"
+
+msgctxt "#30090"
+msgid "Prefer HLS (adaptive bitrate)"
+msgstr "Предпочитаю HLS (адаптивный битрейт)"
