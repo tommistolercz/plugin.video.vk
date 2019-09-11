@@ -1,6 +1,7 @@
 # CHANGELOG
 
 - [Backlog](#backlog)
+- [v1.7.0-dev (unreleased)](#v170-dev-unreleased)
 - [v1.6.0 (2019-07-14)](#v160-2019-07-14)
 - [v1.5.1 (2019-07-03)](#v151-2019-07-03)
 - [v1.5.0 (2019-06-29)](#v150-2019-06-29)
@@ -14,6 +15,16 @@
 
 Todo:
 - Update screenshots
+
+## v1.7.0-dev (unreleased)
+
+Added:
+- .travis.yml
+- requirements.txt
+
+Changed:
+- Modified pytest file structure
+- Refined README.md
 
 ## v1.6.0 (2019-07-14)
 

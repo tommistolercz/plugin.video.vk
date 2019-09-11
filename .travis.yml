@@ -1,21 +1,10 @@
+# https://docs.travis-ci.com
+
 language: python
-python:
-  - "2.7"
+python: 2.7
+
+install:
+    - pip install -r requirements.txt
+
 script:
-  - pytest
-# env: {}
-# deploy:
-  # provider: releases
-  # api_key:
-    # secure: {enter a key}
-  # file:
-    # - .git/
-    # - .gitignore
-    # - .travis.yaml
-    # - resources/lib/tests/.pytest_cache/
-    # - resources/lib/tests/_testdata.py
-  # file_glob: true
-  # on:
-    # repo: tommistolercz/plugin.video.vk
-    # tags: true
-  # skip_cleanup: true
+    - python -m pytest test_addon.py
