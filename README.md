@@ -4,11 +4,11 @@
 
 #### Kodi add-on for watching videos from VK.com social network.
 
-![Release badge](https://img.shields.io/github/release/tommistolercz/plugin.video.vk.svg) &nbsp;
-![Build badge](https://img.shields.io/travis/tommistolercz/plugin.video.vk.svg) &nbsp; 
-![License badge](https://img.shields.io/github/license/tommistolercz/plugin.video.vk.svg) &nbsp; 
-![Downloads badge](https://img.shields.io/github/downloads/tommistolercz/plugin.video.vk/total.svg) &nbsp; 
- 
+[![GitHub release](https://img.shields.io/github/release/tommistolercz/plugin.video.vk.svg)](https://github.com/tommistolercz/plugin.video.vk/releases/latest) 
+![GitHub license](https://img.shields.io/github/license/tommistolercz/plugin.video.vk.svg) 
+![GitHub downloads](https://img.shields.io/github/downloads/tommistolercz/plugin.video.vk/total.svg) 
+[![Gitter chat](https://img.shields.io/gitter/room/plugin-video-vk/chat.svg)](https://gitter.im/plugin-video-vk/chat) 
+
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Features](#features)
@@ -18,7 +18,7 @@
 
 ## Requirements
 
-- [Kodi](https://kodi.tv) 17.6+ 
+- [Kodi](https://kodi.tv) v17+
 - [VK.com](https://vk.com) user account
 
 ## Installation
@@ -30,7 +30,7 @@
     `Kodi → Settings → Add-ons → Install from zip file...`<br>
     [How to install add-ons from zip files](https://kodi.wiki/view/HOW-TO:Install_add-ons_from_zip_files)
 
-Note: You can also install the add-on with [repository.tommistolercz](https://github.com/tommistolercz/repository.tommistolercz). 
+Note: You can also install this add-on from [repository.tommistolercz](https://github.com/tommistolercz/repository.tommistolercz). 
 With this method, the add-on will auto-update when there is a new version available.
 
 ## Features
@@ -97,7 +97,7 @@ Communities:
 
 ## Changelog
 
-[CHANGELOG](CHANGELOG.md) (incl. future features & ideas backlog)
+[CHANGELOG](CHANGELOG.md) (incl. backlog with future features & ideas)
 
 ## Screenshots
 
@@ -109,5 +109,5 @@ Communities:
 
 ## Author & Contributors 
 
-- [Tomas Mistoler](https://github.com/tommistolercz)
+- [TomMistolerCZ](https://github.com/tommistolercz)
 - Владимир Малявин (RU translation)
