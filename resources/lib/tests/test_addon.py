@@ -4,12 +4,15 @@ import addon  # test target
 import mock
 import pytest
 
+# sensitive test data
 try:
-    # sensitive test data
+    # from local non-vcs module
     from _testdata import *
 except ImportError:
-    TESTDATA_VKUSER_LOGIN = ''
-    TESTDATA_VKUSER_PSWD = ''
+    # or from travis-ci secured env vars  (or blank)
+    import os
+    TESTDATA_VKUSER_LOGIN = os.environ.get('TESTDATA_VKUSER_LOGIN', '')
+    TESTDATA_VKUSER_PSWD = os.environ.get('TESTDATA_VKUSER_PSWD', '')
     TESTDATA_FP_PROFILE = ''
     TESTDATA_SEARCHVIDEOS_QUERY = ''
     TESTDATA_VIDEO = {}
