@@ -1,21 +1,11 @@
 language: python
 python:
-  - "2.7"
+  - 2.7
+before_install:
+  - python --version
+  - pip install -U pip
+  - pip install -U pytest
+before_script:
+  - export PYTHONPATH=$PYTHONPATH:$(pwd):$(pwd)/resources/lib:$(pwd)/resources/lib/tests
 script:
-  - pytest
-# env: {}
-# deploy:
-  # provider: releases
-  # api_key:
-    # secure: {enter a key}
-  # file:
-    # - .git/
-    # - .gitignore
-    # - .travis.yaml
-    # - resources/lib/tests/.pytest_cache/
-    # - resources/lib/tests/_testdata.py
-  # file_glob: true
-  # on:
-    # repo: tommistolercz/plugin.video.vk
-    # tags: true
-  # skip_cleanup: true
+  - pytest --rootdir=./resources/lib/tests

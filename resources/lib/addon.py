@@ -1102,7 +1102,7 @@ def playvideo(ownerid, videoid):  # type: (int, int) -> None
     # resolve playable streams + find best quality
     vkr = initvkresolver()
     r = vkr.get('https://vk.com/al_video.php?act=show_inline&al=1&video={}'.format(oidid))
-    cnt = r.text.encode('utf-8')
+    cnt = r.text.encode('utf-8').replace('\\', '')
     resolvedpath = None
     if ADDON.getSetting('preferhls') == 'true':
         # hls - if enabled in settings
@@ -1364,6 +1364,7 @@ def listalbums(offset=0):  # type: (int) -> None
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     listitems = []
+    thumbsizes = ['photo_320', 'photo_160']
     # create pagination item
     if albums['count'] > offset + itemsperpage:
         pi = xbmcgui.ListItem(
@@ -1410,9 +1411,12 @@ def listalbums(offset=0):  # type: (int) -> None
                 int(album['count'])
             )
         )
-        # set art, if any
-        if album['count'] > 0:
-            li.setArt({'thumb': album['photo_320']})
+        # set art
+        try:
+            maxthumb = [album[thumbsize] for thumbsize in thumbsizes if thumbsize in album][0]
+            li.setArt({'thumb': maxthumb})
+        except IndexError:
+            pass
         # before/after album ids for reordering
         beforeid = albums['items'][i - 1]['id'] if i > 0 else None
         afterid = albums['items'][i + 1]['id'] if i < len(albums['items']) - 1 else None

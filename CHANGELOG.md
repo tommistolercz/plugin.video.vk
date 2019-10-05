@@ -1,6 +1,7 @@
 # CHANGELOG
 
 - [Backlog](#backlog)
+- [v1.6.1-dev (unreleased)](#v161-dev-unreleased)
 - [v1.6.0 (2019-07-14)](#v160-2019-07-14)
 - [v1.5.1 (2019-07-03)](#v151-2019-07-03)
 - [v1.5.0 (2019-06-29)](#v150-2019-06-29)
@@ -14,6 +15,16 @@
 
 Todo:
 - Update screenshots
+
+## v1.6.1-dev (unreleased)
+
+Fixed:
+- Cannot play videos due video resolving error
+- Reused maxthumb code in video albums list
+
+Changed:
+- Refactored tests (importing sensitive test data)
+- Updated .travis.yml
 
 ## v1.6.0 (2019-07-14)
 

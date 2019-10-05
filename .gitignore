@@ -1,5 +1,5 @@
 *.pyc
 *.pyo
-resources/lib/tests/.pytest_cache/
-resources/lib/tests/_testdata.py
+_testdata.py
+.pytest_cache/
 /addon_data/
