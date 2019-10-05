@@ -1,16 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="55163e6f-c438-4cbb-91e9-843fe2909383" name="Default Changelist" comment="Revert &quot;dev state 20190911&quot;&#10;&#10;This reverts commit f85ac967">
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/resources/lib/tests/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.travis.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.travis.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/CHANGELOG.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/addon.xml" beforeDir="false" afterPath="$PROJECT_DIR$/addon.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/lib/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/lib/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/lib/addon.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/lib/addon.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/lib/tests/test_addon.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/lib/tests/test_addon.py" afterDir="false" />
+    <list default="true" id="55163e6f-c438-4cbb-91e9-843fe2909383" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -250,16 +243,15 @@
       <option name="project" value="LOCAL" />
       <updated>1568195166301</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="dev state 20191005">
+      <created>1570266342208</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1570266342208</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
-  </component>
-  <component name="TodoView" selected-index="1">
-    <todo-panel id="selected-file">
-      <is-autoscroll-to-source value="true" />
-    </todo-panel>
-    <todo-panel id="all">
-      <is-autoscroll-to-source value="true" />
-    </todo-panel>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -304,7 +296,8 @@
     <MESSAGE value=".travis.yml config" />
     <MESSAGE value="dev state 20190911" />
     <MESSAGE value="Revert &quot;dev state 20190911&quot;&#10;&#10;This reverts commit f85ac967" />
-    <option name="LAST_COMMIT_MESSAGE" value="Revert &quot;dev state 20190911&quot;&#10;&#10;This reverts commit f85ac967" />
+    <MESSAGE value="dev state 20191005" />
+    <option name="LAST_COMMIT_MESSAGE" value="dev state 20191005" />
     <option name="PRESELECT_EXISTING_CHANGELIST" value="true" />
     <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
   </component>
