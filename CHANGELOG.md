@@ -24,7 +24,7 @@ Fixed:
 
 Changed:
 - Refactored tests (importing sensitive test data)
-- Updated .travis.yml
+- Updated CI setup (.travis.yml, requirements.txt)
 
 ## v1.6.0 (2019-07-14)
 

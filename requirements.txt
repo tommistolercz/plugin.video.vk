@@ -1,0 +1,3 @@
+kodistubs>=17.6.0
+pprintpp>=0.4.0
+requests>=2.8.1
