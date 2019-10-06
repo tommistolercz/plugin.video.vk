@@ -12,10 +12,11 @@ try:
     # if running locally, import from file (vcs-excluded)
     from _sensitivedata import *
 except ImportError:
-    # if running on travis, get from secure env vars
+    # if running on travis, get from env vars
     if os.environ.get('TRAVIS'):
         VKUSER_LOGIN = os.environ.get('VKUSER_LOGIN')
         VKUSER_PSWD = os.environ.get('VKUSER_PSWD')
+        FP_PROFILE = os.environ.get('FP_PROFILE')
 
 
 # mocks -----
@@ -27,7 +28,7 @@ MOCK_ADDONINFO = {
 }
 
 MOCK_KODIENV = {
-    'fp_profile': '/Users/tom/Library/Application Support/Kodi/userdata/addon_data/plugin.video.vk',  # todo
+    'fp_profile': FP_PROFILE,
     'sysargv': {
         'path': str(__file__),
         'handle': int(0),
@@ -140,7 +141,6 @@ def patch_xbmcgui(monkeypatch, context=addon):
 def patch_buildfp(monkeypatch, context=addon):
 
     def mock_buildfp(filename):  # type: (str) -> str
-        import os
         fp = str(os.path.join(MOCK_KODIENV['fp_profile'], filename))
         return fp
 
