@@ -1,23 +1,21 @@
 # coding=utf-8
 
-import addon  # test target
 import mock
+import os
 import pytest
+
+# test target
+import addon
 
 # sensitive test data
 try:
-    # from local non-vcs module
-    from _testdata import *
+    # if running locally, import from file (vcs-excluded)
+    from _sensitivedata import *
 except ImportError:
-    # or from travis-ci secured env vars  (or blank)
-    import os
-    TESTDATA_VKUSER_LOGIN = os.environ.get('TESTDATA_VKUSER_LOGIN', '')
-    TESTDATA_VKUSER_PSWD = os.environ.get('TESTDATA_VKUSER_PSWD', '')
-    TESTDATA_FP_PROFILE = ''
-    TESTDATA_SEARCHVIDEOS_QUERY = ''
-    TESTDATA_VIDEO = {}
-    TESTDATA_COMMUNITY = {}
-    TESTDATA_LIKEDCOMMUNITY = {}
+    # if running on travis, get from secure env vars
+    if os.environ.get('TRAVIS'):
+        VKUSER_LOGIN = os.environ.get('VKUSER_LOGIN')
+        VKUSER_PSWD = os.environ.get('VKUSER_PSWD')
 
 
 # mocks -----
@@ -29,7 +27,7 @@ MOCK_ADDONINFO = {
 }
 
 MOCK_KODIENV = {
-    'fp_profile': TESTDATA_FP_PROFILE,
+    'fp_profile': '/Users/tom/Library/Application Support/Kodi/userdata/addon_data/plugin.video.vk',  # todo
     'sysargv': {
         'path': str(__file__),
         'handle': int(0),
@@ -49,19 +47,33 @@ MOCK_USERSETTINGS = {
     'searchdurationmins': '',
     'searchown': 'false',
     'searchsort': '2',  # '0'=bydate, '1'=byduration, '2'=byrelevance
-    'vkuserlogin': TESTDATA_VKUSER_LOGIN,
+    'vkuserlogin': VKUSER_LOGIN,
     'vkuseraccesstoken': '',
 }
 
 MOCK_USERINPUTS = {
-    'LSTR_30030': TESTDATA_VKUSER_LOGIN,
-    'LSTR_30031': TESTDATA_VKUSER_PSWD,
-    'LSTR_30083': TESTDATA_SEARCHVIDEOS_QUERY,
+    # auth
+    'LSTR_30030': VKUSER_LOGIN,
+    'LSTR_30031': VKUSER_PSWD,
+    # search videos
+    'LSTR_30083': 'kazantip',  # q
 }
 
-MOCK_VIDEO = TESTDATA_VIDEO
-MOCK_COMMUNITY = TESTDATA_COMMUNITY
-MOCK_LIKEDCOMMUNITY = TESTDATA_LIKEDCOMMUNITY
+MOCK_VIDEO = {
+    'owner_id': -152615939,
+    'id': 456239302,
+    '_oidid': '-152615939_456239302',
+}
+
+MOCK_COMMUNITY = {
+    'id': 165942624,
+}
+
+MOCK_LIKEDCOMMUNITY = {
+    'group': {
+        'id': 176973002,
+    },
+}
 
 
 # patches -----
@@ -213,7 +225,7 @@ def test_searchvideos(context=addon):
 
 def test_listsearchedvideos(context=addon):
     context.ADDON = context.initaddon()
-    context.listsearchedvideos(q=TESTDATA_SEARCHVIDEOS_QUERY, offset=0)
+    context.listsearchedvideos(q=MOCK_USERINPUTS['LSTR_30083'], offset=0)
     assert True
 
 

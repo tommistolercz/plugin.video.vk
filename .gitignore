@@ -1,5 +1,5 @@
 *.pyc
 *.pyo
-_testdata.py
+_sensitivedata.py
 .pytest_cache/
 /addon_data/
