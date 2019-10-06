@@ -4,7 +4,6 @@
     <list default="true" id="55163e6f-c438-4cbb-91e9-843fe2909383" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.travis.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.travis.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/lib/tests/test_addon.py" beforeDir="false" afterPath="$PROJECT_DIR$/resources/lib/tests/test_addon.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -293,7 +292,14 @@
       <option name="project" value="LOCAL" />
       <updated>1570358930682</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="dev state 20191007">
+      <created>1570402559306</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1570402559306</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -341,7 +347,8 @@
     <MESSAGE value="Revert &quot;dev state 20190911&quot;&#10;&#10;This reverts commit f85ac967" />
     <MESSAGE value="dev state 20191005" />
     <MESSAGE value="dev state 20191006" />
-    <option name="LAST_COMMIT_MESSAGE" value="dev state 20191006" />
+    <MESSAGE value="dev state 20191007" />
+    <option name="LAST_COMMIT_MESSAGE" value="dev state 20191007" />
     <option name="PRESELECT_EXISTING_CHANGELIST" value="true" />
     <option name="GROUP_MULTIFILE_MERGE_BY_DIRECTORY" value="true" />
   </component>
