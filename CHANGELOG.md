@@ -18,6 +18,9 @@ Todo:
 
 ## v1.6.1-dev (unreleased)
 
+Added:
+- VK password (setting, default last used)
+
 Fixed:
 - Cannot play videos due video resolving error
 - Reused maxthumb code in video albums list

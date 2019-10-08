@@ -12,6 +12,6 @@ install:
   - pip install -r requirements.txt
 before_script:
   - export PYTHONPATH=$PYTHONPATH:$(pwd):$(pwd)/resources/lib:$(pwd)/resources/lib/tests
-  - mkdir -p $FP_PROFILE
+  - mkdir -p $(FP_PROFILE)
 script:
   - pytest --rootdir=./resources/lib/tests

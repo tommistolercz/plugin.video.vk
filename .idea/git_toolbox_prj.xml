@@ -3,5 +3,6 @@
   <component name="GitToolBoxProjectSettings">
     <option name="autoFetch" value="false" />
     <option name="autoFetchIntervalMinutes" value="60" />
+    <option name="version" value="2" />
   </component>
 </project>

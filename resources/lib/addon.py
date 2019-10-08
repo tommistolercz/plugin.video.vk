@@ -159,6 +159,7 @@ def initvkauthsession():  # type: () -> vk.api.AuthSession
         )
         pswd = xbmcgui.Dialog().input(
             ADDON.getLocalizedString(30031).encode('utf-8'),
+            defaultt=ADDON.getSetting('vkuserpswd'),
             option=xbmcgui.ALPHANUM_HIDE_INPUT
         )
         if not login or not pswd:
@@ -171,6 +172,7 @@ def initvkauthsession():  # type: () -> vk.api.AuthSession
             raise AddonError(ERR_VKAUTH)
         savesession(vkauthsession)
         ADDON.setSetting('vkuserlogin', login)
+        ADDON.setSetting('vkuserpswd', pswd)
         ADDON.setSetting('vkuseraccesstoken', vkauthsession.access_token)
     else:
         # restore vk auth session
