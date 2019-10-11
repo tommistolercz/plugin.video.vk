@@ -49,6 +49,7 @@ MOCK_USERSETTINGS = {
     'searchown': 'false',
     'searchsort': '2',  # '0'=bydate, '1'=byduration, '2'=byrelevance
     'vkuserlogin': VKUSER_LOGIN,
+    'vkuserpswd': VKUSER_PSWD,
     'vkuseraccesstoken': '',
 }
 
