@@ -11,7 +11,19 @@ before_install:
 install:
   - pip install -r requirements.txt
 before_script:
-  - export PYTHONPATH=$PYTHONPATH:$(pwd):$(pwd)/resources/lib:$(pwd)/resources/lib/tests
+  - export PYTHONPATH=$PYTHONPATH:$(pwd):$(pwd)/resources/lib:$(pwd)/resources/lib/tests:$(pwd)/resources/lib/tinydb:$(pwd)/resources/lib/vk
   - mkdir -p $FP_PROFILE
 script:
   - pytest --rootdir=./resources/lib/tests
+# before_deploy:
+deploy:
+  on:
+    branch: master
+    tags: true
+  provider: releases
+  # api_key: "GITHUB OAUTH TOKEN"
+  draft: true
+  skip_cleanup: true
+  # file: "FILE TO UPLOAD"
+# after_deploy:
+# after_script:
