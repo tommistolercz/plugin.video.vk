@@ -1,5 +1,5 @@
 *.pyc
 *.pyo
-_sensitivedata.py
+.idea/workspace.xml
 .pytest_cache/
 /addon_data/

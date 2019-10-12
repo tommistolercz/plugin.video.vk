@@ -3,37 +3,30 @@
 import mock
 import os
 import pytest
+import addon  # test target
 
-# test target
-import addon
 
-# sensitive test data
-try:
-    # if running locally, import from file (vcs-excluded)
-    from _sensitivedata import *
-except ImportError:
-    # if running on travis, get from env vars
-    if os.environ.get('TRAVIS'):
-        VKUSER_LOGIN = os.environ.get('VKUSER_LOGIN')
-        VKUSER_PSWD = os.environ.get('VKUSER_PSWD')
-        FP_PROFILE = os.environ.get('FP_PROFILE')
+# env vars (set in IDE for local debug and travis.yml for CI)
+PROFILEPATH = os.environ.get('PROFILEPATH')
+VKUSER_LOGIN = os.environ.get('VKUSER_LOGIN')
+VKUSER_PSWD = os.environ.get('VKUSER_PSWD')
 
 
 # mocks -----
 
 
-MOCK_ADDONINFO = {
-    'id': 'plugin.video.vk',
-    'name': 'VK',
-}
-
 MOCK_KODIENV = {
-    'fp_profile': FP_PROFILE,
+    'fp_profile': PROFILEPATH,
     'sysargv': {
         'path': str(__file__),
         'handle': int(0),
         'qs': str(''),
     }
+}
+
+MOCK_ADDONINFO = {
+    'id': 'plugin.video.vk',
+    'name': 'VK',
 }
 
 MOCK_USERSETTINGS = {

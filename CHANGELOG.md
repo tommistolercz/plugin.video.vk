@@ -15,6 +15,7 @@
 
 Todo:
 - Update screenshots
+- ...
 
 ## v1.6.1-dev (unreleased)
 
@@ -26,8 +27,8 @@ Fixed:
 - Reused maxthumb code in video albums list
 
 Changed:
-- Refactored tests (importing sensitive test data)
-- Updated CI setup (.travis.yml, requirements.txt)
+- Refactored tests for enabling CI
+- Refined README
 
 ## v1.6.0 (2019-07-14)
 
