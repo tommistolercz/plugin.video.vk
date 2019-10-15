@@ -28,6 +28,7 @@ Fixed:
 
 Changed:
 - Refactored tests for enabling CI
+- Disabled logging in VK API wrapper
 - Refined README
 
 ## v1.6.0 (2019-07-14)

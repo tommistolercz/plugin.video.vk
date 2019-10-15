@@ -6,7 +6,7 @@ from vk.exceptions import VkAuthError
 from vk.utils import raw_input, get_url_query, LoggingSession, get_form_action
 
 
-logger = logging.getLogger('vk')
+# logger = logging.getLogger('vk').addHandler(logging.NullHandler())  # todo: debug
 
 
 class AuthMixin(object):
@@ -16,8 +16,8 @@ class AuthMixin(object):
     CAPTCHA_URI = 'https://m.vk.com/captcha.php'
 
     def __init__(self, app_id=None, user_login='', user_password='', scope='offline', **kwargs):
-        logger.debug('AuthMixin.__init__(app_id=%(app_id)r, user_login=%(user_login)r, user_password=%(user_password)r, **kwargs=%(kwargs)s)',
-            dict(app_id=app_id, user_login=user_login, user_password=user_password, kwargs=kwargs))
+        # logger.debug('AuthMixin.__init__(app_id=%(app_id)r, user_login=%(user_login)r, user_password=%(user_password)r, **kwargs=%(kwargs)s)',
+        #    dict(app_id=app_id, user_login=user_login, user_password=user_password, kwargs=kwargs))
 
         super(AuthMixin, self).__init__(**kwargs)
 
@@ -61,7 +61,7 @@ class AuthMixin(object):
         """
         Get access token using app id and user login and password.
         """
-        logger.debug('AuthMixin.get_access_token()')
+        # logger.debug('AuthMixin.get_access_token()')
 
         auth_session = LoggingSession()
         with auth_session as self.auth_session:
@@ -89,7 +89,7 @@ class AuthMixin(object):
             'pass': self.user_password,
         }
         response = self.auth_session.post(login_form_action, login_form_data)
-        logger.debug('Cookies: %s', self.auth_session.cookies)
+        # logger.debug('Cookies: %s', self.auth_session.cookies)
 
         response_url_query = get_url_query(response.url)
 
@@ -104,7 +104,7 @@ class AuthMixin(object):
             self.phone_number_is_needed(response.text)
         else:
             message = 'Authorization error (incorrect password)'
-            logger.error(message)
+            # logger.error(message)
             raise VkAuthError(message)
 
     def oauth2_authorization(self):
@@ -124,10 +124,10 @@ class AuthMixin(object):
             return response_url_query
 
         # Permissions is needed
-        logger.info('Getting permissions')
+        # logger.info('Getting permissions')
         # form_action = re.findall(r'<form method="post" action="(.+?)">', auth_response.text)[0]
         form_action = get_form_action(response.text)
-        logger.debug('Response form action: %s', form_action)
+        # logger.debug('Response form action: %s', form_action)
         if form_action:
             response = self.auth_session.get(form_action)
             response_url_query = get_url_query(response.url)
@@ -139,11 +139,11 @@ class AuthMixin(object):
             error_message = 'OAuth2 grant access error'
         else:
             error_message = 'VK error: [{}] {}'.format(response_json['error'], response_json['error_description'])
-        logger.error('Permissions obtained')
+        # logger.error('Permissions obtained')
         raise VkAuthError(error_message)
 
     def auth_check_is_needed(self, html):
-        logger.info('User enabled 2 factors authorization. Auth check code is needed')
+        # logger.info('User enabled 2 factors authorization. Auth check code is needed')
         auth_check_form_action = get_form_action(html)
         auth_check_code = self.get_auth_check_code()
         auth_check_data = {
@@ -154,13 +154,13 @@ class AuthMixin(object):
         response = self.auth_session.post(auth_check_form_action, data=auth_check_data)
 
     def auth_captcha_is_needed(self, response, login_form_data):
-        logger.info('Captcha is needed')
+        # logger.info('Captcha is needed')
 
         response_url_dict = get_url_query(response.url)
 
         # form_url = re.findall(r'<form method="post" action="(.+)" novalidate>', response.text)
         captcha_form_action = get_form_action(response.text)
-        logger.debug('form_url %s', captcha_form_action)
+        # logger.debug('form_url %s', captcha_form_action)
         if not captcha_form_action:
             raise VkAuthError('Cannot find form url')
 
@@ -196,7 +196,7 @@ class InteractiveMixin(object):
         return user_password
 
     def get_access_token(self):
-        logger.debug('InteractiveMixin.get_access_token()')
+        # logger.debug('InteractiveMixin.get_access_token()')
         access_token = super(InteractiveMixin, self).get_access_token()
         if not access_token:
             access_token = raw_input('VK API access token: ')

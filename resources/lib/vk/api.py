@@ -12,8 +12,8 @@ from vk.mixins import AuthMixin, InteractiveMixin
 VERSION = '2.0.2'
 
 
-logging.config.dictConfig(LOGGING_CONFIG)
-logger = logging.getLogger('vk')
+# logging.config.dictConfig(LOGGING_CONFIG)
+# logger = logging.getLogger('vk').addHandler(logging.NullHandler())  # todo: debug
 
 
 class Session(object):
@@ -21,7 +21,7 @@ class Session(object):
 
     def __init__(self, access_token=None):
 
-        logger.debug('API.__init__(access_token=%(access_token)r)', {'access_token': access_token})
+        # logger.debug('API.__init__(access_token=%(access_token)r)', {'access_token': access_token})
 
         self.access_token = access_token
         self.access_token_is_needed = False
@@ -32,12 +32,12 @@ class Session(object):
 
     @property
     def access_token(self):
-        logger.debug('Check that we need new access token')
+        # logger.debug('Check that we need new access token')
         if self.access_token_is_needed:
-            logger.debug('We need new access token. Try to get it.')
+            # logger.debug('We need new access token. Try to get it.')
             self.access_token = self.get_access_token()
-        else:
-            logger.debug('Use old access token')
+        # else:
+            # logger.debug('Use old access token')
         return self._access_token
 
     @access_token.setter
@@ -47,22 +47,22 @@ class Session(object):
             self.censored_access_token = '{}***{}'.format(value[:4], value[-4:])
         else:
             self.censored_access_token = value
-        logger.debug('access_token = %r', self.censored_access_token)
+        # logger.debug('access_token = %r', self.censored_access_token)
         self.access_token_is_needed = not self._access_token
 
     def get_user_login(self):
-        logger.debug('Do nothing to get user login')
+        pass  # logger.debug('Do nothing to get user login')
 
     def get_access_token(self):
         """
         Dummy method
         """
-        logger.debug('API.get_access_token()')
+        # logger.debug('API.get_access_token()')
         return self._access_token
 
     def make_request(self, method_request, captcha_response=None):
 
-        logger.debug('Prepare API Method request')
+        # logger.debug('Prepare API Method request')
 
         response = self.send_api_request(method_request, captcha_response=captcha_response)
         # todo Replace with something less exceptional
@@ -94,7 +94,7 @@ class Session(object):
                     return self.make_request(method_request, captcha_response=captcha_response)
 
                 elif error.is_access_token_incorrect():
-                    logger.info('Authorization failed. Access token will be dropped')
+                    # logger.info('Authorization failed. Access token will be dropped')
                     self.access_token = None
                     return self.make_request(method_request)
 
@@ -141,7 +141,7 @@ class Session(object):
         Default behavior on PHONE NUMBER is to raise exception
         Reload this in child
         """
-        logger.error('Authorization error (phone number is needed)')
+        # logger.error('Authorization error (phone number is needed)')
         raise VkAuthError('Authorization error (phone number is needed)')
 
 

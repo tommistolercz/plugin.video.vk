@@ -7,7 +7,7 @@ from collections import Iterable
 import requests
 
 
-logger = logging.getLogger('vk')
+# logger = logging.getLogger('vk').addHandler(logging.NullHandler())  # todo: debug
 
 
 try:
@@ -75,7 +75,7 @@ def get_form_action(html):
 
 class LoggingSession(requests.Session):
     def request(self, method, url, **kwargs):
-        logger.debug('Request: %s %s, params=%r, data=%r', method, url, kwargs.get('params'), kwargs.get('data'))
+        # logger.debug('Request: %s %s, params=%r, data=%r', method, url, kwargs.get('params'), kwargs.get('data'))
         response = super(LoggingSession, self).request(method, url, **kwargs)
-        logger.debug('Response: %s %s', response.status_code, response.url)
+        # logger.debug('Response: %s %s', response.status_code, response.url)
         return response
