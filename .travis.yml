@@ -16,7 +16,7 @@ before_script:
     - echo $PYTHONPATH
     - cd $TESTDIRPATH
 script:
-    - pytest
+    - pytest -v -rA
 before_deploy:
     - cd $PWD
     # TODO: clean addon file structure
