@@ -4,9 +4,9 @@
 
 #### Kodi add-on for watching videos from VK.com social network.
 
-![Latest release](https://img.shields.io/github/release/tommistolercz/plugin.video.vk.svg)
-![Build status](https://img.shields.io/travis/tommistolercz/plugin.video.vk)
-![Total downloads](https://img.shields.io/github/downloads/tommistolercz/plugin.video.vk/total.svg)
+![GitHub release](https://img.shields.io/github/release/tommistolercz/plugin.video.vk.svg) 
+![GitHub license](https://img.shields.io/github/license/tommistolercz/plugin.video.vk.svg) 
+![GitHub downloads](https://img.shields.io/github/downloads/tommistolercz/plugin.video.vk/total.svg) 
 
 - [Requirements](#requirements)
 - [Installation](#installation)
