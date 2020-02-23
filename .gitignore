@@ -1,5 +1,6 @@
 *.pyc
 *.pyo
-resources/lib/tests/.pytest_cache/
-resources/lib/tests/_testdata.py
+*.log
+.idea/workspace.xml
+.pytest_cache/
 /addon_data/

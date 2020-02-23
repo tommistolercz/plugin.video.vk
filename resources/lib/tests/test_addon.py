@@ -1,10 +1,74 @@
 # coding=utf-8
 
-import addon  # test target
-from _testdata import *  # test data
-
-import pytest
 import mock
+import os
+import pytest
+import addon  # test target
+
+
+# env vars (set in IDE for local debug and in travis.yml for CI)
+PROFILEPATH = os.environ.get('PROFILEPATH')
+VKUSER_LOGIN = os.environ.get('VKUSER_LOGIN')
+VKUSER_PSWD = os.environ.get('VKUSER_PSWD')
+
+
+# mocks -----
+
+
+MOCK_KODIENV = {
+    'fp_profile': PROFILEPATH,
+    'sysargv': {
+        'path': str(__file__),
+        'handle': int(0),
+        'qs': str(''),
+    }
+}
+
+MOCK_ADDONINFO = {
+    'id': 'plugin.video.vk',
+    'name': 'VK',
+}
+
+MOCK_USERSETTINGS = {
+    'forcevideoviewmode': 'true',
+    'forcevideoviewmodeid': '500',
+    'itemsperpage': '200',
+    'keepaddonrequesthistory': 'false',
+    'keepplayedvideohistory': 'false',
+    'preferhls': 'false',
+    'searchadult': 'true',
+    'searchduration': '0',
+    'searchdurationmins': '',
+    'searchown': 'false',
+    'searchsort': '2',  # '0'=bydate, '1'=byduration, '2'=byrelevance
+    'vkuserlogin': VKUSER_LOGIN,
+    'vkuserpswd': VKUSER_PSWD,
+    'vkuseraccesstoken': '',
+}
+
+MOCK_USERINPUTS = {
+    # auth
+    'LSTR_30030': VKUSER_LOGIN,
+    'LSTR_30031': VKUSER_PSWD,
+    # search videos
+    'LSTR_30083': 'kazantip',  # q
+}
+
+MOCK_VIDEO = {
+    'owner_id': -152615939,
+    'id': 456239302,
+    '_oidid': '-152615939_456239302',
+}
+
+MOCK_COMMUNITY = {
+    'id': 165942624,
+}
+
+MOCK_LIKEDCOMMUNITY = {
+    'group': {
+        'id': 176973002,
+    },
+}
 
 
 # patches -----
@@ -22,13 +86,13 @@ def patch_xbmc(monkeypatch, context=addon):
 def patch_xbmcaddon(monkeypatch, context=addon):
 
     def mock_getaddoninfo(id_):  # type: (str) -> str
-        return TEST_ADDONINFO[id_]
+        return MOCK_ADDONINFO[id_]
 
     def mock_getsetting(id_):  # type: (str) -> str
-        return TEST_SETTINGS[id_]
+        return MOCK_USERSETTINGS[id_]
 
     def mock_setsetting(id_, value):  # type: (str, str) -> None
-        TEST_SETTINGS[id_] = value
+        MOCK_USERSETTINGS[id_] = value
 
     def mock_getlocalizedstring(id_):  # type: (int) -> str
         return 'LSTR_{}'.format(id_)
@@ -56,7 +120,7 @@ def patch_xbmcplugin(monkeypatch, context=addon):
 def patch_xbmcgui(monkeypatch, context=addon):
 
     def mock_input(heading, **_):  # type: (str, dict) -> str
-        return TEST_INPUTS[heading]
+        return MOCK_USERINPUTS[heading]
 
     mock_dialogclass = mock.Mock(name='Dialog')
     mock_dialogclass.input.side_effect = mock_input
@@ -71,8 +135,7 @@ def patch_xbmcgui(monkeypatch, context=addon):
 def patch_buildfp(monkeypatch, context=addon):
 
     def mock_buildfp(filename):  # type: (str) -> str
-        import os
-        fp = str(os.path.join(TEST_ENV['fp_profile'], filename))
+        fp = str(os.path.join(MOCK_KODIENV['fp_profile'], filename))
         return fp
 
     monkeypatch.setattr(context, 'buildfp', mock_buildfp)
@@ -83,7 +146,7 @@ def patch_buildfp(monkeypatch, context=addon):
 def patch_parsesysargv(monkeypatch, context=addon):
 
     def mock_parsesysargv():  # type: () -> dict
-        return TEST_ENV['sysargv']
+        return MOCK_KODIENV['sysargv']
 
     monkeypatch.setattr(context, 'parsesysargv', mock_parsesysargv)
 
@@ -93,8 +156,8 @@ def patch_parsesysargv(monkeypatch, context=addon):
 
 def test_addonglobal(context=addon):
     context.ADDON = context.initaddon()
-    assert context.ADDON.getAddonInfo('id') == TEST_ADDONINFO['id']
-    assert context.ADDON.getSetting('itemsperpage') == TEST_SETTINGS['itemsperpage']
+    assert context.ADDON.getAddonInfo('id') == MOCK_ADDONINFO['id']
+    assert context.ADDON.getSetting('itemsperpage') == MOCK_USERSETTINGS['itemsperpage']
 
 
 def test_initvkauthsession(context=addon):
@@ -121,7 +184,7 @@ def test_vkapi_video_get(context=addon):
     vkapi = context.initvkapi()
     r = vkapi.video.get(
         album_id=None,
-        videos=TEST_VIDEO['_oidid'],
+        videos=MOCK_VIDEO['_oidid'],
         extended=True,
     )
     assert r['count'] == 1
@@ -156,14 +219,14 @@ def test_searchvideos(context=addon):
 
 def test_listsearchedvideos(context=addon):
     context.ADDON = context.initaddon()
-    context.listsearchedvideos(q='test', offset=0)
+    context.listsearchedvideos(q=MOCK_USERINPUTS['LSTR_30083'], offset=0)
     assert True
 
 
 def test_listvideos(context=addon):
     context.ADDON = context.initaddon()
     context.listvideos(ownerid=0, albumid=0, offset=0)
-    context.listvideos(ownerid=-TEST_COMMUNITY['id'], albumid=0, offset=0)
+    context.listvideos(ownerid=-MOCK_COMMUNITY['id'], albumid=0, offset=0)
     assert True
 
 
@@ -181,7 +244,7 @@ def test_listwatchlist(context=addon):
 
 def test_playvideo(context=addon):
     context.ADDON = context.initaddon()
-    context.playvideo(ownerid=TEST_VIDEO['owner_id'], videoid=TEST_VIDEO['id'])
+    context.playvideo(ownerid=MOCK_VIDEO['owner_id'], videoid=MOCK_VIDEO['id'])
     assert True
 
 

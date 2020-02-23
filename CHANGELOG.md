@@ -1,27 +1,27 @@
 # CHANGELOG
 
-- [Backlog](#backlog)
-- [v1.6.0 (2019-07-14)](#v160-2019-07-14)
-- [v1.5.1 (2019-07-03)](#v151-2019-07-03)
-- [v1.5.0 (2019-06-29)](#v150-2019-06-29)
-- [v1.4.0 (2019-06-06)](#v140-2019-06-06)
-- [v1.3.0 (2019-04-17)](#v130-2019-04-17)
-- [v1.2.0 (2019-03-04)](#v120-2019-03-04)
-- [v1.1.0 (2019-02-01)](#v110-2019-02-01)
-- [v1.0.0 (2018-11-12)](#v100-2018-11-12)
+## plugin.video.vk-1.7.0 (2020-02-23)
 
-## Backlog
+Added:
+- VK password (setting, default last used)
 
-Todo:
-- Update screenshots
+Fixed:
+- Cannot play videos due video resolving error
+- Reused maxthumb code in video albums list
+- `Video['is_favorite']` issue in video lists
 
-## v1.6.0 (2019-07-14)
+Changed:
+- Refactored tests for enabling CI
+- Disabled logging in VK API wrapper
+- Refined README
+
+## plugin.video.vk-1.6.0 (2019-07-14)
 
 Fixed:
 - Play video throws video resolving error after session cookies expiration (#57) 
 - Search videos not working on RPi (#96)
 - My liked communities list empty (#94)
-- Video['is_favorite'] always false? (#91)
+- `Video['is_favorite']` always false? (#91)
 
 Added:
 - Prefer HLS (adaptive bitrate) (setting, default false)
@@ -39,12 +39,12 @@ Changed:
 - Updated LICENSE.md (GNU GPLv3)
 - Refined README.md
     
-## v1.5.1 (2019-07-03)
+## plugin.video.vk-1.5.1 (2019-07-03)
 
 Fixed:
 - Pagination issue in `listvideos()` 
 
-## v1.5.0 (2019-06-29)
+## plugin.video.vk-1.5.0 (2019-06-29)
 
 Fixed:
 - Content refreshing issues (#69)
@@ -63,7 +63,7 @@ Changed:
 - Refactored `buildfp()`
 - Updated README (repository installation info/link)
 
-## v1.4.0 (2019-06-06)
+## plugin.video.vk-1.4.0 (2019-06-06)
 
 Fixed:
 - Play video fails on video resolving error on iOS (#82)
@@ -84,7 +84,7 @@ Changed:
 - Updated language resources
 - Updated README
 
-## v1.3.0 (2019-04-17)
+## plugin.video.vk-1.3.0 (2019-04-17)
 
 Fixed:
 - Missing pagination for Search history and Played videos (#74)
@@ -105,7 +105,7 @@ Changed:
 - Optimized performance
 - Refined python code
 
-## v1.2.0 (2019-03-04)
+## plugin.video.vk-1.2.0 (2019-03-04)
 
 Fixed:
 - Reported unicode issues (#66, #70)
@@ -118,7 +118,7 @@ Changed:
 - Search videos (contextual action, avail. in all lists)
 - Refactored add-on file structure and python code
 
-## v1.1.0 (2019-02-01)
+## plugin.video.vk-1.1.0 (2019-02-01)
 
 Fixed:
 - Various unicode issues
@@ -139,7 +139,7 @@ Changed:
 - Refined language resources
 - Renamed cookies data file to be non-hidden
 
-## v1.0.0 (2018-11-12)
+## plugin.video.vk-1.0.0 (2018-11-12)
 
 Added:
 - EN/CZ translations
