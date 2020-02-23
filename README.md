@@ -48,6 +48,7 @@ Settings:
 - Keep history of played videos
 - Prefer HLS (adaptive bitrate)
 - VK user login (email/phone)
+- VK user password
 
 Common:
 - Authorize add-on

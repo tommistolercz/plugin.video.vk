@@ -947,7 +947,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                     )
                 )
             ]
-        if not video['is_favorite']:
+        if not video.get('is_favorite'):
             cmi += [
                 # like video
                 (
@@ -962,7 +962,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                     )
                 )
             ]
-        elif video['is_favorite']:
+        elif video.get('is_favorite'):
             cmi += [
                 # unlike video
                 (

@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## plugin.video.vk-1.6.1-dev (unreleased)
+## plugin.video.vk-1.7.0 (2020-02-23)
 
 Added:
 - VK password (setting, default last used)
@@ -8,6 +8,7 @@ Added:
 Fixed:
 - Cannot play videos due video resolving error
 - Reused maxthumb code in video albums list
+- `Video['is_favorite']` issue in video lists
 
 Changed:
 - Refactored tests for enabling CI
