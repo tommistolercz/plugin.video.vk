@@ -1,6 +1,6 @@
 *.pyc
 *.pyo
 *.log
-.idea/workspace.xml
 .pytest_cache/
 /addon_data/
+.idea/workspace.xml
