@@ -3,4 +3,3 @@
 *.log
 .pytest_cache/
 /addon_data/
-.idea/workspace.xml
