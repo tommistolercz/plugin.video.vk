@@ -20,7 +20,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="48f18d7a-289b-44d4-99c8-1299cc8ef82b" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.travis.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.travis.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,6 +50,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="add_unversioned_files" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
@@ -93,7 +95,14 @@
       <option name="project" value="LOCAL" />
       <updated>1604839358525</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="updated .gitignore">
+      <created>1604839424935</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1604839424935</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -110,7 +119,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="updated requirements.txt, added version.py for included vk package" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated requirements.txt, added version.py for included vk package" />
+    <MESSAGE value="updated .gitignore" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated .gitignore" />
   </component>
   <component name="WindowStateProjectService">
     <state x="651" y="264" key="#Menus_and_Toolbars" timestamp="1604746847122">
@@ -165,10 +175,10 @@
       <screen x="0" y="23" width="1680" height="1027" />
     </state>
     <state x="548" y="195" key="SettingsEditor/0.23.1680.1027@0.23.1680.1027" timestamp="1604837132377" />
-    <state x="439" y="262" key="Vcs.Push.Dialog.v2" timestamp="1604839361967">
+    <state x="439" y="262" key="Vcs.Push.Dialog.v2" timestamp="1604839429115">
       <screen x="0" y="23" width="1680" height="1027" />
     </state>
-    <state x="439" y="262" key="Vcs.Push.Dialog.v2/0.23.1680.1027@0.23.1680.1027" timestamp="1604839361967" />
+    <state x="439" y="262" key="Vcs.Push.Dialog.v2/0.23.1680.1027@0.23.1680.1027" timestamp="1604839429115" />
     <state x="100" y="123" width="1480" height="827" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1604747574986">
       <screen x="0" y="23" width="1680" height="1027" />
     </state>
