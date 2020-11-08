@@ -9,9 +9,9 @@
         <setting label="30006" id="searchown" type="bool" default="false"/>
         <setting label="30007" id="searchduration" type="enum" lvalues="30008|30009|30010" default="0"/>
             <setting label="30011" id="searchdurationmins" type="number" default="60" subsetting="true" visible="!eq(-1,0)"/>
-        <setting label="30012" id="searchsort" type="enum" lvalues="30013|30014|30015" default="1"/>
+        <setting label="30012" id="searchsort" type="enum" lvalues="30013|30014|30015" default="2"/>
         <setting type="sep"/>
-        <setting label="30090" id="preferhls" type="bool" default="false"/>
+        <setting label="30090" id="preferhls" type="bool" default="true"/>
         <setting type="sep"/>
         <setting label="30018" id="keepaddonrequesthistory" type="bool" default="false" visible="false"/>
         <setting label="30019" id="keepplayedvideohistory" type="bool" default="false"/>

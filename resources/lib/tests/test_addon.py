@@ -30,17 +30,18 @@ MOCK_ADDONINFO = {
 }
 
 MOCK_USERSETTINGS = {
+    # corresponds to default settings
+    'itemsperpage': '100',
     'forcevideoviewmode': 'true',
     'forcevideoviewmodeid': '500',
-    'itemsperpage': '200',
-    'keepaddonrequesthistory': 'false',
-    'keepplayedvideohistory': 'false',
-    'preferhls': 'false',
     'searchadult': 'true',
+    'searchown': 'false',
     'searchduration': '0',
     'searchdurationmins': '',
-    'searchown': 'false',
     'searchsort': '2',  # '0'=bydate, '1'=byduration, '2'=byrelevance
+    'preferhls': 'true',
+    'keepaddonrequesthistory': 'false',
+    'keepplayedvideohistory': 'false',
     'vkuserlogin': VKUSER_LOGIN,
     'vkuserpswd': VKUSER_PSWD,
     'vkuseraccesstoken': '',
