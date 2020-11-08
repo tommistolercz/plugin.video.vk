@@ -200,12 +200,32 @@ def test_listaddonmenu(context=addon):
     assert True
 
 
+@pytest.mark.skip()  # todo
+def test_skiptopage():
+    assert True
+
+
+@pytest.mark.skip()  # todo
+def test_logout():
+    assert True
+
+
 # search
 
 
 def test_listsearchhistory(context=addon):
     context.ADDON = context.initaddon()
     context.listsearchhistory(offset=0)
+    assert True
+
+
+@pytest.mark.skip()  # todo
+def test_deletesearch():
+    assert True
+
+
+@pytest.mark.skip()  # todo
+def test_clearsearchhistory():
     assert True
 
 
@@ -216,6 +236,17 @@ def test_searchvideos(context=addon):
 
 
 # videos
+
+
+@pytest.mark.skip()  # todo
+def test_listplayedvideos():
+    assert True
+
+
+def test_listwatchlist(context=addon):
+    context.ADDON = context.initaddon()
+    context.listwatchlist(offset=0)
+    assert True
 
 
 def test_listsearchedvideos(context=addon):
@@ -237,15 +268,73 @@ def test_listlikedvideos(context=addon):
     assert True
 
 
-def test_listwatchlist(context=addon):
-    context.ADDON = context.initaddon()
-    context.listwatchlist(offset=0)
-    assert True
-
-
 def test_playvideo(context=addon):
     context.ADDON = context.initaddon()
     context.playvideo(ownerid=MOCK_VIDEO['owner_id'], videoid=MOCK_VIDEO['id'])
+    assert True
+
+
+@pytest.mark.skip()  # todo
+def test_likevideo():
+    assert True
+
+
+@pytest.mark.skip()  # todo
+def test_unlikevideo():
+    assert True
+
+
+@pytest.mark.skip()  # todo
+def test_addvideotoalbums():
+    assert True
+
+
+@pytest.mark.skip()  # todo
+def test_addvideotowatchlist():
+    assert True
+
+
+@pytest.mark.skip()  # todo
+def test_deletevideofromwatchlist():
+    assert True
+
+
+@pytest.mark.skip()  # todo
+def test_clearwatchlist():
+    assert True
+
+
+@pytest.mark.skip()  # todo
+def test_clearplayedvideos():
+    assert True
+
+
+# video albums
+
+
+def test_listalbums(context=addon):
+    context.ADDON = context.initaddon()
+    context.listalbums(offset=0)
+    assert True
+
+
+@pytest.mark.skip()  # todo
+def test_reorderalbum():
+    assert True
+
+
+@pytest.mark.skip()  # todo
+def test_renamealbum():
+    assert True
+
+
+@pytest.mark.skip()  # todo
+def test_deletealbum():
+    assert True
+
+
+@pytest.mark.skip()  # todo
+def test_createalbum():
     assert True
 
 
@@ -264,10 +353,21 @@ def test_listlikedcommunities(context=addon):
     assert True
 
 
-# albums
+@pytest.mark.skip()  # todo
+def test_likecommunity():
+    assert True
 
 
-def test_listalbums(context=addon):
-    context.ADDON = context.initaddon()
-    context.listalbums(offset=0)
+@pytest.mark.skip()  # todo
+def test_unlikecommunity():
+    assert True
+
+
+@pytest.mark.skip()  # todo
+def test_followcommunity():
+    assert True
+
+
+@pytest.mark.skip()  # todo
+def test_unfollowcommunity():
     assert True
