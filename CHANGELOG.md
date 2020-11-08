@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## plugin.video.vk-1.8.0-develop (unreleased)
+
+Added:
+
+Fixed:
+
+Changed:
+- Changed default settings (searchsort: by relevance, preferhls: true)
+
 ## plugin.video.vk-1.7.0 (2020-02-23)
 
 Added:
