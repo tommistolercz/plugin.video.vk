@@ -2,9 +2,8 @@
 
 ## plugin.video.vk-1.8.0-develop (unreleased)
 
-Added:
-
 Fixed:
+- `Video['description']` key error in buildvideolist()   
 
 Changed:
 - Changed default settings (searchsort: by relevance, preferhls: true)
