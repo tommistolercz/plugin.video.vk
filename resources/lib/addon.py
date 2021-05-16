@@ -3,14 +3,13 @@
 __all__ = []
 
 import datetime
-import HTMLParser
+import html  # py3
 import math
 import os
 import pickle
 import re
 import sys
-import urllib  # py2
-import urlparse  # py2
+import urllib.parse  # py3
 
 import xbmc
 import xbmcaddon
@@ -154,11 +153,11 @@ def initvkauthsession():  # type: () -> vk.api.AuthSession
     if not ADDON.getSetting('vkuseraccesstoken'):
         # create a new vk auth session, ask user for vk credentials
         login = xbmcgui.Dialog().input(
-            ADDON.getLocalizedString(30030).encode('utf-8'),
+            ADDON.getLocalizedString(30030),
             defaultt=ADDON.getSetting('vkuserlogin')
         )
         pswd = xbmcgui.Dialog().input(
-            ADDON.getLocalizedString(30031).encode('utf-8'),
+            ADDON.getLocalizedString(30031),
             defaultt=ADDON.getSetting('vkuserpswd'),
             option=xbmcgui.ALPHANUM_HIDE_INPUT
         )
@@ -256,7 +255,7 @@ def buildurl(urlpath, urlargs=None):  # type: (str, dict) -> str
     """
     url = 'plugin://' + ADDON.getAddonInfo('id') + urlpath
     if urlargs:
-        url += '?' + urllib.urlencode(urlargs)
+        url += '?' + urllib.parse.urlencode(urlargs)
     return url
 
 
@@ -277,10 +276,10 @@ def parseurl():  # type: () -> tuple
     Parse add-on url.
     """
     sysargv = parsesysargv()
-    urlpath = str(urlparse.urlsplit(sysargv['path'])[2])
+    urlpath = str(urllib.parse.urlsplit(sysargv['path'])[2])
     urlargs = {}
     if sysargv['qs'].startswith('?'):
-        urlargs = dict(urlparse.parse_qsl(sysargv['qs'].lstrip('?')))
+        urlargs = dict(urllib.parse.parse_qsl(sysargv['qs'].lstrip('?')))
     return urlpath, urlargs
 
 
@@ -348,7 +347,7 @@ def listaddonmenu():  # type: () -> None
             # search videos
             buildurl(URLPATH_SEARCHVIDEOS),
             xbmcgui.ListItem(
-                ADDON.getLocalizedString(30040).encode('utf-8')
+                ADDON.getLocalizedString(30040)
             ),
             ITEMTYPE_NOTFOLDER
         ),
@@ -357,7 +356,7 @@ def listaddonmenu():  # type: () -> None
             buildurl(URLPATH_LISTSEARCHHISTORY),
             xbmcgui.ListItem(
                 '{} [COLOR blue]({})[/COLOR]'.format(
-                    ADDON.getLocalizedString(30041).encode('utf-8'),
+                    ADDON.getLocalizedString(30041),
                     counters['searchhistory']
                 )
             ),
@@ -371,7 +370,7 @@ def listaddonmenu():  # type: () -> None
                 buildurl(URLPATH_LISTPLAYEDVIDEOS),
                 xbmcgui.ListItem(
                     '{} [COLOR blue]({})[/COLOR]'.format(
-                        ADDON.getLocalizedString(30047).encode('utf-8'),
+                        ADDON.getLocalizedString(30047),
                         counters['playedvideos']
                     )
                 ),
@@ -384,7 +383,7 @@ def listaddonmenu():  # type: () -> None
             buildurl(URLPATH_LISTWATCHLIST),
             xbmcgui.ListItem(
                 '{} [COLOR blue]({})[/COLOR]'.format(
-                    ADDON.getLocalizedString(30048).encode('utf-8'),
+                    ADDON.getLocalizedString(30048),
                     counters['watchlist']
                 )
             ),
@@ -395,7 +394,7 @@ def listaddonmenu():  # type: () -> None
             buildurl(URLPATH_LISTVIDEOS),
             xbmcgui.ListItem(
                 '{} [COLOR blue]({})[/COLOR]'.format(
-                    ADDON.getLocalizedString(30042).encode('utf-8'),
+                    ADDON.getLocalizedString(30042),
                     counters['videos']
                 )
             ),
@@ -406,7 +405,7 @@ def listaddonmenu():  # type: () -> None
             buildurl(URLPATH_LISTLIKEDVIDEOS),
             xbmcgui.ListItem(
                 '{} [COLOR blue]({})[/COLOR]'.format(
-                    ADDON.getLocalizedString(30043).encode('utf-8'),
+                    ADDON.getLocalizedString(30043),
                     counters['likedvideos']
                 )
             ),
@@ -417,7 +416,7 @@ def listaddonmenu():  # type: () -> None
             buildurl(URLPATH_LISTALBUMS),
             xbmcgui.ListItem(
                 '{} [COLOR blue]({})[/COLOR]'.format(
-                    ADDON.getLocalizedString(30044).encode('utf-8'),
+                    ADDON.getLocalizedString(30044),
                     counters['albums']
                 )
             ),
@@ -428,7 +427,7 @@ def listaddonmenu():  # type: () -> None
             buildurl(URLPATH_LISTCOMMUNITIES),
             xbmcgui.ListItem(
                 '{} [COLOR blue]({})[/COLOR]'.format(
-                    ADDON.getLocalizedString(30045).encode('utf-8'),
+                    ADDON.getLocalizedString(30045),
                     counters['communities']
                 )
             ),
@@ -439,7 +438,7 @@ def listaddonmenu():  # type: () -> None
             buildurl(URLPATH_LISTLIKEDCOMMUNITIES),
             xbmcgui.ListItem(
                 '{} [COLOR blue]({})[/COLOR]'.format(
-                    ADDON.getLocalizedString(30046).encode('utf-8'),
+                    ADDON.getLocalizedString(30046),
                     counters['likedcommunities']
                 )
             ),
@@ -460,7 +459,7 @@ def skiptopage(page, lastpage, urlpath, urlargs):  # type: (int, int, str, str) 
     # ask user for entering page nr.
     topage = xbmcgui.Dialog().input(
         '{} ({}-{})'.format(
-            ADDON.getLocalizedString(30035).encode('utf-8'),
+            ADDON.getLocalizedString(30035),
             1,
             lastpage
         ),
@@ -486,7 +485,7 @@ def logout():  # type: () -> None
     ADDON.setSetting('vkuseraccesstoken', '')
     xbmcgui.Dialog().notification(
         ADDON.getAddonInfo('name'),
-        ADDON.getLocalizedString(30032).encode('utf-8')
+        ADDON.getLocalizedString(30032)
     )
 
 
@@ -511,7 +510,7 @@ def listsearchhistory(offset=0):  # type: (int) -> None
     if searchhistory['count'] > offset + itemsperpage:
         pi = xbmcgui.ListItem(
             '[COLOR blue]{} ({}/{})[/COLOR]'.format(
-                ADDON.getLocalizedString(30034).encode('utf-8'),
+                ADDON.getLocalizedString(30034),
                 int(offset / itemsperpage) + 1 + 1,  # nextpage
                 int(math.ceil(float(searchhistory['count']) / itemsperpage))  # lastpage
             )
@@ -521,7 +520,7 @@ def listsearchhistory(offset=0):  # type: (int) -> None
                 # skip to page
                 (
                     '[COLOR blue]{}[/COLOR]'.format(
-                        ADDON.getLocalizedString(30035).encode('utf-8')
+                        ADDON.getLocalizedString(30035)
                     ),
                     'RunPlugin({})'.format(
                         buildurl(
@@ -549,7 +548,7 @@ def listsearchhistory(offset=0):  # type: (int) -> None
         # create search history item
         li = xbmcgui.ListItem(
             '{} [COLOR blue]({})[/COLOR]'.format(
-                search['q'].encode('utf-8'),
+                search['q'],
                 int(search['resultsCount'])
             )
         )
@@ -558,7 +557,7 @@ def listsearchhistory(offset=0):  # type: (int) -> None
             # delete search
             (
                 '[COLOR blue]{}[/COLOR]'.format(
-                    ADDON.getLocalizedString(30081).encode('utf-8')
+                    ADDON.getLocalizedString(30081)
                 ),
                 'RunPlugin({})'.format(
                     buildurl(URLPATH_DELETESEARCH, {'searchid': search.doc_id})
@@ -567,7 +566,7 @@ def listsearchhistory(offset=0):  # type: (int) -> None
             # clear search history
             (
                 '[COLOR blue]{}[/COLOR]'.format(
-                    ADDON.getLocalizedString(30082).encode('utf-8')
+                    ADDON.getLocalizedString(30082)
                 ),
                 'RunPlugin({})'.format(
                     buildurl(URLPATH_CLEARSEARCHHISTORY)
@@ -576,7 +575,7 @@ def listsearchhistory(offset=0):  # type: (int) -> None
             # search videos
             (
                 '[COLOR blue]{}[/COLOR]'.format(
-                    ADDON.getLocalizedString(30083).encode('utf-8')
+                    ADDON.getLocalizedString(30083)
                 ),
                 'RunPlugin({})'.format(
                     buildurl(URLPATH_SEARCHVIDEOS)
@@ -585,17 +584,17 @@ def listsearchhistory(offset=0):  # type: (int) -> None
             # search videos by similar title
             (
                 '[COLOR blue]{}[/COLOR]'.format(
-                    ADDON.getLocalizedString(30085).encode('utf-8')
+                    ADDON.getLocalizedString(30085)
                 ),
                 'RunPlugin({})'.format(
-                    buildurl(URLPATH_SEARCHVIDEOS, {'defq': search['q'].encode('utf-8')})
+                    buildurl(URLPATH_SEARCHVIDEOS, {'defq': search['q']})
                 )
             ),
         ]
         li.addContextMenuItems(cmi)
         kodilist.append(
             (
-                buildurl(URLPATH_LISTSEARCHEDVIDEOS, {'q': search['q'].encode('utf-8')}),
+                buildurl(URLPATH_LISTSEARCHEDVIDEOS, {'q': search['q']}),
                 li,
                 ITEMTYPE_FOLDER
             )
@@ -616,8 +615,8 @@ def deletesearch(searchid):  # type: (int) -> None
     searchid = int(searchid)
     # ask user for confirmation
     if not xbmcgui.Dialog().yesno(
-        ADDON.getLocalizedString(30081).encode('utf-8'),
-        ADDON.getLocalizedString(30033).encode('utf-8')
+        ADDON.getLocalizedString(30081),
+        ADDON.getLocalizedString(30033)
     ):
         return
     # query db for deleting
@@ -634,8 +633,8 @@ def clearsearchhistory():  # type: () -> None
     """
     # ask user for confirmation
     if not xbmcgui.Dialog().yesno(
-            ADDON.getLocalizedString(30082).encode('utf-8'),
-            ADDON.getLocalizedString(30033).encode('utf-8')
+            ADDON.getLocalizedString(30082),
+            ADDON.getLocalizedString(30033)
     ):
         return
     # purge db table
@@ -651,7 +650,7 @@ def searchvideos(defq=''):  # type: (str) -> None
     Search videos.
     """
     # ask user for entering/editing a new query
-    q = xbmcgui.Dialog().input(ADDON.getLocalizedString(30083).encode('utf-8'), defaultt=defq)
+    q = xbmcgui.Dialog().input(ADDON.getLocalizedString(30083), defaultt=defq)
     if not q:
         return
     # update content with searched videos
@@ -769,7 +768,7 @@ def listsearchedvideos(q, offset=0):  # type: (str, int) -> None
         # notify search results count
         xbmcgui.Dialog().notification(
             ADDON.getAddonInfo('name'),
-            ADDON.getLocalizedString(30084).encode('utf-8').format(searchedvideos['count'])
+            ADDON.getLocalizedString(30084).format(searchedvideos['count'])
         )
     # build list
     buildvideolist(URLPATH_LISTSEARCHEDVIDEOS, searchedvideos)
@@ -857,7 +856,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
     if 'pagination' in listdata:
         pi = xbmcgui.ListItem(
             '[COLOR blue]{} ({}/{})[/COLOR]'.format(
-                ADDON.getLocalizedString(30034).encode('utf-8'),
+                ADDON.getLocalizedString(30034),
                 listdata['pagination']['page'] + 1,
                 listdata['pagination']['lastpage']
             )
@@ -867,7 +866,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                 # skip to page
                 (
                     '[COLOR blue]{}[/COLOR]'.format(
-                        ADDON.getLocalizedString(30035).encode('utf-8')
+                        ADDON.getLocalizedString(30035)
                     ),
                     'RunPlugin({})'.format(
                         buildurl(
@@ -893,7 +892,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
     # create list items
     for video in listdata['items']:
         # create video item
-        videotitle = video['title'].encode('utf-8').replace('.', ' ').replace('_', ' ')  # wrapable
+        videotitle = video['title'].replace('.', ' ').replace('_', ' ')  # wrapable
         li = xbmcgui.ListItem(videotitle)
         # set isplayable
         li.setProperty('IsPlayable', 'true')
@@ -902,7 +901,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
             'video',
             {
                 'title': videotitle,
-                'plot': video.get('description', '').encode('utf-8'),
+                'plot': video.get('description', ''),
                 'duration': video['duration'],
                 'date': datetime.datetime.fromtimestamp(video['date']).strftime('%d.%m.%Y'),
             }
@@ -922,7 +921,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                 # add video to watchlist
                 (
                     '[COLOR blue]{}[/COLOR]'.format(
-                        ADDON.getLocalizedString(30056).encode('utf-8')
+                        ADDON.getLocalizedString(30056)
                     ),
                     'RunPlugin({})'.format(
                         buildurl(
@@ -937,7 +936,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                 # delete video from watchlist
                 (
                     '[COLOR blue]{}[/COLOR]'.format(
-                        ADDON.getLocalizedString(30057).encode('utf-8')
+                        ADDON.getLocalizedString(30057)
                     ),
                     'RunPlugin({})'.format(
                         buildurl(
@@ -952,7 +951,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                 # like video
                 (
                     '[COLOR blue]{}[/COLOR]'.format(
-                        ADDON.getLocalizedString(30053).encode('utf-8')
+                        ADDON.getLocalizedString(30053)
                     ),
                     'RunPlugin({})'.format(
                         buildurl(
@@ -967,7 +966,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                 # unlike video
                 (
                     '[COLOR blue]{}[/COLOR]'.format(
-                        ADDON.getLocalizedString(30054).encode('utf-8')
+                        ADDON.getLocalizedString(30054)
                     ),
                     'RunPlugin({})'.format(
                         buildurl(
@@ -981,7 +980,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
             # set albums for video
             (
                 '[COLOR blue]{}[/COLOR]'.format(
-                    ADDON.getLocalizedString(30055).encode('utf-8')
+                    ADDON.getLocalizedString(30055)
                 ),
                 'RunPlugin({})'.format(
                     buildurl(
@@ -993,7 +992,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
             # create album
             (
                 '[COLOR blue]{}[/COLOR]'.format(
-                    ADDON.getLocalizedString(30064).encode('utf-8')
+                    ADDON.getLocalizedString(30064)
                 ),
                 'RunPlugin({})'.format(
                     buildurl(URLPATH_CREATEALBUM)
@@ -1005,7 +1004,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                 # clear watchlist
                 (
                     '[COLOR blue]{}[/COLOR]'.format(
-                        ADDON.getLocalizedString(30058).encode('utf-8')
+                        ADDON.getLocalizedString(30058)
                     ),
                     'RunPlugin({})'.format(
                         buildurl(URLPATH_CLEARWATCHLIST)
@@ -1017,7 +1016,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                 # clear played videos
                 (
                     '[COLOR blue]{}[/COLOR]'.format(
-                        ADDON.getLocalizedString(30059).encode('utf-8')
+                        ADDON.getLocalizedString(30059)
                     ),
                     'RunPlugin({})'.format(
                         buildurl(URLPATH_CLEARPLAYEDVIDEOS)
@@ -1029,8 +1028,8 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                 # go to owning community (list community videos)
                 (
                     '[COLOR blue]{} {}[/COLOR]'.format(
-                        ADDON.getLocalizedString(30036).encode('utf-8'),
-                        listdata['groups'][str(video['owner_id'])]['name'].encode('utf-8')
+                        ADDON.getLocalizedString(30036),
+                        listdata['groups'][str(video['owner_id'])]['name']
                     ),
                     'Container.Update({})'.format(
                         buildurl(URLPATH_LISTVIDEOS, {'ownerid': video['owner_id']})
@@ -1042,8 +1041,8 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
                     # follow owning community
                     (
                         '[COLOR blue]{} {}[/COLOR]'.format(
-                            ADDON.getLocalizedString(30037).encode('utf-8'),
-                            listdata['groups'][str(video['owner_id'])]['name'].encode('utf-8')
+                            ADDON.getLocalizedString(30037),
+                            listdata['groups'][str(video['owner_id'])]['name']
                         ),
                         'RunPlugin({})'.format(
                             buildurl(URLPATH_FOLLOWCOMMUNITY, {'communityid': video['owner_id']})
@@ -1054,7 +1053,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
             # search videos
             (
                 '[COLOR blue]{}[/COLOR]'.format(
-                    ADDON.getLocalizedString(30083).encode('utf-8')
+                    ADDON.getLocalizedString(30083)
                 ),
                 'RunPlugin({})'.format(
                     buildurl(URLPATH_SEARCHVIDEOS)
@@ -1063,7 +1062,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
             # search videos by similar title
             (
                 '[COLOR blue]{}[/COLOR]'.format(
-                    ADDON.getLocalizedString(30085).encode('utf-8')
+                    ADDON.getLocalizedString(30085)
                 ),
                 'RunPlugin({})'.format(
                     buildurl(URLPATH_SEARCHVIDEOS, {'defq': videotitle})
@@ -1104,14 +1103,16 @@ def playvideo(ownerid, videoid):  # type: (int, int) -> None
     # resolve playable streams + find best quality
     vkr = initvkresolver()
     r = vkr.get('https://vk.com/al_video.php?act=show_inline&al=1&video={}'.format(oidid))
-    cnt = r.text.encode('utf-8').replace('\\', '')
+    cnt = r.text.replace('\\', '')
     resolvedpath = None
     if ADDON.getSetting('preferhls') == 'true':
         # hls - if enabled in settings
         try:
-            resolvedpath = HTMLParser.HTMLParser().unescape(urllib.unquote(
-                re.compile(r'src="([^"]+video_hls\.php[^"]+)"').findall(cnt)[0]
-            )).encode('utf-8')
+            resolvedpath = html.unescape(
+                urllib.parse.unquote(
+                    re.compile(r'src="([^"]+video_hls\.php[^"]+)"').findall(cnt)[0]
+                )
+            )
         except IndexError:
             pass
     if not resolvedpath:
@@ -1223,7 +1224,7 @@ def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
         opts.append(album['title'])
         if album['id'] in albumids:
             sel.append(i)
-    newsel = xbmcgui.Dialog().multiselect(ADDON.getLocalizedString(30055).encode('utf-8'), opts, preselect=sel)
+    newsel = xbmcgui.Dialog().multiselect(ADDON.getLocalizedString(30055), opts, preselect=sel)
     if newsel is None or newsel == sel:
         return
     # selected albums changed
@@ -1293,8 +1294,8 @@ def deletevideofromwatchlist(ownerid, videoid):  # type: (int, int) -> None
     oidid = str('{}_{}'.format(ownerid, videoid))
     # ask user for confirmation
     if not xbmcgui.Dialog().yesno(
-            ADDON.getLocalizedString(30057).encode('utf-8'),
-            ADDON.getLocalizedString(30033).encode('utf-8')
+            ADDON.getLocalizedString(30057),
+            ADDON.getLocalizedString(30033)
     ):
         return
     # query db for deleting
@@ -1313,8 +1314,8 @@ def clearwatchlist():  # type: () -> None
     """
     # ask user for confirmation
     if not xbmcgui.Dialog().yesno(
-            ADDON.getLocalizedString(30058).encode('utf-8'),
-            ADDON.getLocalizedString(30033).encode('utf-8')
+            ADDON.getLocalizedString(30058),
+            ADDON.getLocalizedString(30033)
     ):
         return
     # purge db table
@@ -1331,8 +1332,8 @@ def clearplayedvideos():  # type: () -> None
     """
     # ask user for confirmation
     if not xbmcgui.Dialog().yesno(
-            ADDON.getLocalizedString(30059).encode('utf-8'),
-            ADDON.getLocalizedString(30033).encode('utf-8')
+            ADDON.getLocalizedString(30059),
+            ADDON.getLocalizedString(30033)
     ):
         return
     # purge db table
@@ -1371,7 +1372,7 @@ def listalbums(offset=0):  # type: (int) -> None
     if albums['count'] > offset + itemsperpage:
         pi = xbmcgui.ListItem(
             '[COLOR blue]{} ({}/{})[/COLOR]'.format(
-                ADDON.getLocalizedString(30034).encode('utf-8'),
+                ADDON.getLocalizedString(30034),
                 int(offset / itemsperpage) + 1 + 1,  # nextpage
                 int(math.ceil(float(albums['count']) / itemsperpage))  # lastpage
             )
@@ -1381,7 +1382,7 @@ def listalbums(offset=0):  # type: (int) -> None
                 # skip to page
                 (
                     '[COLOR blue]{}[/COLOR]'.format(
-                        ADDON.getLocalizedString(30035).encode('utf-8')
+                        ADDON.getLocalizedString(30035)
                     ),
                     'RunPlugin({})'.format(
                         buildurl(
@@ -1409,7 +1410,7 @@ def listalbums(offset=0):  # type: (int) -> None
         # create album item
         li = xbmcgui.ListItem(
             '{} [COLOR blue]({})[/COLOR]'.format(
-                album['title'].encode('utf-8'),
+                album['title'],
                 int(album['count'])
             )
         )
@@ -1427,7 +1428,7 @@ def listalbums(offset=0):  # type: (int) -> None
             # reorder album up
             (
                 '[COLOR blue]{}[/COLOR]'.format(
-                    ADDON.getLocalizedString(30061).encode('utf-8')
+                    ADDON.getLocalizedString(30061)
                 ),
                 'RunPlugin({})'.format(
                     buildurl(URLPATH_REORDERALBUM, {'albumid': album['id'], 'beforeid': beforeid})
@@ -1436,7 +1437,7 @@ def listalbums(offset=0):  # type: (int) -> None
             # reorder album down
             (
                 '[COLOR blue]{}[/COLOR]'.format(
-                    ADDON.getLocalizedString(30062).encode('utf-8')
+                    ADDON.getLocalizedString(30062)
                 ),
                 'RunPlugin({})'.format(
                     buildurl(URLPATH_REORDERALBUM, {'albumid': album['id'], 'afterid': afterid})
@@ -1445,7 +1446,7 @@ def listalbums(offset=0):  # type: (int) -> None
             # rename album
             (
                 '[COLOR blue]{}[/COLOR]'.format(
-                    ADDON.getLocalizedString(30060).encode('utf-8')
+                    ADDON.getLocalizedString(30060)
                 ),
                 'RunPlugin({})'.format(
                     buildurl(URLPATH_RENAMEALBUM, {'albumid': album['id']})
@@ -1454,7 +1455,7 @@ def listalbums(offset=0):  # type: (int) -> None
             # delete album
             (
                 '[COLOR blue]{}[/COLOR]'.format(
-                    ADDON.getLocalizedString(30063).encode('utf-8')
+                    ADDON.getLocalizedString(30063)
                 ),
                 'RunPlugin({})'.format(
                     buildurl(URLPATH_DELETEALBUM, {'albumid': album['id']})
@@ -1463,7 +1464,7 @@ def listalbums(offset=0):  # type: (int) -> None
             # create new album
             (
                 '[COLOR blue]{}[/COLOR]'.format(
-                    ADDON.getLocalizedString(30064).encode('utf-8')
+                    ADDON.getLocalizedString(30064)
                 ),
                 'RunPlugin({})'.format(
                     buildurl(URLPATH_CREATEALBUM)
@@ -1472,7 +1473,7 @@ def listalbums(offset=0):  # type: (int) -> None
             # search videos
             (
                 '[COLOR blue]{}[/COLOR]'.format(
-                    ADDON.getLocalizedString(30083).encode('utf-8')
+                    ADDON.getLocalizedString(30083)
                 ),
                 'RunPlugin({})'.format(
                     buildurl(URLPATH_SEARCHVIDEOS)
@@ -1481,10 +1482,10 @@ def listalbums(offset=0):  # type: (int) -> None
             # search videos by similar title (album title)
             (
                 '[COLOR blue]{}[/COLOR]'.format(
-                    ADDON.getLocalizedString(30085).encode('utf-8')
+                    ADDON.getLocalizedString(30085)
                 ),
                 'RunPlugin({})'.format(
-                    buildurl(URLPATH_SEARCHVIDEOS, {'defq': album['title'].encode('utf-8')})
+                    buildurl(URLPATH_SEARCHVIDEOS, {'defq': album['title']})
                 )
             ),
         ]
@@ -1546,7 +1547,7 @@ def renamealbum(albumid):  # type: (int) -> None
         raise AddonError(ERR_VKAPI)
     # ask user for editing current album title
     newtitle = xbmcgui.Dialog().input(
-        ADDON.getLocalizedString(30060).encode('utf-8'),
+        ADDON.getLocalizedString(30060),
         defaultt=album['title']
     )
     if not newtitle or newtitle == album['title']:
@@ -1573,8 +1574,8 @@ def deletealbum(albumid):  # type: (int) -> None
     albumid = int(albumid)
     # ask user for confirmation
     if not xbmcgui.Dialog().yesno(
-            ADDON.getLocalizedString(30063).encode('utf-8'),
-            ADDON.getLocalizedString(30033).encode('utf-8')
+            ADDON.getLocalizedString(30063),
+            ADDON.getLocalizedString(30033)
     ):
         return
     # request vk api
@@ -1597,7 +1598,7 @@ def createalbum():  # type: () -> None
     """
     # ask user for new album title
     albumtitle = xbmcgui.Dialog().input(
-        ADDON.getLocalizedString(30064).encode('utf-8')
+        ADDON.getLocalizedString(30064)
     )
     if not albumtitle:
         return
@@ -1690,7 +1691,7 @@ def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
     if 'pagination' in listdata:
         pi = xbmcgui.ListItem(
             '[COLOR blue]{} ({}/{})[/COLOR]'.format(
-                ADDON.getLocalizedString(30034).encode('utf-8'),
+                ADDON.getLocalizedString(30034),
                 listdata['pagination']['page'] + 1,
                 listdata['pagination']['lastpage']
             )
@@ -1700,7 +1701,7 @@ def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
                 # skip to page
                 (
                     '[COLOR blue]{}[/COLOR]'.format(
-                        ADDON.getLocalizedString(30035).encode('utf-8')
+                        ADDON.getLocalizedString(30035)
                     ),
                     'RunPlugin({})'.format(
                         buildurl(
@@ -1727,7 +1728,7 @@ def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
     for item in listdata['items']:
         community = item['group'] if listtype == URLPATH_LISTLIKEDCOMMUNITIES else item
         # create community item
-        li = xbmcgui.ListItem(label=community['name'].encode('utf-8'))
+        li = xbmcgui.ListItem(label=community['name'])
         # set art
         try:
             maxthumb = [community[thumbsize] for thumbsize in thumbsizes if thumbsize in community][0]
@@ -1741,7 +1742,7 @@ def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
                 # like community
                 (
                     '[COLOR blue]{}[/COLOR]'.format(
-                        ADDON.getLocalizedString(30070).encode('utf-8')
+                        ADDON.getLocalizedString(30070)
                     ),
                     'RunPlugin({})'.format(
                         buildurl(URLPATH_LIKECOMMUNITY, {'communityid': community['id']})
@@ -1753,7 +1754,7 @@ def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
                 # unlike community
                 (
                     '[COLOR blue]{}[/COLOR]'.format(
-                        ADDON.getLocalizedString(30071).encode('utf-8')
+                        ADDON.getLocalizedString(30071)
                     ),
                     'RunPlugin({})'.format(
                         buildurl(URLPATH_UNLIKECOMMUNITY, {'communityid': community['id']})
@@ -1764,7 +1765,7 @@ def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
             # unfollow community
             (
                 '[COLOR blue]{}[/COLOR]'.format(
-                    ADDON.getLocalizedString(30072).encode('utf-8')
+                    ADDON.getLocalizedString(30072)
                 ),
                 'RunPlugin({})'.format(
                     buildurl(URLPATH_UNFOLLOWCOMMUNITY, {'communityid': community['id']})
@@ -1773,7 +1774,7 @@ def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
             # search videos
             (
                 '[COLOR blue]{}[/COLOR]'.format(
-                    ADDON.getLocalizedString(30083).encode('utf-8')
+                    ADDON.getLocalizedString(30083)
                 ),
                 'RunPlugin({})'.format(
                     buildurl(URLPATH_SEARCHVIDEOS)
@@ -1782,12 +1783,12 @@ def buildcommunitylist(listtype, listdata):  # type: (str, dict) -> None
             # search videos by similar title (community name)
             (
                 '[COLOR blue]{}[/COLOR]'.format(
-                    ADDON.getLocalizedString(30085).encode('utf-8')
+                    ADDON.getLocalizedString(30085)
                 ),
                 'RunPlugin({})'.format(
                     buildurl(
                         URLPATH_SEARCHVIDEOS,
-                        {'defq': community['name'].encode('utf-8')}
+                        {'defq': community['name']}
                     )
                 )
             ),
@@ -1873,8 +1874,8 @@ def unfollowcommunity(communityid):  # type: (int) -> None
     communityid = abs(int(communityid))  # positive id!
     # ask user for confirmation
     if not xbmcgui.Dialog().yesno(
-            ADDON.getLocalizedString(30072).encode('utf-8'),
-            ADDON.getLocalizedString(30033).encode('utf-8')
+            ADDON.getLocalizedString(30072),
+            ADDON.getLocalizedString(30033)
     ):
         return
     # request vk api
@@ -1900,6 +1901,6 @@ if __name__ == '__main__':
     except AddonError as e:
         xbmcgui.Dialog().notification(
             ADDON.getAddonInfo('name'),
-            ADDON.getLocalizedString(e.errid).encode('utf-8'),
+            ADDON.getLocalizedString(e.errid),
             icon=xbmcgui.NOTIFICATION_ERROR
         )

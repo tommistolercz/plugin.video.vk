@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## plugin.video.vk-2.0.0-dev (unreleased)
+
+Added:
+- Python 3 support (Kodi v19+)
+
 ## plugin.video.vk-1.8.0 (2021-05-16)
 
 Fixed:

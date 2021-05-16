@@ -3,7 +3,7 @@ python:
   - "2.7"
 env:
   global:
-    - TRAVIS_TAG=1.8.0
+    - TRAVIS_TAG=2.0.0-dev
     - PWD=$(pwd)
     - TESTPATH=$PWD/resources/lib/tests
     - PROFILEPATH=$PWD/tmp/addon_data
