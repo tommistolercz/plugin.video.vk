@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## plugin.video.vk-1.8.0-develop (unreleased)
+## plugin.video.vk-1.8.0 (2021-05-16)
 
 Fixed:
 - `Video['description']` key error in buildvideolist()   

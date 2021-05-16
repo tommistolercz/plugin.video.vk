@@ -17,7 +17,7 @@
 
 ## Requirements
 
-- [Kodi](https://kodi.tv) v17+
+- [Kodi](https://kodi.tv) v17 or v18 (v19 not yet supported)
 - [VK.com](https://vk.com) user account
 
 ## Installation
