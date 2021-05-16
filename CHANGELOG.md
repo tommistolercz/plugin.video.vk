@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## plugin.video.vk-1.8.0 (2021-05-16)
+
+Fixed:
+- `Video['description']` key error in buildvideolist()   
+
+Changed:
+- Changed default settings (searchsort: by relevance, preferhls: true)
+
 ## plugin.video.vk-1.7.0 (2020-02-23)
 
 Added:

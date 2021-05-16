@@ -902,7 +902,7 @@ def buildvideolist(listtype, listdata):  # type: (str, dict) -> None
             'video',
             {
                 'title': videotitle,
-                'plot': video['description'].encode('utf-8'),
+                'plot': video.get('description', '').encode('utf-8'),
                 'duration': video['duration'],
                 'date': datetime.datetime.fromtimestamp(video['date']).strftime('%d.%m.%Y'),
             }
