@@ -6,18 +6,18 @@ import datetime
 import html  # py3
 import math
 import os
-import pickle
 import re
 import sys
 import urllib.parse  # py3
 
+import requests
 import xbmc
 import xbmcaddon
 import xbmcgui
 import xbmcplugin
 
 import tinydb
-import vk
+import vk_api
 
 
 # db table names
@@ -35,7 +35,7 @@ ERR_RESOLVING = 30024
 
 # file names
 FILENAME_DB = 'db.json'
-FILENAME_SESSION = 'session.txt'
+FILENAME_SESSION = 'session.json'
 
 # content types
 CONTENTTYPE_GENERALFILES = 'files'
@@ -68,7 +68,6 @@ URLPATH_LISTSEARCHHISTORY = '/searchhistory'
 URLPATH_LISTSEARCHEDVIDEOS = '/searchedvideos'
 URLPATH_LISTVIDEOS = '/videos'
 URLPATH_LISTWATCHLIST = '/watchlist'
-URLPATH_LOGOUT = '/logout'
 URLPATH_PLAYVIDEO = '/playvideo'
 URLPATH_RENAMEALBUM = '/renamealbum'
 URLPATH_REORDERALBUM = '/reorderalbum'
@@ -79,10 +78,9 @@ URLPATH_UNLIKECOMMUNITY = '/unlikecommunity'
 URLPATH_UNLIKEVIDEO = '/unlikevideo'
 
 # vk api config
-VKAPI_APPID = '6432748'
-VKAPI_LANG = 'en'
+VKAPI_APPID = 6432748
 VKAPI_SCOPE = 'email,friends,groups,offline,stats,status,video,wall'
-VKAPI_VERSION = '5.95'
+
 
 # global vars
 ADDON = None
@@ -146,93 +144,54 @@ def initaddon():  # type: () -> xbmcaddon.Addon
     return xbmcaddon.Addon()
 
 
-def initvkauthsession():  # type: () -> vk.api.AuthSession
+def initvkauthsession():  # type: () -> vk_api.vk_api.VkApi
     """
     Initialize VK auth session.
     """
-    if not ADDON.getSetting('vkuseraccesstoken'):
-        # create a new vk auth session, ask user for vk credentials
-        login = xbmcgui.Dialog().input(
-            ADDON.getLocalizedString(30030),
-            defaultt=ADDON.getSetting('vkuserlogin')
-        )
-        pswd = xbmcgui.Dialog().input(
-            ADDON.getLocalizedString(30031),
-            defaultt=ADDON.getSetting('vkuserpswd'),
-            option=xbmcgui.ALPHANUM_HIDE_INPUT
-        )
-        if not login or not pswd:
-            xbmc.log('plugin.video.vk: VK auth error!', level=xbmc.LOGERROR)
-            raise AddonError(ERR_VKAUTH)
-        try:
-            vkauthsession = vk.api.AuthSession(VKAPI_APPID, login, pswd, VKAPI_SCOPE)
-        except vk.exceptions.VkAuthError:
-            xbmc.log('plugin.video.vk: VK auth error!', level=xbmc.LOGERROR)
-            raise AddonError(ERR_VKAUTH)
-        savesession(vkauthsession)
-        ADDON.setSetting('vkuserlogin', login)
-        ADDON.setSetting('vkuserpswd', pswd)
-        ADDON.setSetting('vkuseraccesstoken', vkauthsession.access_token)
-    else:
-        # restore vk auth session
-        vkauthsession = loadsession()
+    login = ADDON.getSetting('vkuserlogin')
+    pswd = ADDON.getSetting('vkuserpswd')
+    vkauthsession = vk_api.VkApi(
+        login=login,
+        password=pswd,
+        app_id=VKAPI_APPID,
+        scope=VKAPI_SCOPE,
+        config_filename=buildfp(FILENAME_SESSION)
+    )
+    try:
+        vkauthsession.auth()
+    except vk_api.AuthError:
+        xbmc.log('plugin.video.vk: VK auth error!', level=xbmc.LOGERROR)
+        raise AddonError(ERR_VKAUTH)
     return vkauthsession
 
 
-def initvkapi(vkauthsession=None):  # type: (vk.api.AuthSession) -> vk.api.API
+def initvkapi(vkauthsession=None):  # type: (vk_api.vk_api.VkApi) -> vk_api.vk_api.VkApiMethod
     """
     Initialize VK API.
     """
     if not vkauthsession:
         vkauthsession = initvkauthsession()
     try:
-        vkapi = vk.api.API(vkauthsession, v=VKAPI_VERSION, lang=VKAPI_LANG)
+        vkapi = vkauthsession.get_api()
         vkapi.stats.trackVisitor()
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     return vkapi
 
 
-def initvkresolver(vkauthsession=None):  # type: (vk.api.AuthSession) -> vk.utils.LoggingSession
+def initvkresolver(vkauthsession=None):  # type: (vk_api.vk_api.VkApi) -> vk_api.vk_api.requests.sessions.Session
     """
     Initialize VK video resolver.
     """
     if not vkauthsession:
         vkauthsession = initvkauthsession()
-    return vkauthsession.auth_session
-
-
-def savesession(obj):  # type: (object) -> None
-    """
-    Save session object to add-on data file.
-    """
-    fp = buildfp(FILENAME_SESSION)
-    try:
-        with open(fp, 'wb') as f:  # truncate if exists
-            pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
-    except IOError:
-        xbmc.log('plugin.video.vk: Data file error!', level=xbmc.LOGERROR)
-        raise AddonError(ERR_DATAFILE)
-
-
-def loadsession():  # type: () -> object
-    """
-    Load session object from add-on data file.
-    """
-    fp = buildfp(FILENAME_SESSION)
-    try:
-        with open(fp, 'rb') as f:  # must exist since auth
-            obj = pickle.load(f)
-    except IOError:
-        xbmc.log('plugin.video.vk: Data file error!', level=xbmc.LOGERROR)
-        raise AddonError(ERR_DATAFILE)
-    return obj
+    return vkauthsession.http
 
 
 def deletesession():  # type: () -> None
     """
-    Delete session object / add-on data file.
+    Delete session / add-on data file.
     """
     fp = buildfp(FILENAME_SESSION)
     try:
@@ -337,7 +296,7 @@ def listaddonmenu():  # type: () -> None
     vkapi = initvkapi()
     try:
         counters.update(vkapi.execute.getMenuCounters())
-    except vk.exceptions.VkAuthError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     # build menu list
@@ -473,19 +432,6 @@ def skiptopage(page, lastpage, urlpath, urlargs):  # type: (int, int, str, str) 
         'Container.Update({})'.format(
             buildurl(urlpath, urlargs.update({'offset': (int(topage) - 1) * int(ADDON.getSetting('itemsperpage'))}))
         )
-    )
-
-
-@route(URLPATH_LOGOUT)
-def logout():  # type: () -> None
-    """
-    Logout user.
-    """
-    deletesession()
-    ADDON.setSetting('vkuseraccesstoken', '')
-    xbmcgui.Dialog().notification(
-        ADDON.getAddonInfo('name'),
-        ADDON.getLocalizedString(30032)
     )
 
 
@@ -741,7 +687,7 @@ def listsearchedvideos(q, offset=0):  # type: (str, int) -> None
         kwargs['shorter'] = int(ADDON.getSetting('searchdurationmins')) * 60
     try:
         searchedvideos = vkapi.video.search(**kwargs)
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     # pagination data
@@ -796,7 +742,7 @@ def listvideos(ownerid=0, albumid=0, offset=0):  # type: (int, int, int) -> None
         kwargs['album_id'] = albumid
     try:
         videos = vkapi.video.get(**kwargs)
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     # pagination data
@@ -827,7 +773,7 @@ def listlikedvideos(offset=0):  # type: (int) -> None
             offset=offset,
             count=itemsperpage,
         )
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     # pagination data
@@ -1102,7 +1048,7 @@ def playvideo(ownerid, videoid):  # type: (int, int) -> None
     oidid = str('{}_{}'.format(ownerid, videoid))
     # resolve playable streams + find best quality
     vkr = initvkresolver()
-    r = vkr.get('https://vk.com/al_video.php?act=show_inline&al=1&video={}'.format(oidid))
+    r = vkr.get('https://vk.com/video{}'.format(oidid))
     cnt = r.text.replace('\\', '')
     resolvedpath = None
     if ADDON.getSetting('preferhls') == 'true':
@@ -1110,7 +1056,7 @@ def playvideo(ownerid, videoid):  # type: (int, int) -> None
         try:
             resolvedpath = html.unescape(
                 urllib.parse.unquote(
-                    re.compile(r'src="([^"]+video_hls\.php[^"]+)"').findall(cnt)[0]
+                    re.compile(r'"hls":"([^"]+[^"]+)"').findall(cnt)[0]
                 )
             )
         except IndexError:
@@ -1130,7 +1076,7 @@ def playvideo(ownerid, videoid):  # type: (int, int) -> None
         vkapi = initvkapi()
         try:
             video = vkapi.video.get(extended=1, videos=oidid)['items'][0]
-        except vk.exceptions.VkAPIError:
+        except vk_api.ApiError:
             xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
             raise AddonError(ERR_VKAPI)
         video.update(
@@ -1164,7 +1110,7 @@ def likevideo(ownerid, videoid):  # type: (int, int) -> None
             owner_id=ownerid,
             item_id=videoid,
         )
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     # refresh content
@@ -1186,7 +1132,7 @@ def unlikevideo(ownerid, videoid):  # type: (int, int) -> None
             owner_id=ownerid,
             item_id=videoid,
         )
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     # refresh content
@@ -1214,7 +1160,7 @@ def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
             owner_id=ownerid,
             video_id=videoid,
         )
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     # create dialog w current albums selected
@@ -1247,7 +1193,7 @@ def addvideotoalbums(ownerid, videoid):  # type: (int, int) -> None
                 video_id=videoid,
                 album_ids=newalbumids
             )
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     # refresh content
@@ -1266,7 +1212,7 @@ def addvideotowatchlist(ownerid, videoid):  # type: (int, int) -> None
     vkapi = initvkapi()
     try:
         video = vkapi.video.get(extended=1, videos=oidid)['items'].pop()
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     # store video into db
@@ -1363,7 +1309,7 @@ def listalbums(offset=0):  # type: (int) -> None
             offset=offset,
             count=itemsperpage,
         )
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     listitems = []
@@ -1523,7 +1469,7 @@ def reorderalbum(albumid, beforeid=None, afterid=None):  # type: (int, int, int)
             album_id=albumid,
             **reorder
         )
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     # refresh content
@@ -1542,7 +1488,7 @@ def renamealbum(albumid):  # type: (int) -> None
         album = vkapi.video.getAlbumById(
             album_id=albumid
         )
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     # ask user for editing current album title
@@ -1559,7 +1505,7 @@ def renamealbum(albumid):  # type: (int) -> None
             title=newtitle,
             privacy=3  # 3=onlyme
         )
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     # refresh content
@@ -1584,7 +1530,7 @@ def deletealbum(albumid):  # type: (int) -> None
         vkapi.video.deleteAlbum(
             album_id=albumid,
         )
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     # refresh content
@@ -1609,7 +1555,7 @@ def createalbum():  # type: () -> None
             title=albumtitle,
             privacy=3,  # 3=onlyme
         )
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     # refresh content
@@ -1634,7 +1580,7 @@ def listcommunities(offset=0):  # type: (int) -> None
             offset=offset,
             count=itemsperpage,
         )
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     # pagination data
@@ -1665,7 +1611,7 @@ def listlikedcommunities(offset=0):  # type: (int) -> None
             offset=offset,
             count=itemsperpage,
         )
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     # pagination data
@@ -1821,7 +1767,7 @@ def likecommunity(communityid):  # type: (int) -> None
         vkapi.fave.addGroup(
             group_id=communityid
         )
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     # refresh content
@@ -1840,7 +1786,7 @@ def unlikecommunity(communityid):  # type: (int) -> None
         vkapi.fave.removeGroup(
             group_id=communityid
         )
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     # refresh content
@@ -1859,7 +1805,7 @@ def followcommunity(communityid):  # type: (int) -> None
         vkapi.groups.join(
             group_id=communityid
         )
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     # refresh content
@@ -1884,7 +1830,7 @@ def unfollowcommunity(communityid):  # type: (int) -> None
         vkapi.groups.leave(
             group_id=communityid
         )
-    except vk.exceptions.VkAPIError:
+    except vk_api.ApiError:
         xbmc.log('plugin.video.vk: VK API error!', level=xbmc.LOGERROR)
         raise AddonError(ERR_VKAPI)
     # refresh content
