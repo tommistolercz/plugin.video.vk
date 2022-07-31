@@ -5,6 +5,13 @@
 Added:
 - Python 3 support (Kodi v19+)
 
+Changed:
+- Replaced VKAPI wrapper completely
+- Reworked vkauthsession handling
+
+Fixed:
+- Cannot play videos due video resolving error
+
 ## plugin.video.vk-1.8.0 (2021-05-16)
 
 Fixed:
