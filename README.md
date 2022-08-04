@@ -17,7 +17,7 @@
 
 ## Requirements
 
-- [Kodi](https://kodi.tv) v17 or v18 (v19 not yet supported)
+- [Kodi](https://kodi.tv) v19+
 - [VK.com](https://vk.com) user account
 
 ## Installation
@@ -52,7 +52,6 @@ Settings:
 
 Common:
 - Authorize add-on
-- Logout user
 - List add-on menu
 - Skip to page nr.
 

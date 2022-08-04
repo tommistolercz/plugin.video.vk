@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.vk" name="VK" version="1.8.0" provider-name="TomMistolerCZ">
+<addon id="plugin.video.vk" name="VK" version="2.0.0" provider-name="TomMistolerCZ">
     <requires>
-        <import addon="xbmc.python" version="2.25.0"/>
+        <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.requests" version="2.8.1"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="resources/lib/addon.py">
@@ -19,7 +19,7 @@
         <disclaimer lang="ru_RU">Автор не размещает и не распространяет содержимое, отображаемое этим плагином.</disclaimer>
         <disclaimer lang="cs_CZ">Autor doplňku se nepodílí na tvorbě či distribuci obsahu zobrazovaného tímto doplňkem.</disclaimer>
         <platform>all</platform>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, June 2007</license>
         <website>https://www.vk.com</website>
         <source>https://github.com/tommistolercz/plugin.video.vk</source>
         <assets>
@@ -29,11 +29,13 @@
             <screenshot>resources/media/screenshot03.jpg</screenshot>
         </assets>
         <news>
-Fixed:
-- `Video['description']` key error in buildvideolist()
-
 Changed:
-- Changed default settings (searchsort: by relevance, preferhls: true)
+- Migrated to py3 (Kodi v19+ required)
+- Replaced VKAPI wrapper completely
+- Reworked vkauthsession handling
+
+Fixed:
+- Cannot play videos due video resolving error
         </news>
     </extension>
 </addon>

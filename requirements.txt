@@ -3,4 +3,4 @@ pytest
 pprintpp
 requests
 
-kodistubs >= 17.6.0
+kodistubs >= 19.0.0

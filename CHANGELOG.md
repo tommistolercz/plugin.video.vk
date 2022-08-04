@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## plugin.video.vk-2.0.0 (2022-08-04)
+
+Changed:
+- Migrated to py3 (Kodi v19+ required)
+- Replaced VKAPI wrapper completely
+- Reworked vkauthsession handling
+
+Fixed:
+- Cannot play videos due video resolving error
+
 ## plugin.video.vk-1.8.0 (2021-05-16)
 
 Fixed:

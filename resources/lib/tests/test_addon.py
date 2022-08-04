@@ -44,7 +44,6 @@ MOCK_USERSETTINGS = {
     'keepplayedvideohistory': 'false',
     'vkuserlogin': VKUSER_LOGIN,
     'vkuserpswd': VKUSER_PSWD,
-    'vkuseraccesstoken': '',
 }
 
 MOCK_USERINPUTS = {
@@ -56,9 +55,9 @@ MOCK_USERINPUTS = {
 }
 
 MOCK_VIDEO = {
-    'owner_id': -152615939,
-    'id': 456239302,
-    '_oidid': '-152615939_456239302',
+    'owner_id': -193744863,
+    'id': 456239286,
+    '_oidid': '-193744863_456239286',
 }
 
 MOCK_COMMUNITY = {
@@ -155,42 +154,6 @@ def patch_parsesysargv(monkeypatch, context=addon):
 # tests -----
 
 
-def test_addonglobal(context=addon):
-    context.ADDON = context.initaddon()
-    assert context.ADDON.getAddonInfo('id') == MOCK_ADDONINFO['id']
-    assert context.ADDON.getSetting('itemsperpage') == MOCK_USERSETTINGS['itemsperpage']
-
-
-def test_initvkauthsession(context=addon):
-    context.ADDON = context.initaddon()
-    context.logout()
-    assert context.ADDON.getSetting('vkuseraccesstoken') == ''
-    # create a new vk session
-    vkauthsession = context.initvkauthsession()
-    assert context.ADDON.getSetting('vkuseraccesstoken') != ''
-    assert isinstance(vkauthsession, context.vk.api.AuthSession)
-    # restore vk auth session
-    vkauthsession_r = context.initvkauthsession()
-    assert isinstance(vkauthsession_r, context.vk.api.AuthSession)
-
-
-def test_initvkapi(context=addon):
-    context.ADDON = context.initaddon()
-    vkapi = context.initvkapi()
-    assert isinstance(vkapi, context.vk.api.API)
-
-
-def test_vkapi_video_get(context=addon):
-    context.ADDON = context.initaddon()
-    vkapi = context.initvkapi()
-    r = vkapi.video.get(
-        album_id=None,
-        videos=MOCK_VIDEO['_oidid'],
-        extended=True,
-    )
-    assert r['count'] == 1
-
-
 # general
 
 
@@ -202,11 +165,6 @@ def test_listaddonmenu(context=addon):
 
 @pytest.mark.skip()  # todo
 def test_skiptopage():
-    assert True
-
-
-@pytest.mark.skip()  # todo
-def test_logout():
     assert True
 
 
