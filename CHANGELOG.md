@@ -1,11 +1,9 @@
 # CHANGELOG
 
-## plugin.video.vk-2.0.0-dev (unreleased)
-
-Added:
-- Python 3 support (Kodi v19+)
+## plugin.video.vk-2.0.0 (2022-08-04)
 
 Changed:
+- Migrated to py3 (Kodi v19+ required)
 - Replaced VKAPI wrapper completely
 - Reworked vkauthsession handling
 

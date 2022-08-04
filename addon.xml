@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.vk" name="VK" version="2.0.0-dev" provider-name="TomMistolerCZ">
+<addon id="plugin.video.vk" name="VK" version="2.0.0" provider-name="TomMistolerCZ">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.requests" version="2.8.1"/>
@@ -29,8 +29,13 @@
             <screenshot>resources/media/screenshot03.jpg</screenshot>
         </assets>
         <news>
-Added:
-- Python 3 support (Kodi v19+)
+Changed:
+- Migrated to py3 (Kodi v19+ required)
+- Replaced VKAPI wrapper completely
+- Reworked vkauthsession handling
+
+Fixed:
+- Cannot play videos due video resolving error
         </news>
     </extension>
 </addon>
