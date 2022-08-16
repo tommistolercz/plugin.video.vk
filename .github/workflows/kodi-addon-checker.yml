@@ -1,29 +1,27 @@
 name:
-  Kodi Addon-Checker
+  Kodi addon checker
 
 on:
   workflow_dispatch:
 
 jobs:
-  kodi-addon-checker:
-    name: Kodi Addon-Checker
+  kodi-addon-checker
+    name: Kodi addon checker
     runs-on: ubuntu-latest
     steps:
 
-    - name: Checkout
+    - name: Checkout repo
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
 
-    - name: Setup Python
+    - name: Setup python
       uses: actions/setup-python@v2
       with:
         python-version: '3.x'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip3 install --user kodi-addon-checker
+    - name: Install checker
+      run: pip3 install --user kodi-addon-checker
 
     - name: Run checker
-      run: $HOME/.local/bin/kodi-addon-checker
+      run: $HOME/.local/bin/kodi-addon-checker --branch=matrix
