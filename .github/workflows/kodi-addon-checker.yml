@@ -1,0 +1,36 @@
+name: Kodi addon checker
+
+# Checks Kodi add-on repository for best practices and creates problem and warning reports.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  kodi-addon-checker:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout repo
+      uses: actions/checkout@v3
+      with:
+        ref: 'dev'
+        fetch-depth: 0
+
+    - name: Setup python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+
+    - name: Install checker
+      run: pip3 install --user kodi-addon-checker
+
+    - name: Debug info
+      run: |
+        echo "GITHUB_REF_NAME: $GITHUB_REF_NAME"
+        echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+        pwd
+        ls -al
+        which kodi-addon-checker
+
+    #- name: Run checker
+    #  run: kodi-addon-checker --branch=matrix
