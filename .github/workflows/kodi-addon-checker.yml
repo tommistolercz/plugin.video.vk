@@ -1,0 +1,37 @@
+# This workflow checks Kodi addon repository using kodi-addon-checker tool (https://github.com/xbmc/addon-check)
+name: Kodi addon checker
+
+on:
+  workflow_dispatch:
+  
+jobs:
+  kodi-addon-checker:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Check out branch
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.ref_name }}
+        fetch-depth: 0
+
+    - name: Clean up non-package files
+      shell: bash
+      run: |
+        find . -name '.git' -type d -exec rm -rf {} +
+        find . -name '.github' -type d -exec rm -rf {} +
+        find . -name '.idea' -type d -exec rm -rf {} +
+        find . -name 'tests' -type d -exec rm -rf {} +
+        find . -name '.gitignore' -type f -exec rm -rf {} +
+        find . -name 'requirements.txt' -type f -exec rm -rf {} +
+
+    - name: Setup python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.8
+
+    - name: Install checker
+      run: pip3 install --user kodi-addon-checker
+
+    - name: Run checker
+      run: kodi-addon-checker --branch=matrix
