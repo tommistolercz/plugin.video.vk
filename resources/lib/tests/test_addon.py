@@ -132,6 +132,13 @@ def patch_xbmcgui(monkeypatch, context=addon):
     monkeypatch.setattr(context, 'xbmcgui', mock_xbmcgui)
 
 
+# patch addon.xbmcvfs module
+@pytest.fixture(autouse=True)
+def patch_xbmcvfs(monkeypatch, context=addon):
+    mock_xbmcvfs = mock.Mock(name='xbmcvfs')
+    monkeypatch.setattr(context, 'xbmcvfs', mock_xbmcvfs)
+
+
 # patch addon.buildfp()
 @pytest.fixture(autouse=True)
 def patch_buildfp(monkeypatch, context=addon):

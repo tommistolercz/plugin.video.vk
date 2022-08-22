@@ -14,6 +14,7 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 import xbmcplugin
+import xbmcvfs
 
 import tinydb
 import vk_api
@@ -186,7 +187,7 @@ def buildfp(filename):  # type: (str) -> str
     """
     Build add-on data file path.
     """
-    fp = str(os.path.join(xbmc.translatePath(ADDON.getAddonInfo('profile')), filename))
+    fp = str(os.path.join(xbmcvfs.translatePath(ADDON.getAddonInfo('profile')), filename))
     return fp
 
 

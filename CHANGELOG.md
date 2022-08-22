@@ -2,6 +2,8 @@
 
 ## plugin.video.vk-2.0.1-dev (unreleased)
 
+Changed:
+- Replaced xbmc.translatePath() (deprecated) with xbmcvfs.translatePath()
 
 ## plugin.video.vk-2.0.0 (2022-08-04)
 
