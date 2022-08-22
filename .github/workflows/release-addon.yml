@@ -5,8 +5,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  publish-addon:
-    name: Publish addon
+  release-addon:
+    name: Release addon
     runs-on: ubuntu-latest
     steps:
     
