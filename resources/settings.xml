@@ -1,23 +1,114 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?> 
-<settings>
-    <category label="30000">
-        <setting label="30002" id="itemsperpage" type="slider" option="int" range="100,50,200" default="100"/>
-        <setting label="30003" id="forcevideoviewmode" type="bool" default="true"/>
-            <setting label="30004" id="forcevideoviewmodeid" type="number" default="500" subsetting="true" visible="eq(-1,true)"/>
-        <setting type="sep"/>
-        <setting label="30005" id="searchadult" type="bool" default="true"/>
-        <setting label="30006" id="searchown" type="bool" default="false"/>
-        <setting label="30007" id="searchduration" type="enum" lvalues="30008|30009|30010" default="0"/>
-            <setting label="30011" id="searchdurationmins" type="number" default="60" subsetting="true" visible="!eq(-1,0)"/>
-        <setting label="30012" id="searchsort" type="enum" lvalues="30013|30014|30015" default="2"/>
-        <setting type="sep"/>
-        <setting label="30090" id="preferhls" type="bool" default="true"/>
-        <setting type="sep"/>
-        <setting label="30018" id="keepaddonrequesthistory" type="bool" default="false" visible="false"/>
-        <setting label="30019" id="keepplayedvideohistory" type="bool" default="false"/>
-    </category>
-    <category label="30001">
-        <setting label="30030" id="vkuserlogin" type="text" default=""/>
-        <setting label="30031" id="vkuserpswd" type="text" default="" option="hidden"/>
-    </category>
+<?xml version="1.0" ?>
+<settings version="1">
+    <section id="plugin.video.vk">
+        <category id="general" label="30000">
+            <group id="1">
+                <setting id="itemsperpage" type="integer" label="30002">
+                    <control type="slider" format="integer">
+		                <popup>false</popup>
+	                </control>
+                    <constraints>
+		                <minimum>100</minimum>
+		                <step>50</step>
+		                <maximum>200</maximum>
+	                </constraints>
+                    <default>100</default>
+                </setting>
+                <setting id="forcevideoviewmode" type="boolean" label="30003">
+                    <control type="toggle"/>
+                    <default>true</default>
+                </setting>
+                <setting id="forcevideoviewmodeid" type="integer" label="30004" parent="forcevideoviewmode">
+                    <control type="edit" format="integer">
+		                <heading>30004</heading>
+	                </control>
+                    <dependencies>
+	                    <dependency type="visible" setting="forcevideoviewmode">true</dependency>
+                    </dependencies>
+                    <default>500</default>
+                </setting>
+            </group>
+            <group id="2">
+                <setting id="searchadult" type="boolean" label="30005">
+                    <control type="toggle"/>
+                    <default>true</default>
+                </setting>
+                <setting id="searchown" type="boolean" label="30006">
+                    <control type="toggle"/>
+                    <default>false</default>
+                </setting>
+                <setting id="searchduration" type="integer" label="30007">
+                    <control type="spinner" format="string"/>
+                    <constraints>
+                        <options>
+                            <option label="30008">0</option>
+                            <option label="30009">1</option>
+                            <option label="30010">2</option>
+                        </options>
+	                </constraints>
+                    <default>0</default>
+                </setting>
+                <setting id="searchdurationmins" type="integer" label="30011" parent="searchduration">
+                    <control type="edit" format="integer">
+		                <heading>30011</heading>
+	                </control>
+                    <dependencies>
+	                    <dependency type="visible" setting="searchduration" operator="!is">0</dependency>
+                    </dependencies>
+                    <default>60</default>
+                </setting>
+                <setting id="searchsort" type="integer" label="30012">
+                    <control type="spinner" format="string"/>
+                    <constraints>
+                        <options>
+                            <option label="30013">0</option>
+                            <option label="30014">1</option>
+                            <option label="30015">2</option>
+                        </options>
+	                </constraints>
+                    <default>2</default>
+                </setting>
+            </group>
+            <group id="3">
+                <setting id="preferhls" type="boolean" label="30090">
+                    <control type="toggle"/>
+                    <default>true</default>
+                </setting>
+            </group>
+            <group id="4">
+                <setting id="keepaddonrequesthistory" type="boolean" label="30018">
+                    <control type="toggle"/>
+                    <default>false</default>
+                    <level>4</level>
+                </setting>
+                <setting id="keepplayedvideohistory" type="boolean" label="30019">
+                    <control type="toggle"/>
+                    <default>false</default>
+                </setting>
+            </group>
+        </category>
+        <category id="user" label="30001">
+            <group id="5">
+                <setting id="vkuserlogin" type="string" label="30030">
+                    <control type="edit" format="string">
+                        <heading>30030</heading>
+                    </control>
+                    <constraints>
+		                <allowempty>true</allowempty>
+	                </constraints>
+                    <default/>
+                </setting>
+                <setting id="vkuserpswd" type="string" label="30031">
+                    <control type="edit" format="string">
+                        <heading>30031</heading>
+                        <hidden>true</hidden>
+                    </control>
+                    <constraints>
+		                <allowempty>true</allowempty>
+	                </constraints>
+                    <default/>
+                </setting>
+            </group>
+        </category>
+    </section>
 </settings>
