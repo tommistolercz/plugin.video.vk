@@ -51,7 +51,7 @@ jobs:
       shell: bash
       run: |
         TAG_NAME="v${{ env.ADDON_VERSION }}"
-        RELEASE_NAME="${TAG_NAME} (`date -I date`)"        
+        RELEASE_NAME="${TAG_NAME} (`date +%Y-%m-%d`)"
         echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
         echo "RELEASE_NAME=${RELEASE_NAME}" >> $GITHUB_ENV
       # todo: what if tag already exists? (Get a release by tag name
