@@ -4,12 +4,11 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/resources/lib" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/resources/lib/tinydb" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/resources/lib/tests" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/resources/lib/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/resources" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/resources/lib/jconfig" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/resources/lib/vk_api" isTestSource="false" />
-      <excludeFolder url="file://$MODULE_DIR$/venv" />
-      <excludeFolder url="file://$MODULE_DIR$/resources/lib/tests/.pytest_cache" />
+      <excludeFolder url="file://$MODULE_DIR$/.venv" />
     </content>
     <content url="file://$MODULE_DIR$/../../userdata/addon_data/plugin.video.vk" />
     <orderEntry type="jdk" jdkName="Python 3.8 (plugin.video.vk)" jdkType="Python SDK" />

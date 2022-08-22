@@ -2,5 +2,6 @@
 *.pyo
 *.log
 .idea/workspace.xml
+.venv/
 .pytest_cache/
 /addon_data/
