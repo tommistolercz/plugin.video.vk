@@ -10,7 +10,6 @@ import re
 import sys
 import urllib.parse  # py3
 
-import requests
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -115,23 +114,6 @@ class KodiList(object):
         xbmcplugin.addSortMethod(sysargv['handle'], self.sortmethod)
         xbmcplugin.addDirectoryItems(sysargv['handle'], self.items, len(self.items))
         xbmcplugin.endOfDirectory(sysargv['handle'])
-
-
-class PaginableKodiList(KodiList):  # todo
-    """
-    Paginable list class.
-    """
-
-    def __init__(self, **kwargs):  # type: (dict) -> None
-        super(PaginableKodiList, self).__init__(**kwargs)
-        self.nextpagenr = kwargs.get('nextpagenr')
-        self.lastpagenr = kwargs.get('lastpagenr')
-
-    def buildlist(self):  # type: () -> None
-        super(PaginableKodiList, self).buildlist()
-
-    def nextpage(self):  # type: () -> None
-        pass
 
 
 # -----

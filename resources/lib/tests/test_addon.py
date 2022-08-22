@@ -1,12 +1,14 @@
 # coding=utf-8
 
-import mock
 import os
+
+import mock
 import pytest
+
 import addon  # test target
 
 
-# env vars (set in IDE for local debug and in travis.yml for CI)
+# env vars (set in IDE for local debug)
 PROFILEPATH = os.environ.get('PROFILEPATH')
 VKUSER_LOGIN = os.environ.get('VKUSER_LOGIN')
 VKUSER_PSWD = os.environ.get('VKUSER_PSWD')
