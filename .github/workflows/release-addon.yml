@@ -1,5 +1,5 @@
-# This workflow publishes addon when there is a new version available.
-name: Publish addon
+# This workflow releases addon when there is a new version available.
+name: Release addon
 
 on:
   workflow_dispatch:
@@ -26,7 +26,7 @@ jobs:
         find . -name '.gitignore' -type f -exec rm -rf {} +
         find . -name 'requirements.txt' -type f -exec rm -rf {} +
 
-    - name: Find out addon id/version
+    - name: Parse addon id/version
       shell: bash
       run: |
         XMLTAG=`grep -e "<addon" ./addon.xml`
@@ -36,17 +36,6 @@ jobs:
             echo "ADDON_VERSION=${BASH_REMATCH[2]}" >> $GITHUB_ENV
         fi
 
-    - name: Create addon zip package
-      shell: bash
-      run: |
-        cd ..
-        PACKAGE_NAME="${{ env.ADDON_ID }}-${{ env.ADDON_VERSION }}.zip"
-        PACKAGE_PATH="./${PACKAGE_NAME}"
-        DIR="./${{ env.ADDON_ID }}/"
-        zip -r -v "${PACKAGE_PATH}" "${DIR}"
-        echo "PACKAGE_NAME=${PACKAGE_NAME}" >> $GITHUB_ENV
-        echo "PACKAGE_PATH=${PACKAGE_PATH}" >> $GITHUB_ENV
-
     - name: Set up release
       shell: bash
       run: |
@@ -54,8 +43,11 @@ jobs:
         RELEASE_NAME="${TAG_NAME} (`date +%Y-%m-%d`)"
         echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
         echo "RELEASE_NAME=${RELEASE_NAME}" >> $GITHUB_ENV
-      # todo: what if tag already exists? (Get a release by tag name
-
+        if [[ -n "$(git tag -l '${TAG_NAME}')" ]]; then
+          echo "Cancelling... version already released!"
+          exit 1
+        fi
+        
     - name: Create release
       id: create-release
       uses: actions/create-release@v1
@@ -66,6 +58,17 @@ jobs:
           release_name: ${{ env.RELEASE_NAME }}
           draft: true  # todo: debug only
 
+    - name: Create addon zip package
+      shell: bash
+      run: |
+        cd ..
+        PACKAGE_NAME="${{ env.ADDON_ID }}-${{ env.ADDON_VERSION }}.zip"
+        PACKAGE_PATH="`pwd`/${PACKAGE_NAME}"
+        DIR="${{ env.ADDON_ID }}/"
+        zip -r -v "./${PACKAGE_NAME}" "./${DIR}"
+        echo "PACKAGE_NAME=${PACKAGE_NAME}" >> $GITHUB_ENV
+        echo "PACKAGE_PATH=${PACKAGE_PATH}" >> $GITHUB_ENV
+
     - name: Attach addon zip package to release
       uses: actions/upload-release-asset@v1
       env:
@@ -75,5 +78,3 @@ jobs:
           asset_content_type: application/zip
           asset_name: ${{ env.PACKAGE_NAME }}
           asset_path: ${{ env.PACKAGE_PATH }}
-
-      # todo: deploy addon to repository.tommistolercz
