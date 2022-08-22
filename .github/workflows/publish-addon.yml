@@ -5,7 +5,6 @@ on:
   workflow_dispatch:
 
 jobs:
-
   publish-addon:
     name: Publish addon
     runs-on: ubuntu-latest
@@ -48,14 +47,14 @@ jobs:
         echo "PACKAGE_NAME=${PACKAGE_NAME}" >> $GITHUB_ENV
         echo "PACKAGE_PATH=${PACKAGE_PATH}" >> $GITHUB_ENV
 
-    - name: Set release vars
+    - name: Set up release
       shell: bash
       run: |
-        TAG_NAME="v2.0.1"
-        RELEASE_DATE="2022-08-21"
-        RELEASE_NAME="${TAG_NAME} (${RELEASE_DATE})"        
+        TAG_NAME="v${{ env.ADDON_VERSION }}"
+        RELEASE_NAME="${TAG_NAME} (`date -I date`)"        
         echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
         echo "RELEASE_NAME=${RELEASE_NAME}" >> $GITHUB_ENV
+      # todo: what if tag already exists? (Get a release by tag name
 
     - name: Create release
       id: create-release
@@ -65,9 +64,9 @@ jobs:
       with:
           tag_name: ${{ env.TAG_NAME }}
           release_name: ${{ env.RELEASE_NAME }}
-          draft: true
+          draft: true  # todo: debug only
 
-    - name: Upload release asset
+    - name: Attach addon zip package to release
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -76,3 +75,5 @@ jobs:
           asset_content_type: application/zip
           asset_name: ${{ env.PACKAGE_NAME }}
           asset_path: ${{ env.PACKAGE_PATH }}
+
+      # todo: deploy addon to repository.tommistolercz
